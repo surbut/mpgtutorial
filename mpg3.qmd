@@ -1,6 +1,6 @@
 ---
 title: "A Practical Primer on Bayesian Statistics for Population Genomics"
-author: "Instructor's Name"
+author: "Sarah Urbut"
 date: "March 29, 2025"
 format: 
   revealjs:
