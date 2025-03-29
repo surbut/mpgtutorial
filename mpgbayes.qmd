@@ -1,0 +1,1010 @@
+---
+title: "Bayesian Statistics in Population Genomics"
+subtitle: "From P-values to Posterior Probabilities"
+author: "Sarah Urbut, MD PhD"
+format:
+  revealjs:
+    theme: simple
+    transition: fade
+    slide-number: true
+    code-fold: true
+editor: visual
+execute:
+  echo: true
+  warning: false
+---
+
+## Overview
+
+In this primer, we'll explore key Bayesian concepts critical for modern genomics:
+
+1.  **P-values vs. Posterior Probabilities**: Why Bayesian thinking helps avoid misinterpretations
+2.  **Conjugate Models**: Elegant solutions for population genetic inference
+3.  **Mixture Models**: Powerful tools for complex genomic data
+4.  **Bayesian Clinical & Adaptive Designs**: Learning and adapting as data accumulates
+
+------------------------------------------------------------------------
+
+# P-values vs. Posterior Probabilities
+
+## The Fallacy of P-values
+
+::: incremental
+-   P-values answer a **counterfactual question**: "If there were no effect, how surprising would these data be?"
+
+-   But researchers want to know: "**What is the probability this association is real?**"
+
+-   This disconnect leads to systematic misinterpretation
+:::
+
+## A GWAS Example
+
+::::: columns
+::: {.column width="50%"}
+**Same evidence, different conclusions:**
+
+-   SNP with p = 1 × 10⁻⁵ in GWAS
+
+-   Traditional: "Nearly significant!"
+
+-   Bayesian: "Probably a false positive"
+
+**Why the difference?**
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-width: 6
+#| fig-height: 5
+library(ggplot2)
+library(dplyr)
+
+# Function to calculate posterior probability
+calc_posterior <- function(prior, p_value, n_snps=1e6) {
+  # Convert p-value to z-score
+  z <- qnorm(p_value/2, lower.tail = FALSE)
+  # Approximate Bayes factor
+  bf <- exp(z^2/2)
+  # Calculate posterior
+  posterior <- (prior * bf) / (prior * bf + (1 - prior))
+  return(posterior)
+}
+
+# Create data
+p_values <- 10^seq(-8, -2, 0.5)
+posteriors <- sapply(p_values, function(p) calc_posterior(1/10000, p))
+
+# Create plot
+df <- data.frame(
+  p_value = p_values,
+  posterior = posteriors
+)
+
+ggplot(df, aes(x = -log10(p_value), y = posterior)) +
+  geom_line(size = 1.5, color = "blue") +
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "red") +
+  geom_vline(xintercept = -log10(5e-8), linetype = "dashed", color = "red") +
+  annotate("text", x = 8, y = 0.2, label = "GWAS\nsignificance", color = "red") +
+  annotate("text", x = 4, y = 0.55, label = "50% posterior\nprobability", color = "red") +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "P-value vs. Posterior Probability",
+    subtitle = "Prior probability = 1/10,000",
+    x = "-log10(p-value)",
+    y = "Posterior probability of association"
+  )
+```
+:::
+:::::
+
+## Bayes' Rule Explained {.smaller}
+
+$$ P(H|D) = \frac{P(D|H) \times P(H)}{P(D)} $$
+
+In GWAS context:
+
+$$ P(\text{Real association}|\text{Data}) = \frac{P(\text{Data}|\text{Real association}) \times P(\text{Real association})}{P(\text{Data})} $$
+
+::: incremental
+-   The **prior probability** matters tremendously:
+    -   **Rare diseases**: Stronger priors for genes in relevant pathways
+    -   **Common traits**: Most variants have tiny or no effects
+    -   **eQTLs**: Higher prior near transcription start sites
+:::
+
+## Effect of Different Priors {.smaller}
+
+```{r}
+#| fig-width: 10
+#| fig-height: 6
+# Calculate posteriors for different priors
+priors <- c(1/1000, 1/10000, 1/100000)
+prior_labels <- c("Strong prior (1/1,000)", 
+                 "Moderate prior (1/10,000)", 
+                 "Weak prior (1/100,000)")
+
+results <- data.frame()
+for (i in 1:length(priors)) {
+  posteriors <- sapply(p_values, function(p) calc_posterior(priors[i], p))
+  results <- rbind(results, data.frame(
+    p_value = p_values,
+    posterior = posteriors,
+    prior = prior_labels[i]
+  ))
+}
+
+# Create plot
+ggplot(results, aes(x = -log10(p_value), y = posterior, color = prior)) +
+  geom_line(size = 1.5) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = -log10(5e-8), linetype = "dashed", color = "black") +
+  theme_minimal(base_size = 14) +
+  scale_color_brewer(palette = "Set1") +
+  labs(
+    title = "Effect of Prior Probabilities on Posterior Inference",
+    x = "-log10(p-value)",
+    y = "Posterior probability of association",
+    color = "Prior probability"
+  )
+```
+
+::: fragment
+**Key insight**: In genomics, informative priors come from: - Functional annotations (coding, regulatory, etc.) - Evolutionary conservation - Previous studies in related traits
+:::
+
+## Likelihood Ratios: The Bridge {.smaller}
+
+The likelihood ratio (LR) directly quantifies evidence:
+
+$$ LR = \frac{P(D|H_1)}{P(D|H_0)} $$
+
+::::: columns
+::: {.column width="50%"}
+**Jeffreys' scale for LR:**
+
+| LR     | Evidence                |
+|--------|-------------------------|
+| 1-3    | Barely worth mentioning |
+| 3-10   | Substantial             |
+| 10-30  | Strong                  |
+| 30-100 | Very strong             |
+| \>100  | Decisive                |
+:::
+
+::: {.column width="50%"}
+**Converting p-values to LR:**
+
+```{r}
+p_vals <- c(0.05, 0.01, 0.001, 1e-5, 1e-8)
+z_scores <- qnorm(p_vals/2, lower.tail = FALSE)
+approx_lr <- exp(z_scores^2/2)
+
+data.frame(
+  p_value = p_vals,
+  approx_LR = round(approx_lr, 1)
+) %>%
+  knitr::kable()
+```
+:::
+:::::
+
+::: fragment
+**Advantage**: LR is independent of priors, providing a direct measure of evidence strength
+:::
+
+------------------------------------------------------------------------
+
+# Conjugate Models in Population Genomics
+
+## Conjugate Distributions: Why They Matter {.smaller}
+
+::: incremental
+-   **Conjugate prior**: When prior and posterior come from the same family of distributions
+
+-   **Why important in genomics**:
+
+    -   Analytically tractable (closed-form solutions)
+    -   Intuitive interpretation of parameters
+    -   Computational efficiency for large-scale analyses
+    -   Natural way to incorporate previous knowledge
+:::
+
+## Beta-Binomial: The Population Geneticist's Friend {.smaller}
+
+::::: columns
+::: {.column width="50%"}
+**The model:** - **Prior**: Beta(α, β) for allele frequency - **Data**: Binomial sampling (observed alleles) - **Posterior**: Beta(α + counts, β + non-counts)
+
+**Perfect for:** - Allele frequency estimation - Mutation rate estimation - Selection coefficient inference
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 5
+# Function to plot Beta distributions
+plot_beta <- function(alpha, beta, label) {
+  x <- seq(0, 1, length.out = 500)
+  y <- dbeta(x, alpha, beta)
+  data.frame(x = x, y = y, distribution = label)
+}
+
+# Create example data
+prior_data <- plot_beta(1, 1, "Prior: Beta(1,1)")
+likelihood_data <- data.frame(
+  x = seq(0, 1, length.out = 500),
+  y = dbinom(70, 100, seq(0, 1, length.out = 500)),
+  distribution = "Likelihood: 70/100 reference alleles"
+)
+likelihood_data$y <- likelihood_data$y / max(likelihood_data$y) * max(prior_data$y) * 0.8
+posterior_data <- plot_beta(1+70, 1+30, "Posterior: Beta(71,31)")
+
+# Combine data
+plot_data <- rbind(prior_data, posterior_data)
+
+# Create plot
+ggplot() +
+  geom_line(data = plot_data, aes(x = x, y = y, color = distribution), size = 1.5) +
+  geom_line(data = likelihood_data, aes(x = x, y = y, color = distribution), 
+            size = 1.5, linetype = "dashed") +
+  theme_minimal(base_size = 14) +
+  scale_color_manual(values = c("blue", "red", "darkgreen")) +
+  labs(
+    title = "Beta-Binomial Conjugacy",
+    x = "Allele Frequency",
+    y = "Density",
+    color = ""
+  )
+```
+:::
+:::::
+
+## Beta-Binomial as "Pseudo-counts" {.smaller}
+
+The Beta prior parameters (α, β) can be interpreted as **pseudo-counts**:
+
+-   **Beta(1, 1)**: Uniform prior (no pseudo-counts)
+-   **Beta(0.5, 0.5)**: Jeffreys prior (favors extremes)
+-   **Beta(10, 30)**: Strong prior centered at 0.25
+
+::: fragment
+**In practice**: α and β represent "prior observations"
+
+For a sample with 20 A alleles and 30 B alleles: - With Beta(1, 1) prior: Posterior is Beta(21, 31) - Estimate = 21/(21+31) = 0.404 (close to data)
+
+-   With Beta(10, 30) prior: Posterior is Beta(30, 60)
+-   Estimate = 30/(30+60) = 0.333 (pulled toward prior)
+:::
+
+## Conjugate Priors in STRUCTURE {.smaller}
+
+STRUCTURE uses Dirichlet-Multinomial conjugacy:
+
+::: incremental
+1.  **For each population k and locus j**:
+    -   Prior on allele frequencies: Dirichlet(α₁, α₂, ..., αᵦ)
+    -   Data: Observed allele counts in that population
+    -   Posterior: Updated Dirichlet with added counts
+2.  **For each individual i**:
+    -   Prior on population membership: Dirichlet(λ₁, λ₂, ..., λₖ)
+    -   Data: Genotype information across loci
+    -   Posterior: Updated admixture proportions
+:::
+
+::: fragment
+**Why conjugacy matters**: Enables efficient Gibbs sampling in the MCMC algorithm - essential for making STRUCTURE computationally feasible
+:::
+
+## Dirichlet Prior Parameters Matter {.smaller}
+
+::::: columns
+::: {.column width="60%"}
+```{r}
+#| fig-height: 5.5
+library(tidyr)
+
+# Function to sample from a Dirichlet distribution
+rdirichlet <- function(n, alpha) {
+  k <- length(alpha)
+  r <- matrix(rgamma(n*k, shape=alpha, rate=1), ncol=k, byrow=TRUE)
+  r <- r / rowSums(r)
+  return(r)
+}
+
+# Sample from different Dirichlet priors
+set.seed(123)
+n_samples <- 1000
+
+# Very small alpha (sparse)
+alpha_small <- c(0.1, 0.1, 0.1)  
+samples_small <- rdirichlet(n_samples, alpha_small)
+
+# Unity alpha (uniform)
+alpha_unity <- c(1, 1, 1)
+samples_unity <- rdirichlet(n_samples, alpha_unity)
+
+# Large alpha (concentrated)
+alpha_large <- c(10, 10, 10) 
+samples_large <- rdirichlet(n_samples, alpha_large)
+
+# Create data frames
+df_small <- as.data.frame(samples_small)
+df_small$prior <- "Sparse: Dirichlet(0.1,0.1,0.1)"
+names(df_small)[1:3] <- c("Pop1", "Pop2", "Pop3")
+
+df_unity <- as.data.frame(samples_unity)
+df_unity$prior <- "Uniform: Dirichlet(1,1,1)"
+names(df_unity)[1:3] <- c("Pop1", "Pop2", "Pop3")
+
+df_large <- as.data.frame(samples_large)
+df_large$prior <- "Concentrated: Dirichlet(10,10,10)"
+names(df_large)[1:3] <- c("Pop1", "Pop2", "Pop3")
+
+# Combine data
+df_all <- rbind(df_small, df_unity, df_large)
+
+# Convert to long format for ggplot
+df_long <- df_all %>%
+  pivot_longer(cols = c("Pop1", "Pop2", "Pop3"), 
+               names_to = "Population", 
+               values_to = "Proportion")
+
+# Create ggplot
+ggplot(df_long, aes(x = Proportion, fill = Population)) +
+  geom_density(alpha = 0.6) +
+  facet_wrap(~ prior, ncol = 1) +
+  theme_minimal(base_size = 12) +
+  labs(
+    title = "Effect of Dirichlet Prior Parameters",
+    x = "Population Proportion",
+    y = "Density"
+  ) +
+  scale_fill_brewer(palette = "Set2")
+```
+:::
+
+::: {.column width="40%"}
+**Interpreting the priors**:
+
+-   **Sparse prior**: Favors solutions where each individual belongs to mostly one population
+
+-   **Uniform prior**: No preference for admixture level
+
+-   **Concentrated prior**: Favors solutions where individuals have similar proportions of each ancestry
+
+**In STRUCTURE**: - For population allele frequencies, typically use small α (0.1-1) - For admixture proportions, λ controls expected admixture level
+:::
+:::::
+
+------------------------------------------------------------------------
+
+# Mixture Models in Genomics
+
+## Mixture Models: The Concept {.smaller}
+
+A mixture model assumes data comes from multiple distinct distributions:
+
+$$ p(x) = \sum_{k=1}^K \pi_k f_k(x|\theta_k) $$
+
+Where: - $\pi_k$ are the mixing weights ($\sum \pi_k = 1$) - $f_k$ are the component distributions - $\theta_k$ are the parameters of each component
+
+::: fragment
+**Key genomic applications**: - Cell type deconvolution - Population structure (STRUCTURE) - Gene expression clustering - QTL effect sharing across tissues (mash)
+:::
+
+## EM Algorithm: The Workhorse {.smaller}
+
+::::: columns
+::: {.column width="60%"}
+The EM algorithm iteratively:
+
+1.  **E-step**: Calculate responsibilities (posterior probability each data point comes from each component) $$\gamma_{ik} = \frac{\pi_k f_k(x_i|\theta_k)}{\sum_j \pi_j f_j(x_i|\theta_j)}$$
+
+2.  **M-step**: Update parameters using weighted data $$\pi_k^{new} = \frac{1}{n}\sum_{i=1}^n \gamma_{ik}$$ $$\theta_k^{new} = \arg\max_{\theta_k} \sum_{i=1}^n \gamma_{ik} \log f_k(x_i|\theta_k)$$
+:::
+
+::: {.column width="40%"}
+```{r}
+#| fig-height: 5
+# Simulate data from a mixture of two normal distributions
+set.seed(123)
+n <- 500
+z <- rbinom(n, 1, 0.6)  # Component memberships
+x <- ifelse(z == 0, rnorm(n, -2, 0.7), rnorm(n, 2, 1))
+
+# Create plot data
+hist_data <- data.frame(x = x)
+
+# Create plot
+ggplot(hist_data, aes(x = x)) +
+  geom_histogram(aes(y = after_stat(density)), 
+                 bins = 30, 
+                 fill = "lightblue", 
+                 color = "black", 
+                 alpha = 0.7) +
+  stat_function(fun = function(x) 0.6 * dnorm(x, 2, 1), 
+                aes(color = "Component 1"), 
+                size = 1.2) +
+  stat_function(fun = function(x) 0.4 * dnorm(x, -2, 0.7), 
+                aes(color = "Component 2"), 
+                size = 1.2) +
+  stat_function(fun = function(x) 0.6 * dnorm(x, 2, 1) + 0.4 * dnorm(x, -2, 0.7), 
+                aes(color = "Mixture"), 
+                size = 1.5) +
+  theme_minimal(base_size = 12) +
+  scale_color_manual(values = c("Component 1" = "red", 
+                              "Component 2" = "blue", 
+                              "Mixture" = "purple")) +
+  labs(
+    title = "Gaussian Mixture Model",
+    x = "Value",
+    y = "Density",
+    color = ""
+  )
+```
+:::
+:::::
+
+## Cell Type Deconvolution Example {.smaller}
+
+::::: columns
+::: {.column width="50%"}
+**Problem**: Tissue samples contain multiple cell types
+
+**Mixture model interpretation**: - Each cell type has a distinct expression profile - Observed expression is a weighted sum of profiles - Weights = cell type proportions
+
+**Components**: - $f_k(x|\theta_k)$ = Expression profile of cell type k - $\pi_k$ = Proportion of cell type k in sample
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 6
+# Simulate gene expression data for deconvolution
+set.seed(123)
+n_genes <- 500
+n_cell_types <- 3
+n_samples <- 50
+
+# True cell type proportions for each sample
+cell_props <- matrix(runif(n_samples * n_cell_types), ncol = n_cell_types)
+cell_props <- cell_props / rowSums(cell_props)
+colnames(cell_props) <- c("CellType1", "CellType2", "CellType3")
+
+# True expression profiles for each cell type
+cell_profiles <- matrix(rnorm(n_genes * n_cell_types, mean = 5, sd = 1), 
+                        nrow = n_genes)
+# Make some genes specific to cell types
+cell_profiles[1:50, 1] <- cell_profiles[1:50, 1] + 3  # Cell type 1 markers
+cell_profiles[51:100, 2] <- cell_profiles[51:100, 2] + 3  # Cell type 2 markers
+cell_profiles[101:150, 3] <- cell_profiles[101:150, 3] + 3  # Cell type 3 markers
+
+# Generate mixed samples
+mixed_expression <- matrix(0, nrow = n_genes, ncol = n_samples)
+for (i in 1:n_samples) {
+  mixed_expression[, i] <- cell_profiles %*% cell_props[i, ] + 
+                           rnorm(n_genes, 0, 0.1)  # Add noise
+}
+
+# Create heatmap data
+example_genes <- c(25, 75, 125)  # Marker genes for each cell type
+example_data <- data.frame(
+  Gene = rep(paste0("Gene", example_genes), each = n_samples),
+  Sample = rep(1:n_samples, times = length(example_genes)),
+  Expression = c(mixed_expression[example_genes[1], ],
+                mixed_expression[example_genes[2], ],
+                mixed_expression[example_genes[3], ])
+)
+
+# Add cell type proportions to the data
+for (i in 1:n_cell_types) {
+  example_data[[paste0("Prop", i)]] <- rep(cell_props[, i], times = length(example_genes))
+}
+
+# Create plot
+ggplot(example_data, aes(x = Sample, y = Expression, color = Gene)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_line(size = 1, alpha = 0.5) +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x = element_blank()) +
+  labs(
+    title = "Gene Expression in Mixed Tissue Samples",
+    subtitle = "Expression correlates with cell type proportions",
+    x = "Samples",
+    y = "Expression Level"
+  ) +
+  scale_color_brewer(palette = "Set1") +
+  facet_wrap(~ Gene, ncol = 1)
+```
+:::
+:::::
+
+## Mixture Models: mash Approach {.smaller}
+
+The `mash` method (Urbut, Stephens, et al.) uses mixture models to share information across conditions:
+
+::::: columns
+::: {.column width="45%"}
+**Key components**:
+
+1.  **Component distributions**: Different patterns of effects across tissues/conditions
+
+    -   Shared effects
+    -   Tissue-specific effects
+    -   Correlated tissues effects
+
+2.  **Mixture weights**: Learned from data, revealing which patterns are common
+
+3.  **Result**: Improved effect estimates by borrowing strength appropriately
+:::
+
+::: {.column width="55%"}
+```{r}
+#| fig-height: 6
+# Simulate mash-like data for visualization
+set.seed(456)
+n_effects <- 200
+n_tissues <- 4
+
+# Create different effect patterns for visualization
+effect_patterns <- list(
+  "Shared" = rep(1, n_tissues),
+  "Tissue1_specific" = c(1, 0, 0, 0),
+  "Tissue2_specific" = c(0, 1, 0, 0),
+  "Tissues_1_2" = c(1, 1, 0, 0),
+  "Tissues_3_4" = c(0, 0, 1, 1)
+)
+
+# Create matrix to store true effects
+true_effects <- matrix(0, nrow = n_effects, ncol = n_tissues)
+colnames(true_effects) <- paste0("Tissue", 1:n_tissues)
+
+# Assign effects based on patterns
+n_shared <- 50
+n_pattern <- (n_effects - n_shared) / (length(effect_patterns) - 1)
+
+for (i in 1:n_shared) {
+  effect_size <- rnorm(1, 0, 0.5)
+  true_effects[i, ] <- effect_patterns[[1]] * effect_size
+}
+
+current_idx <- n_shared + 1
+for (p in 2:length(effect_patterns)) {
+  for (i in 1:n_pattern) {
+    effect_size <- rnorm(1, 0, 0.5)
+    true_effects[current_idx, ] <- effect_patterns[[p]] * effect_size
+    current_idx <- current_idx + 1
+  }
+}
+
+# Create observed data with noise
+observed_effects <- true_effects + matrix(rnorm(n_effects * n_tissues, 0, 0.2),
+                                        nrow = n_effects)
+
+# Prepare data for plotting correlation structure
+correlation_matrix <- cor(observed_effects)
+
+# Convert correlation matrix to long format for plotting
+corr_data <- expand.grid(Tissue1 = colnames(correlation_matrix),
+                        Tissue2 = colnames(correlation_matrix))
+corr_data$Correlation <- c(correlation_matrix)
+
+# Create heatmap
+ggplot(corr_data, aes(x = Tissue1, y = Tissue2, fill = Correlation)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red",
+                      midpoint = 0, limits = c(-1, 1)) +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    title = "Correlation Structure Across Tissues",
+    subtitle = "mash leverages these patterns",
+    x = "",
+    y = ""
+  )
+```
+:::
+:::::
+
+::: fragment
+**Key insight**: mash automatically learns which patterns of sharing are common and uses this to improve effect estimates
+:::
+
+------------------------------------------------------------------------
+
+# Bayesian Clinical & Adaptive Designs
+
+## Adaptive Designs: Learn As You Go {.smaller}
+
+::: incremental
+-   **Traditional approach**: Fixed design, analyze only at end
+-   **Bayesian adaptive approach**: Update and adjust as data accumulates
+:::
+
+::: fragment
+**Key advantages in genomics**: - Focus resources on promising candidates - Stop early when evidence is compelling - Adjust study parameters based on interim results
+:::
+
+## Adaptive Clinical Trial Example {.smaller}
+
+::::: columns
+::: {.column width="50%"}
+**Traditional vs. Adaptive**:
+
+-   **Traditional**: Fixed number of patients in treatment & control
+
+-   **Adaptive**:
+
+    -   Start with small groups
+    -   Calculate P(treatment \> control)
+    -   If high probability, assign more patients to treatment
+    -   If low probability, stop for futility
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 6
+library(ggplot2)
+
+# Simulate adaptive trial
+set.seed(42)
+
+# True treatment effect
+true_effect <- 0.12  # 12% improvement
+
+# Trial parameters
+max_patients <- 500
+interims <- seq(50, max_patients, by = 50)
+success_threshold <- 0.95  # Probability treatment is better
+futility_threshold <- 0.1  # Probability treatment is better
+
+# Prior for control rate: Beta(10, 40) - centered around 20%
+prior_alpha_control <- 10
+prior_beta_control <- 40
+
+# Prior for treatment rate: Same as control (skeptical)
+prior_alpha_treatment <- 10
+prior_beta_treatment <- 40
+
+# Calculate posterior probability of superiority through trial
+calc_prob_superior <- function(control_a, control_b, treat_a, treat_b, n_samples = 10000) {
+  # Monte Carlo estimation
+  control_samples <- rbeta(n_samples, control_a, control_b)
+  treat_samples <- rbeta(n_samples, treat_a, treat_b)
+  mean(treat_samples > control_samples)
+}
+
+# Simulate adaptive trial
+trial_data <- data.frame(
+  Patients = interims,
+  ProbSuperior = NA,
+  ControlRate = NA,
+  TreatmentRate = NA,
+  Decision = NA
+)
+
+# Simulate control and treatment outcomes
+control_results <- rbinom(max_patients, 1, 0.2)  # 20% success rate
+treat_results <- rbinom(max_patients, 1, 0.2 + true_effect)  # 32% success rate
+
+for (i in 1:length(interims)) {
+  n <- interims[i]
+  
+  # Current data
+  current_control <- control_results[1:n/2]  # Half in control
+  current_treat <- treat_results[1:n/2]      # Half in treatment
+  
+  # Update posteriors
+  post_alpha_control <- prior_alpha_control + sum(current_control)
+  post_beta_control <- prior_beta_control + length(current_control) - sum(current_control)
+  
+  post_alpha_treat <- prior_alpha_treatment + sum(current_treat)
+  post_beta_treat <- prior_beta_treatment + length(current_treat) - sum(current_treat)
+  
+  # Calculate probability of superiority
+  prob_superior <- calc_prob_superior(
+    post_alpha_control, post_beta_control,
+    post_alpha_treat, post_beta_treat
+  )
+  
+  # Record results
+  trial_data$ProbSuperior[i] <- prob_superior
+  trial_data$ControlRate[i] <- post_alpha_control / (post_alpha_control + post_beta_control)
+  trial_data$TreatmentRate[i] <- post_alpha_treat / (post_alpha_treat + post_beta_treat)
+  
+  # Make decision
+  if (prob_superior >= success_threshold) {
+    trial_data$Decision[i] <- "Success"
+    if (i < length(interims)) {
+      trial_data$Decision[(i+1):length(interims)] <- NA
+    }
+    break
+  } else if (prob_superior <= futility_threshold) {
+    trial_data$Decision[i] <- "Futility"
+    if (i < length(interims)) {
+      trial_data$Decision[(i+1):length(interims)] <- NA
+    }
+    break
+  } else {
+    trial_data$Decision[i] <- "Continue"
+  }
+}
+
+# Create plot
+ggplot(trial_data, aes(x = Patients, y = ProbSuperior)) +
+  geom_line(size = 1.2, color = "blue") +
+  geom_point(size = 3, aes(color = Decision)) +
+  geom_hline(yintercept = success_threshold, linetype = "dashed", color = "green") +
+  geom_hline(yintercept = futility_threshold, linetype = "dashed", color = "red") +
+  annotate("text", x = max_patients * 0.8, y = success_threshold + 0.02, 
+           label = "Success threshold", color = "green") +
+  annotate("text", x = max_patients * 0.8, y = futility_threshold - 0.02, 
+           label = "Futility threshold", color = "red") +
+  scale_color_manual(values = c("Continue" = "orange", 
+                               "Success" = "green", 
+                               "Futility" = "red")) +
+  theme_minimal(base_size = 12) +
+  labs(
+    title = "Bayesian Adaptive Clinical Trial",
+    subtitle = "Posterior probability treatment is superior to control",
+    x = "Number of Patients Enrolled",
+    y = "P(Treatment > Control)"
+  )
+```
+:::
+:::::
+
+## Population Genomics Applications {.smaller}
+
+**Adaptive sequencing designs**:
+
+::: incremental
+1.  **Candidate gene sequencing**:
+    -   Sequence initial set of genes in a subset of samples
+    -   Calculate posterior probability of association for each gene
+    -   Focus remaining resources on promising genes
+    -   Add related genes based on pathway analysis
+2.  **Exome-to-genome expansion**:
+    -   Start with exome sequencing in all samples
+    -   For variants with high posterior probability, sequence surrounding regions
+    -   Iteratively expand to full genome in regions of interest
+3.  **Sample size re-estimation**:
+    -   Update power calculations based on observed effect sizes
+    -   Increase sample size only where needed
+:::
+
+## Using Informative Priors from Previous Studies {.smaller}
+
+::::: columns
+::: {.column width="50%"}
+**Combining data across studies**:
+
+1.  **Previous study as prior**:
+    -   Convert previous results to Beta/Normal prior
+    -   Current study provides likelihood
+    -   Posterior combines both sources
+2.  **Meta-analysis alternative**:
+    -   Each study analyzed separately
+    -   Results combined at the end
+    -   Less efficient use of information
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 6
+# Demonstrate using previous study as prior
+set.seed(123)
+
+# Previous study data (small study)
+prev_n <- 50
+prev_effect <- 0.15
+prev_se <- 0.1
+
+# Current study (larger)
+current_n <- 200
+true_effect <- 0.12
+current_se <- 0.05
+
+# Simulate observed effects
+prev_observed <- rnorm(1, prev_effect, prev_se)
+current_observed <- rnorm(1, true_effect, current_se)
+
+# Approaches to combine:
+# 1. Flat prior + current data only
+flat_prior_mean <- 0
+flat_prior_sd <- 10  # Very diffuse
+
+# 2. Using previous study as prior
+informative_prior_mean <- prev_observed
+informative_prior_sd <- prev_se
+
+# Calculate posteriors
+# Flat prior
+flat_posterior_precision <- 1/flat_prior_sd^2 + 1/current_se^2
+flat_posterior_sd <- sqrt(1/flat_posterior_precision)
+flat_posterior_mean <- (flat_prior_mean/flat_prior_sd^2 + 
+                       current_observed/current_se^2) / flat_posterior_precision
+
+# Informative prior
+inf_posterior_precision <- 1/informative_prior_sd^2 + 1/current_se^2
+inf_posterior_sd <- sqrt(1/inf_posterior_precision)
+inf_posterior_mean <- (informative_prior_mean/informative_prior_sd^2 + 
+                     current_observed/current_se^2) / inf_posterior_precision
+
+# 3. Fixed meta-analysis (inverse variance weighted)
+meta_weight_prev <- 1/prev_se^2
+meta_weight_current <- 1/current_se^2
+meta_mean <- (meta_weight_prev * prev_observed + 
+             meta_weight_current * current_observed) / 
+            (meta_weight_prev + meta_weight_current)
+meta_se <- sqrt(1/(meta_weight_prev + meta_weight_current))
+
+# Plot the results
+x_range <- seq(0, 0.3, length.out = 1000)
+prior_density <- dnorm(x_range, informative_prior_mean, informative_prior_sd)
+likelihood_density <- dnorm(x_range, current_observed, current_se)
+flat_posterior_density <- dnorm(x_range, flat_posterior_mean, flat_posterior_sd)
+inf_posterior_density <- dnorm(x_range, inf_posterior_mean, inf_posterior_sd)
+meta_density <- dnorm(x_range, meta_mean, meta_se)
+
+plot_data <- data.frame(
+  x = rep(x_range, 5),
+  y = c(prior_density, likelihood_density, flat_posterior_density, 
+       inf_posterior_density, meta_density),
+  Distribution = factor(rep(c("Previous Study (Prior)", "Current Study (Likelihood)", 
+                           "Posterior (Flat Prior)", "Posterior (Informative)", 
+                           "Fixed Meta-analysis"), 
+                       each = length(x_range)))
+)
+
+# Plot
+ggplot(plot_data, aes(x = x, y = y, color = Distribution)) +
+  geom_line(size = 1) +
+  geom_vline(xintercept = true_effect, linetype = "dashed", color = "black") +
+  theme_minimal(base_size = 12) +
+  scale_color_brewer(palette = "Set1") +
+  labs(
+    title = "Combining Information Across Studies",
+    subtitle = paste("True effect =", true_effect),
+    x = "Effect Size",
+    y = "Density"
+  )
+```
+:::
+:::::
+
+## Bayesian FDR Control in GWAS {.smaller}
+
+::::: columns
+::: {.column width="40%"}
+**Traditional FDR**: - Sort p-values - Apply B-H procedure - Control expected proportion of false discoveries
+
+**Bayesian FDR**: - Calculate posterior probability of association for each variant - Sort by posterior probability - Include variants until expected FDR reaches threshold
+
+**Advantage**: Directly incorporates prior information like: - Functional annotations - MAF - LD structure
+:::
+
+::: {.column width="60%"}
+```{r}
+#| fig-height: 6
+# Simulate GWAS results
+set.seed(123)
+n_variants <- 5000
+n_causal <- 100
+
+# Generate true status (1 = causal, 0 = null)
+true_status <- c(rep(1, n_causal), rep(0, n_variants - n_causal))
+
+# Generate z-scores
+null_z <- rnorm(n_variants - n_causal, 0, 1)
+causal_z <- rnorm(n_causal, 0, 1) + runif(n_causal, 2, 5)  # Add effect
+z_scores <- c(causal_z, null_z)
+
+# Calculate p-values
+p_values <- 2 * pnorm(-abs(z_scores))
+
+# Calculate Bayes factors
+bf <- exp(z_scores^2/2)
+
+# Calculate posterior with uniform prior
+prior_prob <- n_causal / n_variants
+posterior_prob <- (prior_prob * bf) / (prior_prob * bf + (1 - prior_prob))
+
+# Apply Benjamini-Hochberg
+alpha <- 0.1
+sorted_p <- sort(p_values)
+ranks <- 1:n_variants
+bh_threshold <- max(sorted_p[sorted_p <= (ranks / n_variants) * alpha])
+bh_significant <- p_values <= bh_threshold
+
+# Apply Bayesian FDR control
+sorted_probs <- sort(1 - posterior_prob, decreasing = FALSE)
+cumulative_fdr <- cumsum(sorted_probs) / (1:n_variants)
+bayes_threshold <- min(posterior_prob[posterior_prob >= 
+                                     min(posterior_prob[cumulative_fdr <= alpha])])
+bayes_significant <- posterior_prob >= bayes_threshold
+
+# Create data for comparison
+results <- data.frame(
+  z_score = z_scores,
+  p_value = p_values,
+  posterior = posterior_prob,
+  true_status = as.factor(true_status),
+  bh_sig = bh_significant,
+  bayes_sig = bayes_significant
+)
+
+# Calculate FDR and power
+bh_fdr <- sum(!true_status & bh_significant) / max(1, sum(bh_significant))
+bayes_fdr <- sum(!true_status & bayes_significant) / max(1, sum(bayes_significant))
+bh_power <- sum(true_status & bh_significant) / sum(true_status)
+bayes_power <- sum(true_status & bayes_significant) / sum(true_status)
+
+# Plot comparison
+ggplot(results, aes(x = -log10(p_value), y = posterior, color = true_status)) +
+  geom_point(alpha = 0.6) +
+  geom_hline(yintercept = bayes_threshold, linetype = "dashed", color = "blue") +
+  geom_vline(xintercept = -log10(bh_threshold), linetype = "dashed", color = "red") +
+  theme_minimal(base_size = 12) +
+  scale_color_manual(values = c("0" = "gray", "1" = "orange"), 
+                    labels = c("0" = "Null", "1" = "Causal")) +
+  labs(
+    title = "Bayesian vs. Traditional FDR Control",
+    subtitle = paste0("BH FDR = ", round(bh_fdr, 3), ", Power = ", round(bh_power, 3),
+                    "\nBayes FDR = ", round(bayes_fdr, 3), ", Power = ", round(bayes_power, 3)),
+    x = "-log10(p-value)",
+    y = "Posterior Probability",
+    color = "True Status"
+  ) +
+  annotate("text", x = 2, y = bayes_threshold + 0.05, 
+           label = "Bayesian threshold", color = "blue") +
+  annotate("text", x = -log10(bh_threshold) + 0.5, y = 0.1, 
+           label = "BH threshold", color = "red")
+```
+:::
+:::::
+
+## Recommended Resources {.smaller}
+
+::::: columns
+::: {.column width="50%"}
+**Books & Articles**: - "Statistical Rethinking" by McElreath - "Bayesian Data Analysis" by Gelman et al. - Five Minute Statistics: http://stephens999.github.io/fiveMinuteStats/ - Urbut et al. "Flexible statistical methods for estimating and testing effects in genomic studies with multiple conditions" (2019)
+:::
+
+::: {.column width="50%"}
+**Software & Packages**: - Stan/rstan: Comprehensive Bayesian modeling - STRUCTURE: Population inference - mash: Multi-condition effect sharing - ashr: Adaptive shrinkage - INLA: Fast Bayesian inference
+:::
+:::::
+
+::: fragment
+**Key papers**: - Stephens & Balding (2009) "Bayesian statistical methods for genetic association studies" - Guan & Stephens (2008) "Practical Issues in Imputation-Based Association Mapping" - Servin & Stephens (2007) "Imputation-based analysis of association studies"
+:::
+
+## Summary: Why Bayesian Methods Matter {.smaller}
+
+::: incremental
+1.  **Direct probability statements** about hypotheses
+    -   "There is a 95% probability this variant affects the trait"
+2.  **Natural incorporation of prior knowledge**
+    -   Functional annotations, conservation, previous studies
+3.  **Honest handling of uncertainty**
+    -   Credible intervals with correct interpretation
+4.  **More efficient use of data**
+    -   Borrow strength across contexts (genes, tissues, populations)
+5.  **Adaptive learning framework**
+    -   Update beliefs as data accumulates
+:::
+
+------------------------------------------------------------------------
+
+## Thank You!
+
+**Questions?**
+
+------------------------------------------------------------------------
+
+## Appendix: Technical Details
+
+```{r}
+#| echo: false
+# This slide will only appear when presenting the HTML version
+# It's useful to include technical details that might be referenced during Q&A
+```
