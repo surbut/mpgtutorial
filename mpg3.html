@@ -370,6 +370,16 @@ Sarah Urbut
 </ul>
 <p>Bayesian approaches offer elegant solutions to these challenges.</p>
 </section>
+<section id="overview-1" class="slide level2">
+<h2>Overview</h2>
+<p>In this primer, we’ll explore key Bayesian concepts critical for modern genomics:</p>
+<ol type="1">
+<li><strong>P-values vs.&nbsp;Posterior Probabilities</strong>: Why Bayesian thinking helps avoid misinterpretations</li>
+<li><strong>Conjugate Models</strong>: Elegant solutions for population genetic inference</li>
+<li><strong>Mixture Models</strong>: Powerful tools for complex genomic data</li>
+<li><strong>Bayesian Clinical &amp; Adaptive Designs</strong>: Learning and adapting as data accumulates</li>
+</ol>
+</section>
 <section id="bayes-theorem---the-core-idea" class="slide level2">
 <h2>Bayes’ Theorem - The Core Idea</h2>
 <p><span class="math display">\[P(H|D) = \frac{P(D|H) \times P(H)}{P(D)}\]</span></p>
@@ -390,295 +400,500 @@ Sarah Urbut
 
 </section></section>
 <section>
-<section id="the-p-value-fallacy-and-bayesian-solutions" class="title-slide slide level1 center">
-<h1>The p-value Fallacy and Bayesian Solutions</h1>
+<section id="p-values-vs.-posterior-probabilities" class="title-slide slide level1 center">
+<h1>P-values vs.&nbsp;Posterior Probabilities</h1>
 
 </section>
-<section id="the-problem-with-p-values" class="slide level2">
-<h2>The Problem with p-values</h2>
-<div>
-<ol type="1">
-<li class="fragment"><strong>Misinterpreted</strong>: p-values ≠ probability the null is true</li>
-<li class="fragment"><strong>Multiple testing chaos</strong>: Testing thousands of variants requires arbitrary corrections</li>
-<li class="fragment"><strong>No prior knowledge</strong>: Each test ignores previous research</li>
-<li class="fragment"><strong>Binary thinking</strong>: Significance thresholds create false dichotomies</li>
-</ol>
-</div>
-<div class="callout callout-important callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>The p-value fallacy</strong></p>
-</div>
-<div class="callout-content">
-<p>“If the null hypothesis is true, the probability of obtaining data as extreme or more extreme than what was observed is p.”</p>
-<p>NOT: “The probability that the null hypothesis is true is p.”</p>
-</div>
-</div>
-</div>
-</section>
-<section id="from-p-values-to-posterior-probabilities" class="slide level2">
-<h2>From p-values to Posterior Probabilities</h2>
-<p>For a genetic association test with Z-score:</p>
-<p><strong>Bayesian posterior</strong>: <span class="math display">\[P(H_1 | Z) = \frac{P(Z | H_1) \times P(H_1)}{P(Z | H_1) \times P(H_1) + P(Z | H_0) \times P(H_0)}\]</span></p>
-<p>Using Bayes Factor (BF): <span class="math display">\[\text{BF} = \frac{P(Z | H_1)}{P(Z | H_0)}\]</span> <span class="math display">\[P(H_1 | Z) = \frac{\text{BF} \times P(H_1)}{\text{BF} \times P(H_1) + P(H_0)}\]</span></p>
-</section>
-<section id="p-values-vs.-posterior-probabilities" class="slide level2">
-<h2>p-values vs.&nbsp;Posterior Probabilities</h2>
-
-<img data-src="mpg3_files/figure-revealjs/pvalue-simulation-1.png" width="960" class="r-stretch"></section>
-<section id="bayesian-decision-theory" class="slide level2">
-<h2>Bayesian Decision Theory</h2>
-
-<img data-src="mpg3_files/figure-revealjs/bayesian-decisions-1.png" width="960" class="r-stretch"></section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="conjugate-priors-elegant-bayesian-updating" class="title-slide slide level1 center">
-<h1>Conjugate Priors: Elegant Bayesian Updating</h1>
-
-</section>
-<section id="the-beta-binomial-model-for-allele-frequencies" class="slide level2">
-<h2>The Beta-Binomial Model for Allele Frequencies</h2>
-<p>For allele frequency <span class="math inline">\(\theta\)</span> with Beta prior and binomial data:</p>
-<ul>
-<li><strong>Prior</strong>: <span class="math inline">\(\theta \sim \text{Beta}(\alpha, \beta)\)</span></li>
-<li><strong>Likelihood</strong>: <span class="math inline">\(x | \theta \sim \text{Binomial}(n, \theta)\)</span></li>
-<li><strong>Posterior</strong>: <span class="math inline">\(\theta | x \sim \text{Beta}(\alpha + x, \beta + n - x)\)</span></li>
-</ul>
-<p>The posterior mean is a weighted average: <span class="math display">\[E[\theta|x] = \frac{\alpha+x}{\alpha+\beta+n}\]</span></p>
-</section>
-<section id="beta-updating-with-more-data" class="slide level2">
-<h2>Beta Updating with More Data</h2>
-
-<img data-src="mpg3_files/figure-revealjs/beta-updating-1.png" width="960" class="r-stretch"></section>
-<section id="dirichlet-multinomial-for-population-structure" class="slide level2">
-<h2>Dirichlet-Multinomial for Population Structure</h2>
-<p>The multivariate extension of Beta-Binomial:</p>
-<ul>
-<li><strong>Prior</strong>: <span class="math inline">\(\mathbf{q} \sim \text{Dirichlet}(\alpha_1, \ldots, \alpha_K)\)</span>
-<ul>
-<li><span class="math inline">\(p(\mathbf{q}) \propto \prod_{k=1}^K q_k^{\alpha_k-1}\)</span></li>
-</ul></li>
-<li><strong>Likelihood</strong>: <span class="math inline">\(\mathbf{x} | \mathbf{q} \sim \text{Multinomial}(n, \mathbf{q})\)</span>
-<ul>
-<li><span class="math inline">\(p(\mathbf{x} | \mathbf{q}) = {n \choose {x_1, \ldots, x_K}} \prod_{k=1}^K q_k^{x_k}\)</span></li>
-</ul></li>
-<li><strong>Posterior</strong>: <span class="math inline">\(\mathbf{q} | \mathbf{x} \sim \text{Dirichlet}(\alpha_1 + x_1, \ldots, \alpha_K + x_K)\)</span>
-<ul>
-<li><span class="math inline">\(p(\mathbf{q} | \mathbf{x}) \propto \prod_{k=1}^K q_k^{\alpha_k + x_k - 1}\)</span></li>
-</ul></li>
-</ul>
-</section>
-<section id="dirichlet-distributions-visualized" class="slide level2">
-<h2>Dirichlet Distributions Visualized</h2>
-
-<img data-src="mpg3_files/figure-revealjs/dirichlet-visualization-1.png" width="960" class="r-stretch"></section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="mixture-models-for-population-structure" class="title-slide slide level1 center">
-<h1>Mixture Models for Population Structure</h1>
-
-</section>
-<section id="the-mathematics-of-mixture-models" class="slide level2">
-<h2>The Mathematics of Mixture Models</h2>
-<p>A mixture model with <span class="math inline">\(K\)</span> components is defined as:</p>
-<p><span class="math display">\[p(x) = \sum_{k=1}^K \pi_k \, f_k(x | \theta_k)\]</span></p>
-<p>Where: - <span class="math inline">\(\pi_k\)</span> are mixing proportions (<span class="math inline">\(\sum_{k=1}^K \pi_k = 1\)</span>) - <span class="math inline">\(f_k(x | \theta_k)\)</span> are component densities - <span class="math inline">\(\theta_k\)</span> are parameters for each component</p>
-<p>For population structure: - Components = ancestral populations - Mixing proportions = ancestry percentages - Component densities = population-specific allele frequencies</p>
-</section>
-<section id="simulating-population-specific-allele-frequencies" class="slide level2">
-<h2>Simulating Population-Specific Allele Frequencies</h2>
-
-<img data-src="mpg3_files/figure-revealjs/mixture-model-visualization-1.png" width="960" class="r-stretch"></section>
-<section id="admixed-populations---the-model" class="slide level2">
-<h2>Admixed Populations - The Model</h2>
-<p>For an individual with admixture proportions <span class="math inline">\(q = (q_1, q_2, \ldots, q_K)\)</span>:</p>
-<p>The effective allele frequency at locus <span class="math inline">\(j\)</span> is: <span class="math display">\[p_{ij} = \sum_{k=1}^K q_{ik} \cdot f_{kj}\]</span></p>
-<p>Where: - <span class="math inline">\(p_{ij}\)</span> = effective allele frequency for individual <span class="math inline">\(i\)</span> at locus <span class="math inline">\(j\)</span> - <span class="math inline">\(q_{ik}\)</span> = ancestry proportion from population <span class="math inline">\(k\)</span> - <span class="math inline">\(f_{kj}\)</span> = allele frequency in population <span class="math inline">\(k\)</span> at locus <span class="math inline">\(j\)</span></p>
-<p>Genotypes are generated as: <span class="math display">\[g_{ij} \sim \text{Bernoulli}(p_{ij})\]</span></p>
-</section>
-<section id="generated-admixed-individuals" class="slide level2">
-<h2>Generated Admixed Individuals</h2>
-
-<img data-src="mpg3_files/figure-revealjs/admixture-simulation-1.png" width="960" class="r-stretch"></section>
-<section id="visualizing-with-pca" class="slide level2">
-<h2>Visualizing with PCA</h2>
-
-<img data-src="mpg3_files/figure-revealjs/pca-visualization-1.png" width="960" class="r-stretch"></section>
-<section id="bayesian-inference-for-mixture-models" class="slide level2">
-<h2>Bayesian Inference for Mixture Models</h2>
-<p>The Bayesian framework:</p>
-<p><strong>Latent variables</strong>: - <span class="math inline">\(z_i\)</span> = population assignment for individual <span class="math inline">\(i\)</span> - <span class="math inline">\(P_{kj}\)</span> = allele frequency for population <span class="math inline">\(k\)</span> at locus <span class="math inline">\(j\)</span></p>
-<p><strong>Likelihood</strong>: <span class="math display">\[p(g_{ij} | z_i = k, P_{kj}) = P_{kj}^{g_{ij}} (1 - P_{kj})^{1 - g_{ij}}\]</span></p>
-<p><strong>Priors</strong>: - <span class="math inline">\(P_{kj} \sim \text{Beta}(a, b)\)</span> (e.g., <span class="math inline">\(\text{Beta}(1,1)\)</span> = uniform) - <span class="math inline">\(z_i \sim \text{Categorical}(\pi_1, \ldots, \pi_K)\)</span></p>
-<p><strong>Posterior</strong>: <span class="math display">\[p(Z, P | G) \propto p(G | Z, P) p(Z) p(P)\]</span></p>
-</section>
-<section id="gibbs-sampling-implementation" class="slide level2">
-<h2>Gibbs Sampling Implementation</h2>
-<p>We can implement a Gibbs sampler with two steps:</p>
-<ol type="1">
-<li><p>Update <span class="math inline">\(z_i | P, G\)</span> for each individual: <span class="math display">\[p(z_i = k | P, G) \propto \pi_k \prod_{j=1}^J P_{kj}^{g_{ij}} (1 - P_{kj})^{1 - g_{ij}}\]</span></p></li>
-<li><p>Update <span class="math inline">\(P_{kj} | z, G\)</span> for each population and locus: <span class="math display">\[P_{kj} | z, G \sim \text{Beta}(a + \sum_{i: z_i=k} g_{ij}, b + \sum_{i: z_i=k} (1 - g_{ij}))\]</span></p></li>
-</ol>
-<p>This gives us a Markov Chain that converges to the posterior distribution.</p>
-</section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="clinical-trials-and-non-informative-priors" class="title-slide slide level1 center">
-<h1>Clinical Trials and Non-Informative Priors</h1>
-
-</section>
-<section id="the-value-of-flat-priors" class="slide level2">
-<h2>The Value of Flat Priors</h2>
-<p>In both clinical trials and genomics, flat priors are useful when:</p>
-<ol type="1">
-<li>Limited prior knowledge exists</li>
-<li>You want the data to “speak for itself”</li>
-<li>Results need to be defensible to skeptical audiences</li>
-</ol>
-<p>For a proportion parameter (e.g., allele frequency):</p>
-<ul>
-<li><strong>Uniform prior</strong>: <span class="math inline">\(\theta \sim \text{Beta}(1,1)\)</span></li>
-<li><strong>Posterior</strong>: <span class="math inline">\(\theta | y \sim \text{Beta}(1+y, 1+n-y)\)</span></li>
-</ul>
-</section>
-<section id="example-clinical-trial-with-flat-prior" class="slide level2">
-<h2>Example: Clinical Trial with Flat Prior</h2>
-
-<img data-src="mpg3_files/figure-revealjs/clinical-trial-flat-prior-1.png" width="960" class="r-stretch"></section>
-<section id="direct-probability-of-treatment-benefit" class="slide level2">
-<h2>Direct Probability of Treatment Benefit</h2>
-
-<img data-src="mpg3_files/figure-revealjs/posterior-probability-superiority-1.png" width="960" class="r-stretch"></section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="multivariate-normal-mixtures-and-mash" class="title-slide slide level1 center">
-<h1>Multivariate Normal Mixtures and mash</h1>
-
-</section>
-<section id="the-multivariate-challenge-in-genomics" class="slide level2">
-<h2>The Multivariate Challenge in Genomics</h2>
-<p>Genomic studies often examine effects across multiple:</p>
-<ul>
-<li>Traits (height, weight, BMI)</li>
-<li>Tissues (liver, muscle, brain)</li>
-<li>Populations (African, European, Asian)</li>
-<li>Conditions (different environments/exposures)</li>
-</ul>
-<p>Existing approaches have limitations: - Single-trait analysis wastes information - Fixed-effects meta-analysis ignores heterogeneity - Random-effects models are too simplistic</p>
-</section>
-<section id="multivariate-adaptive-shrinkage-mash" class="slide level2">
-<h2>Multivariate Adaptive Shrinkage (mash)</h2>
-<p><strong>mash</strong> provides a flexible Bayesian framework for:</p>
-<ol type="1">
-<li><strong>Sharing information</strong> across related phenotypes/tissues</li>
-<li><strong>Identifying consistent vs.&nbsp;context-specific effects</strong></li>
-<li><strong>Handling multiple testing</strong> across thousands/millions of loci</li>
-<li><strong>Improving estimation accuracy</strong> by borrowing strength</li>
-</ol>
-<p>For variant <span class="math inline">\(j\)</span> across <span class="math inline">\(R\)</span> conditions:</p>
-<p><span class="math inline">\(\hat{\beta}_j \sim N(\beta_j, S_j)\)</span></p>
-<p>With prior on true effects:</p>
-<p><span class="math inline">\(\beta_j \sim \sum_{k=1}^K \pi_k N(0, U_k)\)</span></p>
-</section>
-<section id="key-covariance-matrices-in-mash" class="slide level2">
-<h2>Key Covariance Matrices in mash</h2>
-<p>mash uses a mixture of covariance matrices to capture different patterns:</p>
+<section id="the-fallacy-of-p-values" class="slide level2">
+<h2>The Fallacy of P-values</h2>
 <div>
 <ul>
-<li class="fragment"><strong>Identity:</strong> <span class="math inline">\(U_I = \sigma^2 I\)</span> (Independent effects)</li>
-<li class="fragment"><strong>Rank-1:</strong> <span class="math inline">\(U_R = \sigma^2 \mathbf{1}\mathbf{1}^T\)</span> (Perfectly correlated effects)</li>
-<li class="fragment"><strong>Condition-specific:</strong> <span class="math inline">\(U_r = \sigma^2 \mathbf{e}_r\mathbf{e}_r^T\)</span> (Effect only in condition <span class="math inline">\(r\)</span>)</li>
-<li class="fragment"><strong>Data-driven:</strong> Learned from patterns in the data</li>
+<li class="fragment"><p>P-values answer a <strong>counterfactual question</strong>: “If there were no effect, how surprising would these data be?”</p></li>
+<li class="fragment"><p>But researchers want to know: “<strong>What is the probability this association is real?</strong>”</p></li>
+<li class="fragment"><p>This disconnect leads to systematic misinterpretation</p></li>
 </ul>
 </div>
 </section>
-<section id="simulated-multivariate-effects" class="slide level2">
-<h2>Simulated Multivariate Effects</h2>
-
-<img data-src="mpg3_files/figure-revealjs/mash-simulation-1.png" width="960" class="r-stretch"></section>
-<section id="mash-posterior-calculations" class="slide level2">
-<h2>mash Posterior Calculations</h2>
-<p>For each covariance matrix <span class="math inline">\(U_k\)</span>, the posterior distribution is:</p>
-<p><span class="math inline">\(\beta_j | \hat{\beta}_j, U_k, S_j \sim N(\mu_{jk}, V_{jk})\)</span></p>
-<p>Where: - <span class="math inline">\(V_{jk} = S_j - S_j(S_j + U_k)^{-1}S_j\)</span> - <span class="math inline">\(\mu_{jk} = V_{jk}S_j^{-1}\hat{\beta}_j\)</span></p>
-<p>The posterior mean under the mixture:</p>
-<p><span class="math inline">\(E[\beta_j | \hat{\beta}_j] = \sum_{k=1}^K w_{jk} \mu_{jk}\)</span></p>
-<p>Where weights come from the marginal likelihood:</p>
-<p><span class="math inline">\(w_{jk} \propto \pi_k (2\pi)^{-d/2}|S_j + U_k|^{-1/2}\exp\left(-\frac{1}{2}\hat{\beta}_j^T(S_j + U_k)^{-1}\hat{\beta}_j\right)\)</span></p>
+<section id="the-p-value-fallacy-a-clear-example" class="slide level2">
+<h2>The p-value Fallacy: A Clear Example</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Scenario</strong>: Testing a SNP for disease association</p>
+<p><strong>Traditional approach</strong>: - Obtain p = 0.001 - Declare “significant association” - Publish result</p>
+<p><strong>The fallacy</strong>: - p = 0.001 means “1 in 1000 chance of seeing this data if no association exists” - NOT “999 in 1000 chance the association is real”</p>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="mpg3_files/figure-revealjs/unnamed-chunk-1-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+<p><strong>Key insight</strong>: With a realistic prior of 1/1000, a “significant” p-value of 0.001 only gives ~50% posterior probability of true association!</p>
 </section>
-<section id="improved-estimation-with-mash" class="slide level2">
-<h2>Improved Estimation with mash</h2>
-
-<img data-src="mpg3_files/figure-revealjs/mash-visualization-1.png" width="960" class="r-stretch"></section>
+<section id="a-gwas-example" class="slide level2">
+<h2>A GWAS Example</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Same evidence, different conclusions:</strong></p>
+<ul>
+<li><p>SNP with p = 1 × 10⁻⁵ in GWAS</p></li>
+<li><p>Traditional: “Nearly significant!”</p></li>
+<li><p>Bayesian: “Probably a false positive”</p></li>
+</ul>
+<p><strong>Why the difference?</strong></p>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="mpg3_files/figure-revealjs/unnamed-chunk-2-1.png" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
 <section class="slide level2">
 
 </section></section>
 <section>
-<section id="adaptive-designs-in-population-genomics" class="title-slide slide level1 center">
-<h1>Adaptive Designs in Population Genomics</h1>
+<section id="conjugate-priors-for-genetic-models" class="title-slide slide level1 center">
+<h1>Conjugate Priors for Genetic Models</h1>
+
+</section>
+<section id="conjugate-priors-why-theyre-beautiful" class="slide level2">
+<h2>Conjugate Priors: Why They’re Beautiful</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Definition</strong>: A prior is conjugate when the posterior has the same distribution family</p>
+<p><strong>Why they matter</strong>: 1. <strong>Analytical solutions</strong> - no MCMC needed 2. <strong>Interpretable parameters</strong> - prior as “pseudo-observations” 3. <strong>Sequential updating</strong> - yesterday’s posterior is today’s prior 4. <strong>Computational efficiency</strong> - critical for large genomic datasets</p>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="mpg3_files/figure-revealjs/unnamed-chunk-3-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="beta-binomial-perfect-for-allele-frequencies" class="slide level2">
+<h2>Beta-Binomial: Perfect for Allele Frequencies</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Model</strong>: - <strong>Prior</strong>: <span class="math inline">\(\theta \sim \text{Beta}(\alpha, \beta)\)</span> - <strong>Likelihood</strong>: <span class="math inline">\(X|\theta \sim \text{Binomial}(n, \theta)\)</span> - <strong>Posterior</strong>: <span class="math inline">\(\theta|X \sim \text{Beta}(\alpha + X, \beta + n - X)\)</span></p>
+<p><strong>Applications</strong>: - Allele frequency estimation - Case-control association - Heterozygosity estimation - Sequencing error rates</p>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="mpg3_files/figure-revealjs/unnamed-chunk-4-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="dirichlet-multinomial-for-multiple-alleles" class="slide level2">
+<h2>Dirichlet-Multinomial: For Multiple Alleles</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Model</strong>: - <strong>Prior</strong>: <span class="math inline">\(\vec{\theta} \sim \text{Dirichlet}(\vec{\alpha})\)</span> - <strong>Likelihood</strong>: <span class="math inline">\(\vec{X}|\vec{\theta} \sim \text{Multinomial}(n, \vec{\theta})\)</span> - <strong>Posterior</strong>: <span class="math inline">\(\vec{\theta}|\vec{X} \sim \text{Dirichlet}(\vec{\alpha} + \vec{X})\)</span></p>
+<p><strong>Applications</strong>: - Multiple allele frequencies - Haplotype frequencies - Population admixture proportions - Taxonomic abundances</p>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="mpg3_files/figure-revealjs/unnamed-chunk-5-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="mixture-models-for-complex-data" class="title-slide slide level1 center">
+<h1>Mixture Models for Complex Data</h1>
+
+</section>
+<section id="mixture-models-intuition-and-building-blocks" class="slide level2">
+<h2>Mixture Models: Intuition and Building Blocks</h2>
+<p>A mixture model combines multiple distributions to model complex data:</p>
+<p><span class="math display">\[p(x) = \sum_{k=1}^K \pi_k f_k(x|\theta_k)\]</span></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Key components</strong>:</p>
+<ol type="1">
+<li><strong>Component distributions</strong> <span class="math inline">\(f_k(x|\theta_k)\)</span>
+<ul>
+<li>Each represents a subpopulation</li>
+<li>Can be any distribution family</li>
+</ul></li>
+<li><strong>Mixing weights</strong> <span class="math inline">\(\pi_k\)</span>
+<ul>
+<li>Proportion of data from each component</li>
+<li>Must sum to 1: <span class="math inline">\(\sum_{k=1}^K \pi_k = 1\)</span></li>
+</ul></li>
+<li><strong>Latent variables</strong> <span class="math inline">\(z_i\)</span>
+<ul>
+<li>Unobserved component membership</li>
+<li><span class="math inline">\(z_i = k\)</span> means data point <span class="math inline">\(i\)</span> came from component <span class="math inline">\(k\)</span></li>
+</ul></li>
+</ol>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="mpg3_files/figure-revealjs/unnamed-chunk-6-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="mixture-models-in-genomics-key-applications" class="slide level2">
+<h2>Mixture Models in Genomics: Key Applications</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>1. Population Structure</strong> - Components = ancestral populations - Weights = admixture proportions - Example: STRUCTURE software</p>
+<p><strong>2. Gene Expression Clustering</strong> - Components = cell types/states - Weights = proportion of cells in each state - Example: Single-cell RNA-seq analysis</p>
+<p><strong>3. Effect Size Distribution</strong> - Components = null/causal variants - Weights = proportion of causal variants - Example: Bayesian fine-mapping</p>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="mpg3_files/figure-revealjs/unnamed-chunk-7-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="em-algorithm-how-mixture-models-are-fitted" class="slide level2">
+<h2>EM Algorithm: How Mixture Models Are Fitted</h2>
+<p>The Expectation-Maximization (EM) algorithm iteratively:</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>E-step</strong>: Calculate responsibilities (posterior probabilities) <span class="math display">\[\gamma_{ik} = P(z_i = k | x_i, \theta) = \frac{\pi_k f_k(x_i|\theta_k)}{\sum_{j=1}^K \pi_j f_j(x_i|\theta_j)}\]</span></p>
+<p><strong>M-step</strong>: Update parameters using weighted data <span class="math display">\[\pi_k^{new} = \frac{1}{n}\sum_{i=1}^n \gamma_{ik}\]</span> <span class="math display">\[\theta_k^{new} = \arg\max_{\theta_k} \sum_{i=1}^n \gamma_{ik} \log f_k(x_i|\theta_k)\]</span></p>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="mpg3_files/figure-revealjs/unnamed-chunk-8-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="population-structure-as-a-mixture-model" class="slide level2">
+<h2>Population Structure as a Mixture Model</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>STRUCTURE model</strong>: - Each individual = mixture of <span class="math inline">\(K\)</span> ancestral populations - Each population = distinct allele frequencies - Goal: Infer ancestry proportions &amp; population frequencies</p>
+<p><strong>Bayesian formulation</strong>: - <strong>Prior</strong>: <span class="math inline">\(q_{ik} \sim \text{Dirichlet}(\alpha)\)</span> (ancestry proportions) - <strong>Prior</strong>: <span class="math inline">\(f_{kj} \sim \text{Beta}(\lambda)\)</span> (allele frequencies) - <strong>Likelihood</strong>: <span class="math inline">\(P(X_{ij} | q_i, f_j)\)</span> (genotype probabilities)</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="mpg3_files/figure-revealjs/unnamed-chunk-9-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="conjugate-priors-why-theyre-beautiful-1" class="slide level2">
+<h2>Conjugate Priors: Why They’re Beautiful</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Definition</strong>: A prior is conjugate when the posterior has the same distribution family</p>
+<p><strong>Why they matter</strong>: 1. <strong>Analytical solutions</strong> - no MCMC needed 2. <strong>Interpretable parameters</strong> - prior as “pseudo-observations” 3. <strong>Sequential updating</strong> - yesterday’s posterior is today’s prior 4. <strong>Computational efficiency</strong> - critical for large genomic datasets</p>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="mpg3_files/figure-revealjs/unnamed-chunk-10-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="common-conjugate-priors-in-genomics" class="slide level2">
+<h2>Common Conjugate Priors in Genomics</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Data Model</th>
+<th>Conjugate Prior</th>
+<th>Application</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Binomial</td>
+<td>Beta</td>
+<td>Allele frequencies</td>
+</tr>
+<tr class="even">
+<td>Multinomial</td>
+<td>Dirichlet</td>
+<td>Haplotype frequencies</td>
+</tr>
+<tr class="odd">
+<td>Normal (known variance)</td>
+<td>Normal</td>
+<td>Effect sizes</td>
+</tr>
+<tr class="even">
+<td>Normal (unknown variance)</td>
+<td>Inverse-Gamma</td>
+<td>Variance components</td>
+</tr>
+<tr class="odd">
+<td>Poisson</td>
+<td>Gamma</td>
+<td>Mutation rates</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="bayesian-clinical-trials-and-adaptive-designs" class="title-slide slide level1 center">
+<h1>Bayesian Clinical Trials and Adaptive Designs</h1>
 
 </section>
 <section id="sequential-analysis-and-sample-size-optimization" class="slide level2">
 <h2>Sequential Analysis and Sample Size Optimization</h2>
 
 <img data-src="mpg3_files/figure-revealjs/adaptive-design-1.png" width="960" class="r-stretch"></section>
+<section id="bayesian-decision-theory-beyond-p-0.05" class="slide level2">
+<h2>Bayesian Decision Theory: Beyond p &lt; 0.05</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Moving from significance to utility</strong>:</p>
+<ol type="1">
+<li><strong>Define utilities/costs</strong>:
+<ul>
+<li>Benefit of true discovery</li>
+<li>Cost of false discovery</li>
+<li>Cost of missed discovery</li>
+<li>Cost of additional samples</li>
+</ul></li>
+<li><strong>Calculate expected utility</strong>:
+<ul>
+<li>For each possible decision</li>
+<li>Weighted by posterior probabilities</li>
+</ul></li>
+<li><strong>Choose action that maximizes utility</strong>:
+<ul>
+<li>May differ by context</li>
+<li>Explicitly incorporates costs/benefits</li>
+</ul></li>
+</ol>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="mpg3_files/figure-revealjs/unnamed-chunk-11-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
 <section id="decision-theoretic-framework" class="slide level2">
 <h2>Decision-Theoretic Framework</h2>
 
 <img data-src="mpg3_files/figure-revealjs/decision-theory-1.png" width="960" class="r-stretch"></section>
+<section id="multivariate-normal-mixtures-the-mash-approach" class="slide level2">
+<h2>Multivariate Normal Mixtures: The mash Approach</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Key idea</strong>: Share information across related conditions</p>
+<p><strong>Model</strong>: - <span class="math inline">\(\hat{\beta}_j \sim N(\beta_j, S_j)\)</span> (observed effects) - <span class="math inline">\(\beta_j \sim \sum_{k=1}^K \pi_k N(0, U_k)\)</span> (true effects)</p>
+<p><strong>Covariance matrices <span class="math inline">\(U_k\)</span> capture patterns</strong>: - Shared effects across all conditions - Condition-specific effects - Structured correlation patterns - Data-driven patterns</p>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="mpg3_files/figure-revealjs/unnamed-chunk-12-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="bayesian-networks-for-causal-inference" class="slide level2">
+<h2>Bayesian Networks for Causal Inference</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Problem</strong>: Infer causal relationships in genomic data</p>
+<p><strong>Bayesian networks</strong>: - Directed acyclic graphs (DAGs) - Nodes = variables (genes, traits) - Edges = conditional dependencies - Represent causal relationships</p>
+<p><strong>Advantages</strong>: - Incorporate prior knowledge - Handle missing data - Quantify uncertainty in network structure - Integrate multiple data types</p>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="mpg3_files/figure-revealjs/unnamed-chunk-13-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="case-study-bayesian-fine-mapping" class="slide level2">
+<h2>Case Study: Bayesian Fine-Mapping</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Problem</strong>: Identify causal variants in a GWAS locus</p>
+<p><strong>Traditional approach</strong>: - Select all SNPs with p &lt; threshold - Often includes many correlated SNPs</p>
+<p><strong>Bayesian approach</strong>: - Calculate posterior probability of causality - Report credible sets (e.g., 95% probability) - Incorporate functional priors</p>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="mpg3_files/figure-revealjs/unnamed-chunk-14-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="case-study-bayesian-meta-analysis" class="slide level2">
+<h2>Case Study: Bayesian Meta-Analysis</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>Problem</strong>: Combine evidence across heterogeneous studies</p>
+<p><strong>Traditional approach</strong>: - Fixed effects (assumes same effect size) - Random effects (allows variation in effect size) - Often sensitive to outliers</p>
+<p><strong>Bayesian approach</strong>: - Hierarchical model for effect heterogeneity - Robust methods to handle outliers - Incorporates prior knowledge - Quantifies uncertainty in heterogeneity</p>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="mpg3_files/figure-revealjs/unnamed-chunk-15-1.png" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="practical-recommendations-for-bayesian-genomics" class="slide level2">
+<h2>Practical Recommendations for Bayesian Genomics</h2>
+<ol type="1">
+<li><strong>Start with informative priors when possible</strong>
+<ul>
+<li>Use previous studies</li>
+<li>Incorporate functional annotations</li>
+<li>Consider evolutionary constraints</li>
+</ul></li>
+<li><strong>Report posterior probabilities, not just p-values</strong>
+<ul>
+<li>P(association | data) is more interpretable than P(data | no association)</li>
+<li>Provides direct probability statements about hypotheses</li>
+</ul></li>
+<li><strong>Use conjugate models for computational efficiency</strong>
+<ul>
+<li>Beta-Binomial for allele frequencies</li>
+<li>Dirichlet-Multinomial for haplotype frequencies</li>
+<li>Normal-Normal for quantitative traits</li>
+</ul></li>
+<li><strong>Consider mixture models for complex data</strong>
+<ul>
+<li>Population structure</li>
+<li>Heterogeneous effect sizes</li>
+<li>Multiple causal variants</li>
+</ul></li>
+<li><strong>Apply decision theory for optimal designs</strong>
+<ul>
+<li>Balance false positives and false negatives</li>
+<li>Consider costs of follow-up studies</li>
+<li>Optimize sample allocation</li>
+</ul></li>
+</ol>
+</section>
 <section class="slide level2">
 
-</section></section>
-<section>
-<section id="conclusion-and-resources" class="title-slide slide level1 center">
-<h1>Conclusion and Resources</h1>
-
 </section>
-<section id="key-takeaways" class="slide level2">
-<h2>Key Takeaways</h2>
-<ul>
-<li>Bayesian statistics offers a coherent framework for population genomics</li>
-<li>Posterior probabilities directly answer: “What’s the probability of association?”</li>
-<li>Conjugate priors provide elegant solutions for allele frequencies and population structure</li>
-<li>Decision theory allows optimal tradeoffs between false discoveries and missed associations</li>
-<li>Multivariate models like mash leverage information across related traits</li>
-<li>Bayesian adaptive designs optimize resource allocation</li>
-</ul>
+<section id="summary-when-to-use-bayesian-methods" class="slide level2">
+<h2>Summary: When to Use Bayesian Methods</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 48%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Problem</th>
+<th>Bayesian Approach</th>
+<th>Advantage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Multiple testing</td>
+<td>Posterior probabilities</td>
+<td>Direct interpretation, no arbitrary thresholds</td>
+</tr>
+<tr class="even">
+<td>Sparse effects</td>
+<td>Mixture priors</td>
+<td>Better power, natural sparsity</td>
+</tr>
+<tr class="odd">
+<td>Heterogeneous effects</td>
+<td>Hierarchical models</td>
+<td>Borrows strength across contexts</td>
+</tr>
+<tr class="even">
+<td>Sequential data collection</td>
+<td>Adaptive designs</td>
+<td>Efficiency, early stopping</td>
+</tr>
+<tr class="odd">
+<td>Prior knowledge integration</td>
+<td>Informative priors</td>
+<td>Improved accuracy, reduced sample size</td>
+</tr>
+<tr class="even">
+<td>Complex dependencies</td>
+<td>Bayesian networks</td>
+<td>Causal inference, missing data handling</td>
+</tr>
+</tbody>
+</table>
 </section>
-<section id="software-tools-and-resources" class="slide level2">
-<h2>Software Tools and Resources</h2>
-<div>
-<ul>
-<li class="fragment"><strong>R Packages</strong>
-<ul>
-<li class="fragment"><code>rstan</code>, <code>brms</code>: General Bayesian modeling</li>
-<li class="fragment"><code>mashr</code>: Multivariate adaptive shrinkage</li>
-<li class="fragment"><code>structure</code>, <code>admixture</code>: Population structure</li>
-</ul></li>
-<li class="fragment"><strong>Books &amp; Resources</strong>
-<ul>
-<li class="fragment">“Statistical Rethinking” by Richard McElreath</li>
-<li class="fragment">“Bayesian Data Analysis” by Gelman et al.</li>
-<li class="fragment"><a href="http://stephens999.github.io/fiveMinuteStats/">Five Minute Statistics</a>: Short tutorials on Bayesian concepts</li>
-</ul></li>
-<li class="fragment"><strong>Applications</strong>
-<ul>
-<li class="fragment"><a href="https://stephenslab.github.io/fiveMinuteStats/random_directions.html">GWAS with Bayesian priors</a></li>
-<li class="fragment"><a href="https://stephenslab.github.io/mashr/articles/intro_mash.html">Sharing information across studies</a></li>
-</ul></li>
-</ul>
-</div>
+<section id="resources-for-bayesian-genomics" class="slide level2">
+<h2>Resources for Bayesian Genomics</h2>
+<p><strong>Software</strong>: - <strong>R packages</strong>: <code>rstan</code>, <code>brms</code>, <code>mashr</code>, <code>BGLR</code>, <code>INLA</code> - <strong>Python</strong>: <code>PyMC3</code>, <code>Stan</code>, <code>Edward</code> - <strong>Specialized</strong>: <code>STRUCTURE</code>, <code>ADMIXTURE</code>, <code>SNPTEST</code></p>
+<p><strong>Books</strong>: - “Bayesian Data Analysis” by Gelman et al. - “Statistical Rethinking” by McElreath - “Bayesian Methods for Data Analysis” by Carlin &amp; Louis</p>
+<p><strong>Online Resources</strong>: - <a href="https://stephenslab.github.io/fiveMinuteStats/">StatisticalGenetics.info</a> - <a href="https://mc-stan.org/users/documentation/">Stan User Guide</a> - <a href="https://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/">Bayesian Methods for Hackers</a></p>
 </section>
 <section id="questions" class="slide level2">
 <h2>Questions?</h2>
