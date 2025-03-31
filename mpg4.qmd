@@ -1628,6 +1628,7 @@ ggplot(plot_df, aes(x = Effect, y = Study, color = Group)) +
 ## Questions?
 
 Thank you!! 
-**Pradeep Natarajan, MD MMSc** 
-**Sasha Gusev, PhD** 
-**Giovanni Parmigiani, PhD** 
+
+- Pradeep Natarajan, MD MMSc
+- Sasha Gusev, PhD
+- Giovanni Parmigiani, PhD
