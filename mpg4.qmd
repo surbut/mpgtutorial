@@ -1,6 +1,7 @@
 ---
 title: "A Practical Primer on Bayesian Statistics for Population Genomics"
-author: "Sarah Urbut"
+author: "Sarah Urbut, MD PhD"
+affiliation: "Natarajan Lab"
 date: "March 29, 2025"
 format: 
   revealjs:
@@ -1165,123 +1166,6 @@ ggplot(interim_long, aes(x = SampleSize, y = Discoveries, color = Threshold, gro
 
 ---
 
-## Bayesian Decision Theory: Beyond p < 0.05
-
-::::: columns
-::: {.column width="50%"}
-**Moving from significance to utility**:
-
-1. **Define utilities/costs**:
-   - Benefit of true discovery
-   - Cost of false discovery
-   - Cost of missed discovery
-   - Cost of additional samples
-
-2. **Calculate expected utility**:
-   - For each possible decision
-   - Weighted by posterior probabilities
-
-3. **Choose action that maximizes utility**:
-   - May differ by context
-   - Explicitly incorporates costs/benefits
-:::
-
-::: {.column width="50%"}
-```{r}
-#| fig-height: 6
-# Create a visualization of decision theory
-set.seed(234)
-
-# Define parameters
-effect_sizes <- seq(-0.5, 0.5, length.out = 100)
-prior_mean <- 0
-prior_sd <- 0.2
-
-# Calculate prior density
-prior_density <- dnorm(effect_sizes, prior_mean, prior_sd)
-
-# Define utility functions
-# 1. Symmetric loss (declare significant if |effect| > 0.2)
-symmetric_utility <- ifelse(abs(effect_sizes) > 0.2, 1, 0)
-
-# 2. Asymmetric loss (higher utility for positive effects)
-asymmetric_utility <- ifelse(effect_sizes > 0.2, 2,
-                           ifelse(effect_sizes < -0.2, -1, 0))
-
-# 3. Continuous utility (proportional to effect size)
-continuous_utility <- effect_sizes^2 * sign(effect_sizes)
-
-# Create data frame for plotting
-utility_df <- data.frame(
-  EffectSize = rep(effect_sizes, 3),
-  Utility = c(symmetric_utility, asymmetric_utility, continuous_utility),
-  UtilityType = rep(c("Symmetric", "Asymmetric", "Continuous"), each = length(effect_sizes))
-)
-
-# Calculate expected utilities
-expected_symmetric <- sum(symmetric_utility * prior_density) / sum(prior_density)
-expected_asymmetric <- sum(asymmetric_utility * prior_density) / sum(prior_density)
-expected_continuous <- sum(continuous_utility * prior_density) / sum(prior_density)
-
-# Create plot
-ggplot(utility_df, aes(x = EffectSize, y = Utility, color = UtilityType)) +
-  geom_line(size = 1.2) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "gray") +
-  scale_color_brewer(palette = "Set1") +
-  labs(title = "Utility Functions for Different Decision Rules",
-       subtitle = paste0("Expected utilities: Symmetric = ", round(expected_symmetric, 2),
-                       ", Asymmetric = ", round(expected_asymmetric, 2),
-                       ", Continuous = ", round(expected_continuous, 2)),
-       x = "Effect Size", 
-       y = "Utility",
-       color = "Utility Type") +
-  theme(legend.position = "bottom")
-```
-:::
-:::::
-
----
-
-## Decision-Theoretic Framework
-
-```{r decision-theory}
-# Define costs and benefits
-cost_per_sample <- 1        # Cost per additional sample
-cost_false_positive <- 50   # Cost of following up a false lead
-cost_false_negative <- 100  # Cost of missing a true association
-benefit_true_positive <- 200  # Benefit of discovering a true association
-
-# Calculate expected utility at each sample size
-utility_df <- data.frame(
-  SampleSize = interim_summary$SampleSize,
-  SamplingCost = -interim_summary$SampleSize * cost_per_sample,
-  FalsePositiveCost = -interim_summary$FalsePositives_95 * cost_false_positive,
-  FalseNegativeCost = -(n_causal - interim_summary$TruePositives_95) * cost_false_negative,
-  TruePositiveBenefit = interim_summary$TruePositives_95 * benefit_true_positive
-)
-
-utility_df$TotalUtility <- utility_df$SamplingCost + 
-                         utility_df$FalsePositiveCost + 
-                         utility_df$FalseNegativeCost +
-                         utility_df$TruePositiveBenefit
-
-# Plot total utility 
-optimal_n <- utility_df$SampleSize[which.max(utility_df$TotalUtility)]
-
-ggplot(utility_df, aes(x = SampleSize)) +
-  geom_line(aes(y = TotalUtility), size = 1.2, color = "blue") +
-  geom_point(aes(y = TotalUtility), size = 3, color = "blue") +
-  geom_vline(xintercept = optimal_n, linetype = "dotted", color = "red") +
-  annotate("text", x = optimal_n + 20, y = max(utility_df$TotalUtility) * 0.9, 
-           label = paste("Optimal n =", optimal_n), color = "red") +
-  labs(title = "Total Utility by Sample Size",
-       subtitle = "Bayesian decision theory identifies optimal design",
-       x = "Sample Size", 
-       y = "Total Utility") +
-  theme_minimal()
-```
-
----
 
 ## Multivariate Normal Mixtures: The mash Approach
 
@@ -1743,8 +1627,7 @@ ggplot(plot_df, aes(x = Effect, y = Study, color = Group)) +
 
 ## Questions?
 
-Thank you for your attention!
-
-<div style="text-align: center; margin-top: 2em;">
-<img src="https://bayes.wustl.edu/Images/Bayes.jpg" width="200">
-</div>
+Thank you!! 
+**Pradeep Natarajan, MD MMSc** 
+**Sasha Gusev, PhD** 
+**Giovanni Parmigiani, PhD** 
