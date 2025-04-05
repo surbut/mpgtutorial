@@ -1256,201 +1256,6 @@ ggplot(example_long, aes(x = Condition, y = Value, color = EffectType, group = E
 :::
 :::::
 
----
-
-## Bayesian Networks for Causal Inference
-
-::::: columns
-::: {.column width="50%"}
-**Problem**: Infer causal relationships in genomic data
-
-**Bayesian networks**:
-- Directed acyclic graphs (DAGs)
-- Nodes = variables (genes, traits)
-- Edges = conditional dependencies
-- Represent causal relationships
-
-**Advantages**:
-- Incorporate prior knowledge
-- Handle missing data
-- Quantify uncertainty in network structure
-- Integrate multiple data types
-:::
-
-::: {.column width="50%"}
-```{r}
-#| fig-height: 6
-# Create a simplified visualization of a Bayesian network
-# This doesn't require igraph
-
-# Create a data frame for nodes
-nodes <- data.frame(
-  id = c("SNP1", "SNP2", "Gene1", "Gene2", "Gene3", "Gene4", "Trait", "Outcome"),
-  x = c(1, 1, 2, 2, 3, 3, 4, 5),
-  y = c(1, 3, 2, 4, 1, 3, 2, 2),
-  type = c(rep("SNP", 2), rep("Gene", 4), "Trait", "Outcome"),
-  size = c(rep(3, 2), rep(4, 4), 5, 6)
-)
-
-# Create a data frame for edges
-edges <- data.frame(
-  from = c("SNP1", "SNP2", "Gene1", "Gene1", "Gene2", "Gene3", "Gene4"),
-  to = c("Gene1", "Gene2", "Gene3", "Gene4", "Gene3", "Trait", "Trait"),
-  prob = c(0.85, 0.92, 0.78, 0.65, 0.71, 0.88, 0.76)
-)
-
-# Add the final edge
-edges <- rbind(edges, data.frame(from = "Trait", to = "Outcome", prob = 0.94))
-
-# Create a function to draw arrows
-draw_arrow <- function(from_x, from_y, to_x, to_y, prob, color = "black") {
-  # Calculate arrow coordinates
-  arrows(from_x, from_y, to_x, to_y, length = 0.1, angle = 30, 
-         lwd = 1 + 2 * prob, col = color)
-  
-  # Add probability label
-  text_x <- (from_x + to_x) / 2
-  text_y <- (from_y + to_y) / 2
-  text(text_x, text_y, labels = prob, cex = 0.8, col = "darkblue")
-}
-
-# Create the plot
-plot_network <- function() {
-  # Set up the plot
-  plot(NULL, xlim = c(0.5, 5.5), ylim = c(0.5, 4.5), 
-       xlab = "", ylab = "", xaxt = "n", yaxt = "n",
-       main = "Bayesian Network for Genomic Causality")
-  
-  # Add node colors based on type
-  node_colors <- c("SNP" = "lightblue", "Gene" = "lightgreen", 
-                  "Trait" = "orange", "Outcome" = "pink")
-  
-  # Draw nodes
-  for (i in 1:nrow(nodes)) {
-    points(nodes$x[i], nodes$y[i], pch = 19, 
-           col = node_colors[nodes$type[i]], 
-           cex = nodes$size[i])
-    text(nodes$x[i], nodes$y[i], labels = nodes$id[i], cex = 0.9)
-  }
-  
-  # Draw edges
-  for (i in 1:nrow(edges)) {
-    from_idx <- which(nodes$id == edges$from[i])
-    to_idx <- which(nodes$id == edges$to[i])
-    
-    draw_arrow(nodes$x[from_idx], nodes$y[from_idx],
-              nodes$x[to_idx], nodes$y[to_idx],
-              edges$prob[i])
-  }
-  
-  # Add a legend
-  legend("bottomleft", 
-         legend = names(node_colors),
-         pch = 19, 
-         col = node_colors,
-         title = "Node Types",
-         cex = 0.8)
-}
-
-# Generate the plot
-plot_network()
-```
-:::
-:::::
-
----
-
-## Case Study: Bayesian Fine-Mapping
-
-::::: columns
-::: {.column width="50%"}
-**Problem**: Identify causal variants in a GWAS locus
-
-**Traditional approach**:
-- Select all SNPs with p < threshold
-- Often includes many correlated SNPs
-
-**Bayesian approach**:
-- Calculate posterior probability of causality
-- Report credible sets (e.g., 95% probability)
-- Incorporate functional priors
-:::
-
-::: {.column width="50%"}
-```{r}
-#| fig-height: 6
-# Create a visualization of Bayesian fine-mapping
-set.seed(456)
-
-# Parameters
-n_snps <- 50
-causal_idx <- 25
-
-# Create correlation structure (LD)
-pos <- 1:n_snps
-ld_matrix <- exp(-abs(outer(pos, pos, "-")) / 10)
-
-# Generate true effects (only one causal variant)
-true_effects <- rep(0, n_snps)
-true_effects[causal_idx] <- 0.5
-
-# Generate observed effects based on LD
-observed_effects <- ld_matrix %*% true_effects + rnorm(n_snps, 0, 0.1)
-
-# Calculate p-values
-p_values <- 2 * pnorm(-abs(observed_effects))
-
-# Calculate Bayes factors (simplified)
-bayes_factors <- exp(observed_effects^2 / 2)
-
-# Calculate posterior probabilities (assuming 1/n_snps prior)
-prior <- 1/n_snps
-posterior_probs <- (prior * bayes_factors) / sum(prior * bayes_factors)
-
-# Create data frame for plotting
-fine_map_df <- data.frame(
-  SNP = 1:n_snps,
-  Position = pos,
-  ObservedEffect = observed_effects,
-  PValue = p_values,
-  PosteriorProb = posterior_probs,
-  Causal = (1:n_snps == causal_idx)
-)
-
-# Calculate 95% credible set
-sorted_idx <- order(posterior_probs, decreasing = TRUE)
-cumulative_prob <- cumsum(posterior_probs[sorted_idx])
-credible_set <- sorted_idx[cumulative_prob <= 0.95]
-fine_map_df$InCredibleSet <- (1:n_snps %in% credible_set)
-
-# Create plot
-ggplot(fine_map_df, aes(x = Position)) +
-  geom_point(aes(y = -log10(PValue), color = "P-value"), size = 3, alpha = 0.7) +
-  geom_point(aes(y = PosteriorProb * 10, color = "Posterior"), size = 3, alpha = 0.7) +
-  geom_vline(xintercept = pos[causal_idx], linetype = "dashed", color = "red") +
-  geom_rect(data = subset(fine_map_df, InCredibleSet),
-            aes(xmin = Position - 0.4, xmax = Position + 0.4, 
-                ymin = 0, ymax = -0.2),
-            fill = "darkgreen", alpha = 0.3) +
-  scale_color_manual(values = c("P-value" = "blue", "Posterior" = "darkgreen"),
-                    name = "Measure") +
-  scale_y_continuous(
-    name = "-log10(p-value)",
-    sec.axis = sec_axis(~./10, name = "Posterior Probability")
-  ) +
-  annotate("text", x = n_snps * 0.8, y = 1, 
-           label = "95% Credible Set", color = "darkgreen") +
-  labs(title = "Bayesian Fine-Mapping vs. P-values",
-       subtitle = "Green bars indicate 95% credible set; red line is true causal variant",
-       x = "Genomic Position") +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-```
-:::
-:::::
-
----
-
 ## Case Study: Bayesian Meta-Analysis
 
 ::::: columns
@@ -1467,6 +1272,12 @@ ggplot(fine_map_df, aes(x = Position)) +
 - Robust methods to handle outliers
 - Incorporates prior knowledge
 - Quantifies uncertainty in heterogeneity
+
+**The math behind it**:
+$$y_i | \theta_i, \sigma_i^2 \sim N(\theta_i, \sigma_i^2)$$
+$$\theta_i | \mu, \tau^2 \sim N(\mu, \tau^2)$$
+$$\mu \sim N(\mu_0, \sigma_0^2)$$
+$$\tau^2 \sim \text{InvGamma}(a, b)$$
 :::
 
 ::: {.column width="50%"}
@@ -1563,6 +1374,343 @@ ggplot(plot_df, aes(x = Effect, y = Study, color = Group)) +
 :::
 :::::
 
+---
+
+## Case Study: Bayesian Fine-Mapping with SuSiE
+
+::::: columns
+::: {.column width="50%"}
+**Problem**: Identify causal variants in a GWAS locus
+
+**Traditional approach**:
+- Select all SNPs with p < threshold
+- Often includes many correlated SNPs
+
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 6
+# Create a visualization of Bayesian fine-mapping
+set.seed(456)
+
+# Parameters
+n_snps <- 50
+causal_idx <- 25
+
+# Create correlation structure (LD)
+pos <- 1:n_snps
+ld_matrix <- exp(-abs(outer(pos, pos, "-")) / 10)
+
+# Generate true effects (only one causal variant)
+true_effects <- rep(0, n_snps)
+true_effects[causal_idx] <- 0.5
+
+# Generate observed effects based on LD
+observed_effects <- ld_matrix %*% true_effects + rnorm(n_snps, 0, 0.1)
+
+# Calculate p-values
+p_values <- 2 * pnorm(-abs(observed_effects))
+
+# Calculate Bayes factors (simplified)
+bayes_factors <- exp(observed_effects^2 / 2)
+
+# Calculate posterior probabilities (assuming 1/n_snps prior)
+prior <- 1/n_snps
+posterior_probs <- (prior * bayes_factors) / sum(prior * bayes_factors)
+
+# Create data frame for plotting
+fine_map_df <- data.frame(
+  SNP = 1:n_snps,
+  Position = pos,
+  ObservedEffect = observed_effects,
+  PValue = p_values,
+  PosteriorProb = posterior_probs,
+  Causal = (1:n_snps == causal_idx)
+)
+
+# Calculate 95% credible set
+sorted_idx <- order(posterior_probs, decreasing = TRUE)
+cumulative_prob <- cumsum(posterior_probs[sorted_idx])
+credible_set <- sorted_idx[cumulative_prob <= 0.95]
+fine_map_df$InCredibleSet <- (1:n_snps %in% credible_set)
+
+# Create plot
+ggplot(fine_map_df, aes(x = Position)) +
+  geom_point(aes(y = -log10(PValue), color = "P-value"), size = 3, alpha = 0.7) +
+  geom_point(aes(y = PosteriorProb * 10, color = "Posterior"), size = 3, alpha = 0.7) +
+  geom_vline(xintercept = pos[causal_idx], linetype = "dashed", color = "red") +
+  geom_rect(data = subset(fine_map_df, InCredibleSet),
+            aes(xmin = Position - 0.4, xmax = Position + 0.4, 
+                ymin = 0, ymax = -0.2),
+            fill = "darkgreen", alpha = 0.3) +
+  scale_color_manual(values = c("P-value" = "blue", "Posterior" = "darkgreen"),
+                    name = "Measure") +
+  scale_y_continuous(
+    name = "-log10(p-value)",
+    sec.axis = sec_axis(~./10, name = "Posterior Probability")
+  ) +
+  annotate("text", x = n_snps * 0.8, y = 1, 
+           label = "95% Credible Set", color = "darkgreen") +
+  labs(title = "Bayesian Fine-Mapping vs. P-values",
+       subtitle = "Green bars indicate 95% credible set; red line is true causal variant",
+       x = "Genomic Position") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+:::
+:::::
+
+## The SuSiE Model for Fine-Mapping
+
+---
+
+## What is SuSiE?
+
+- **S**um of **Si**ngle **E**ffects model
+- Bayesian sparse regression for genetic fine-mapping
+- Developed by Wang et al. (2020)
+- Efficiently handles correlated variants (LD)
+- Identifies multiple causal signals simultaneously
+
+---
+
+## Problem SuSiE Solves
+
+**Traditional GWAS challenge:**
+- Many correlated SNPs (in LD) show association signals
+- Which ones are actually causal?
+- How many independent signals exist?
+
+**SuSiE solution:**
+- Model phenotype as sum of sparse effects
+- Each effect has exactly one causal variant
+- Produces probabilistic measures of causality
+
+---
+
+## The SuSiE Mathematical Model
+
+$$\mathbf{y} = \sum_{l=1}^L \mathbf{X} \boldsymbol{\beta}_l + \boldsymbol{\epsilon}$$
+
+Where:
+- $\mathbf{y}$ = phenotype vector
+- $\mathbf{X}$ = genotype matrix
+- $L$ = number of causal signals
+- Each $\boldsymbol{\beta}_l$ has exactly one non-zero element
+- $\boldsymbol{\epsilon} \sim N(\mathbf{0}, \sigma^2\mathbf{I})$ = error term
+
+---
+
+## Key Parameters Explained
+
+- **L**: Number of causal effects
+  * Small integer (typically 1-10)
+  * Can be fixed or determined adaptively
+  * Each effect has one causal variant
+
+- **j**: Index for SNPs
+  * j = 1 to p (total number of SNPs)
+  * Could be hundreds/thousands in a region
+
+---
+
+## Posterior Probabilities in SuSiE
+
+For each effect $l$ and SNP $j$:
+
+$$\alpha_{lj} = P(\text{SNP } j \text{ is causal for effect } l \mid \mathbf{y}, \mathbf{X})$$
+
+**Posterior Inclusion Probability** for SNP $j$:
+
+$$\text{PIP}_j = P(\text{SNP } j \text{ is causal} \mid \mathbf{y}, \mathbf{X}) = 1 - \prod_{l=1}^L (1 - \alpha_{lj})$$
+
+This captures the probability that SNP $j$ is causal for at least one effect.
+
+---
+
+## 95% Credible Sets
+
+For each effect $l$:
+
+1. Order SNPs by their posterior probability $\alpha_{lj}$
+2. Include SNPs until cumulative probability ≥ 95%
+3. This set has 95% probability of containing the causal variant
+
+**Example:**
+- Effect l=1: {SNP25, SNP26, SNP24} with probabilities {0.80, 0.12, 0.05} → 97% coverage
+- Effect l=2: {SNP40, SNP41} with probabilities {0.91, 0.04} → 95% coverage 
+
+---
+
+## SuSiE vs. Traditional Methods
+
+| Feature | SuSiE | Standard GWAS |
+|---------|-------|---------------|
+| Multiple causal variants | ✓ | × |
+| Accounts for LD | ✓ | × |
+| Direct causality measures | ✓ | × |
+| Handles correlation | ✓ | Limited |
+| Interpretation | Probability of causality | Statistical association |
+| Output | Credible sets | Significant SNPs |
+
+---
+
+## Back to Our Example
+
+[Return to your original fine-mapping example visualization]
+
+
+**The math behind SuSiE**:
+
+- Models phenotype as sum of L single-SNP effects
+- Each effect has exactly one causal variant
+- Reports posterior probabilities of causality
+
+$$\mathbf{y} = \sum_{l=1}^L \mathbf{X} \boldsymbol{\beta}_l + \boldsymbol{\epsilon}$$
+
+Where:
+- L = number of causal signals (typically small)
+- Each $\boldsymbol{\beta}_l$ has exactly one non-zero element
+- 95% credible sets contain the causal variant with 95% probability
+--- 
+
+## Bayesian Networks for Causal Inference
+
+::::: columns
+::: {.column width="50%"}
+**Problem**: Infer causal relationships in genomic data
+
+**Bayesian networks**:
+- Directed acyclic graphs (DAGs)
+- Nodes = variables (genes, traits)
+- Edges = conditional dependencies
+- Represent causal relationships
+
+**The math behind it**:
+- Joint probability factorizes as:
+$$P(X_1, X_2, \ldots, X_n) = \prod_{i=1}^n P(X_i | \text{Pa}(X_i))$$
+
+- Posterior probability of network G given data D:
+$$P(G|D) \propto P(D|G)P(G)$$
+
+- Network score considers fit to data and complexity:
+$$\text{Score}(G|D) = \log P(D|G) - \text{penalty}(\text{complexity})$$
+
+**Different from SuSiE**: Bayesian networks model complex dependency structures with directed graphs, while SuSiE is a sparse linear model for fine-mapping.
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 6
+# Create a simplified visualization of a Bayesian network
+# This doesn't require igraph
+
+# Create a function to draw nodes and edges
+plot_network <- function() {
+  # Create a data frame for nodes
+  nodes <- data.frame(
+    id = c("SNP1", "SNP2", "Gene1", "Gene2", "Gene3", "Gene4", "Trait", "Outcome"),
+    x = c(1, 1, 2, 2, 3, 3, 4, 5),
+    y = c(1, 3, 2, 4, 1, 3, 2, 2),
+    type = c(rep("SNP", 2), rep("Gene", 4), "Trait", "Outcome"),
+    size = c(rep(3, 2), rep(4, 4), 5, 6)
+  )
+
+  # Create a data frame for edges
+  edges <- data.frame(
+    from = c("SNP1", "SNP2", "Gene1", "Gene1", "Gene2", "Gene3", "Gene4", "Trait"),
+    to = c("Gene1", "Gene2", "Gene3", "Gene4", "Gene3", "Trait", "Trait", "Outcome"),
+    prob = c(0.85, 0.92, 0.78, 0.65, 0.71, 0.88, 0.76, 0.94)
+  )
+
+  # Set up the plot
+  plot(NULL, xlim = c(0.5, 5.5), ylim = c(0.5, 4.5), 
+       xlab = "", ylab = "", xaxt = "n", yaxt = "n",
+       main = "Bayesian Network for Genomic Causality")
+  
+  # Add node colors based on type
+  node_colors <- c("SNP" = "lightblue", "Gene" = "lightgreen", 
+                  "Trait" = "orange", "Outcome" = "pink")
+  
+  # Draw nodes
+  for (i in 1:nrow(nodes)) {
+    points(nodes$x[i], nodes$y[i], pch = 19, 
+           col = node_colors[nodes$type[i]], 
+           cex = nodes$size[i])
+    text(nodes$x[i], nodes$y[i], labels = nodes$id[i], cex = 0.9)
+  }
+  
+  # Draw edges with arrows
+  for (i in 1:nrow(edges)) {
+    from_idx <- which(nodes$id == edges$from[i])
+    to_idx <- which(nodes$id == edges$to[i])
+    
+    # Draw arrow
+    arrows(nodes$x[from_idx], nodes$y[from_idx],
+          nodes$x[to_idx], nodes$y[to_idx],
+          length = 0.1, angle = 30, 
+          lwd = 1 + 2 * edges$prob[i])
+    
+    # Add probability label
+    text_x <- (nodes$x[from_idx] + nodes$x[to_idx]) / 2
+    text_y <- (nodes$y[from_idx] + nodes$y[to_idx]) / 2
+    text(text_x, text_y, labels = edges$prob[i], cex = 0.8, col = "darkblue")
+  }
+  
+  # Add a legend
+  legend("bottomleft", 
+         legend = names(node_colors),
+         pch = 19, 
+         col = node_colors,
+         title = "Node Types",
+         cex = 0.8)
+}
+
+# Generate the plot
+plot_network()
+```
+:::
+:::::
+
+---
+
+## SuSiE vs. Bayesian Networks: Key Differences
+
+::::: columns
+::: {.column width="50%"}
+**SuSiE (Sum of Single Effects)**:
+- Sparse regression model for fine-mapping
+- Identifies causal variants from correlated SNPs
+- Models outcome as sum of L single-variant effects
+- Linear model structure (not a network)
+- Each effect has exactly one causal variant
+- Designed specifically for genetic fine-mapping
+- Computationally efficient for genomic data
+
+**When to use SuSiE**:
+- GWAS/QTL fine-mapping
+- Identifying causal variants from LD blocks
+- When expecting few causal variants among many candidates
+:::
+
+::: {.column width="50%"}
+**Bayesian Networks**:
+- Graph-based probabilistic models
+- Nodes represent variables (genes, variants, traits)
+- Edges represent conditional dependencies
+- Can represent complex causal relationships
+- Joint probability factorizes according to graph
+- Used for inferring regulatory relationships
+- Structure learning is computationally intensive
+
+**When to use Bayesian Networks**:
+- Gene regulatory network inference
+- Causal pathway analysis
+- Multi-omics data integration
+- When modeling complex interactions between variables
+:::
+:::::
 ---
 
 ## Practical Recommendations for Bayesian Genomics

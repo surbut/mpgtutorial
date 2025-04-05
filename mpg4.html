@@ -801,13 +801,14 @@ Sarah Urbut, MD PhD
 </div>
 </div></div>
 </section>
-<section id="bayesian-networks-for-causal-inference" class="slide level2">
-<h2>Bayesian Networks for Causal Inference</h2>
+<section id="case-study-bayesian-meta-analysis" class="slide level2">
+<h2>Case Study: Bayesian Meta-Analysis</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><strong>Problem</strong>: Infer causal relationships in genomic data</p>
-<p><strong>Bayesian networks</strong>: - Directed acyclic graphs (DAGs) - Nodes = variables (genes, traits) - Edges = conditional dependencies - Represent causal relationships</p>
-<p><strong>Advantages</strong>: - Incorporate prior knowledge - Handle missing data - Quantify uncertainty in network structure - Integrate multiple data types</p>
+<p><strong>Problem</strong>: Combine evidence across heterogeneous studies</p>
+<p><strong>Traditional approach</strong>: - Fixed effects (assumes same effect size) - Random effects (allows variation in effect size) - Often sensitive to outliers</p>
+<p><strong>Bayesian approach</strong>: - Hierarchical model for effect heterogeneity - Robust methods to handle outliers - Incorporates prior knowledge - Quantifies uncertainty in heterogeneity</p>
+<p><strong>The math behind it</strong>: <span class="math display">\[y_i | \theta_i, \sigma_i^2 \sim N(\theta_i, \sigma_i^2)\]</span> <span class="math display">\[\theta_i | \mu, \tau^2 \sim N(\mu, \tau^2)\]</span> <span class="math display">\[\mu \sim N(\mu_0, \sigma_0^2)\]</span> <span class="math display">\[\tau^2 \sim \text{InvGamma}(a, b)\]</span></p>
 </div><div class="column" style="width:50%;">
 <div class="cell">
 <div class="cell-output-display">
@@ -820,13 +821,12 @@ Sarah Urbut, MD PhD
 </div>
 </div></div>
 </section>
-<section id="case-study-bayesian-fine-mapping" class="slide level2">
-<h2>Case Study: Bayesian Fine-Mapping</h2>
+<section id="case-study-bayesian-fine-mapping-with-susie" class="slide level2">
+<h2>Case Study: Bayesian Fine-Mapping with SuSiE</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
 <p><strong>Problem</strong>: Identify causal variants in a GWAS locus</p>
 <p><strong>Traditional approach</strong>: - Select all SNPs with p &lt; threshold - Often includes many correlated SNPs</p>
-<p><strong>Bayesian approach</strong>: - Calculate posterior probability of causality - Report credible sets (e.g., 95% probability) - Incorporate functional priors</p>
 </div><div class="column" style="width:50%;">
 <div class="cell">
 <div class="cell-output-display">
@@ -839,13 +839,131 @@ Sarah Urbut, MD PhD
 </div>
 </div></div>
 </section>
-<section id="case-study-bayesian-meta-analysis" class="slide level2">
-<h2>Case Study: Bayesian Meta-Analysis</h2>
+<section id="the-susie-model-for-fine-mapping" class="slide level2">
+<h2>The SuSiE Model for Fine-Mapping</h2>
+</section>
+<section id="what-is-susie" class="slide level2">
+<h2>What is SuSiE?</h2>
+<ul>
+<li><strong>S</strong>um of <strong>Si</strong>ngle <strong>E</strong>ffects model</li>
+<li>Bayesian sparse regression for genetic fine-mapping</li>
+<li>Developed by Wang et al.&nbsp;(2020)</li>
+<li>Efficiently handles correlated variants (LD)</li>
+<li>Identifies multiple causal signals simultaneously</li>
+</ul>
+</section>
+<section id="problem-susie-solves" class="slide level2">
+<h2>Problem SuSiE Solves</h2>
+<p><strong>Traditional GWAS challenge:</strong> - Many correlated SNPs (in LD) show association signals - Which ones are actually causal? - How many independent signals exist?</p>
+<p><strong>SuSiE solution:</strong> - Model phenotype as sum of sparse effects - Each effect has exactly one causal variant - Produces probabilistic measures of causality</p>
+</section>
+<section id="the-susie-mathematical-model" class="slide level2">
+<h2>The SuSiE Mathematical Model</h2>
+<p><span class="math display">\[\mathbf{y} = \sum_{l=1}^L \mathbf{X} \boldsymbol{\beta}_l + \boldsymbol{\epsilon}\]</span></p>
+<p>Where: - <span class="math inline">\(\mathbf{y}\)</span> = phenotype vector - <span class="math inline">\(\mathbf{X}\)</span> = genotype matrix - <span class="math inline">\(L\)</span> = number of causal signals - Each <span class="math inline">\(\boldsymbol{\beta}_l\)</span> has exactly one non-zero element - <span class="math inline">\(\boldsymbol{\epsilon} \sim N(\mathbf{0}, \sigma^2\mathbf{I})\)</span> = error term</p>
+</section>
+<section id="key-parameters-explained" class="slide level2">
+<h2>Key Parameters Explained</h2>
+<ul>
+<li><strong>L</strong>: Number of causal effects
+<ul>
+<li>Small integer (typically 1-10)</li>
+<li>Can be fixed or determined adaptively</li>
+<li>Each effect has one causal variant</li>
+</ul></li>
+<li><strong>j</strong>: Index for SNPs
+<ul>
+<li>j = 1 to p (total number of SNPs)</li>
+<li>Could be hundreds/thousands in a region</li>
+</ul></li>
+</ul>
+</section>
+<section id="posterior-probabilities-in-susie" class="slide level2">
+<h2>Posterior Probabilities in SuSiE</h2>
+<p>For each effect <span class="math inline">\(l\)</span> and SNP <span class="math inline">\(j\)</span>:</p>
+<p><span class="math display">\[\alpha_{lj} = P(\text{SNP } j \text{ is causal for effect } l \mid \mathbf{y}, \mathbf{X})\]</span></p>
+<p><strong>Posterior Inclusion Probability</strong> for SNP <span class="math inline">\(j\)</span>:</p>
+<p><span class="math display">\[\text{PIP}_j = P(\text{SNP } j \text{ is causal} \mid \mathbf{y}, \mathbf{X}) = 1 - \prod_{l=1}^L (1 - \alpha_{lj})\]</span></p>
+<p>This captures the probability that SNP <span class="math inline">\(j\)</span> is causal for at least one effect.</p>
+</section>
+<section id="credible-sets" class="slide level2">
+<h2>95% Credible Sets</h2>
+<p>For each effect <span class="math inline">\(l\)</span>:</p>
+<ol type="1">
+<li>Order SNPs by their posterior probability <span class="math inline">\(\alpha_{lj}\)</span></li>
+<li>Include SNPs until cumulative probability ≥ 95%</li>
+<li>This set has 95% probability of containing the causal variant</li>
+</ol>
+<p><strong>Example:</strong> - Effect l=1: {SNP25, SNP26, SNP24} with probabilities {0.80, 0.12, 0.05} → 97% coverage - Effect l=2: {SNP40, SNP41} with probabilities {0.91, 0.04} → 95% coverage</p>
+</section>
+<section id="susie-vs.-traditional-methods" class="slide level2">
+<h2>SuSiE vs.&nbsp;Traditional Methods</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Feature</th>
+<th>SuSiE</th>
+<th>Standard GWAS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Multiple causal variants</td>
+<td>✓</td>
+<td>×</td>
+</tr>
+<tr class="even">
+<td>Accounts for LD</td>
+<td>✓</td>
+<td>×</td>
+</tr>
+<tr class="odd">
+<td>Direct causality measures</td>
+<td>✓</td>
+<td>×</td>
+</tr>
+<tr class="even">
+<td>Handles correlation</td>
+<td>✓</td>
+<td>Limited</td>
+</tr>
+<tr class="odd">
+<td>Interpretation</td>
+<td>Probability of causality</td>
+<td>Statistical association</td>
+</tr>
+<tr class="even">
+<td>Output</td>
+<td>Credible sets</td>
+<td>Significant SNPs</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="back-to-our-example" class="slide level2">
+<h2>Back to Our Example</h2>
+<p>[Return to your original fine-mapping example visualization]</p>
+<p><strong>The math behind SuSiE</strong>:</p>
+<ul>
+<li>Models phenotype as sum of L single-SNP effects</li>
+<li>Each effect has exactly one causal variant</li>
+<li>Reports posterior probabilities of causality</li>
+</ul>
+<p><span class="math display">\[\mathbf{y} = \sum_{l=1}^L \mathbf{X} \boldsymbol{\beta}_l + \boldsymbol{\epsilon}\]</span></p>
+<p>Where: - L = number of causal signals (typically small) - Each <span class="math inline">\(\boldsymbol{\beta}_l\)</span> has exactly one non-zero element - 95% credible sets contain the causal variant with 95% probability</p>
+</section>
+<section id="bayesian-networks-for-causal-inference" class="slide level2">
+<h2>Bayesian Networks for Causal Inference</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><strong>Problem</strong>: Combine evidence across heterogeneous studies</p>
-<p><strong>Traditional approach</strong>: - Fixed effects (assumes same effect size) - Random effects (allows variation in effect size) - Often sensitive to outliers</p>
-<p><strong>Bayesian approach</strong>: - Hierarchical model for effect heterogeneity - Robust methods to handle outliers - Incorporates prior knowledge - Quantifies uncertainty in heterogeneity</p>
+<p><strong>Problem</strong>: Infer causal relationships in genomic data</p>
+<p><strong>Bayesian networks</strong>: - Directed acyclic graphs (DAGs) - Nodes = variables (genes, traits) - Edges = conditional dependencies - Represent causal relationships</p>
+<p><strong>The math behind it</strong>: - Joint probability factorizes as: <span class="math display">\[P(X_1, X_2, \ldots, X_n) = \prod_{i=1}^n P(X_i | \text{Pa}(X_i))\]</span></p>
+<ul>
+<li><p>Posterior probability of network G given data D: <span class="math display">\[P(G|D) \propto P(D|G)P(G)\]</span></p></li>
+<li><p>Network score considers fit to data and complexity: <span class="math display">\[\text{Score}(G|D) = \log P(D|G) - \text{penalty}(\text{complexity})\]</span></p></li>
+</ul>
+<p><strong>Different from SuSiE</strong>: Bayesian networks model complex dependency structures with directed graphs, while SuSiE is a sparse linear model for fine-mapping.</p>
 </div><div class="column" style="width:50%;">
 <div class="cell">
 <div class="cell-output-display">
@@ -856,6 +974,17 @@ Sarah Urbut, MD PhD
 </div>
 </div>
 </div>
+</div></div>
+</section>
+<section id="susie-vs.-bayesian-networks-key-differences" class="slide level2">
+<h2>SuSiE vs.&nbsp;Bayesian Networks: Key Differences</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>SuSiE (Sum of Single Effects)</strong>: - Sparse regression model for fine-mapping - Identifies causal variants from correlated SNPs - Models outcome as sum of L single-variant effects - Linear model structure (not a network) - Each effect has exactly one causal variant - Designed specifically for genetic fine-mapping - Computationally efficient for genomic data</p>
+<p><strong>When to use SuSiE</strong>: - GWAS/QTL fine-mapping - Identifying causal variants from LD blocks - When expecting few causal variants among many candidates</p>
+</div><div class="column" style="width:50%;">
+<p><strong>Bayesian Networks</strong>: - Graph-based probabilistic models - Nodes represent variables (genes, variants, traits) - Edges represent conditional dependencies - Can represent complex causal relationships - Joint probability factorizes according to graph - Used for inferring regulatory relationships - Structure learning is computationally intensive</p>
+<p><strong>When to use Bayesian Networks</strong>: - Gene regulatory network inference - Causal pathway analysis - Multi-omics data integration - When modeling complex interactions between variables</p>
 </div></div>
 </section>
 <section id="practical-recommendations-for-bayesian-genomics" class="slide level2">
