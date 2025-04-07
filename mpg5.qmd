@@ -813,6 +813,8 @@ ggplot() +
   theme(legend.position = "bottom")
 ```
 
+
+
 ---
 
 ## Worked Example: EM Algorithm Step-by-Step
@@ -837,6 +839,24 @@ Let's walk through each step of the EM algorithm for a mixture of two Gaussians:
 
 ---
 
+The EM Algorithm: Mathematical Intuition
+Key insight: We're solving a chicken-and-egg problem
+If we knew component assignments, parameter estimation would be easy
+If we knew parameters, component assignments would be easy
+EM iteratively solves both by using expected assignments
+E-step (Expectation): Calculate expected component memberships
+$$\gamma_{ik} = P(z_i = k | x_i, \theta^{(t)}) = \frac{\pi_k^{(t)} f_k(x_i|\theta_k^{(t)})}{\sum_{j=1}^K \pi_j^{(t)} f_j(x_i|\theta_j^{(t)})}$$
+Intuition: "How likely is individual i to belong to population k, given our current parameter estimates?"
+M-step (Maximization): Update parameters using weighted averages
+For mixing weights:
+$$\pi_k^{(t+1)} = \frac{1}{n}\sum_{i=1}^n \gamma_{ik}$$
+Intuition: "The new population frequency is the average membership across all individuals"
+For component means (Gaussian case):
+$$\mu_k^{(t+1)} = \frac{\sum_{i=1}^n \gamma_{ik}x_i}{\sum_{i=1}^n \gamma_{ik}}$$
+Intuition: "The new population mean is a weighted average where individuals are weighted by their probability of belonging to this population"
+
+---
+
 ## Bayesian Mixture Models
 
 Bayesian mixture models add priors to the parameters:
@@ -851,7 +871,8 @@ Common prior choices:
 - Handle uncertainty in the number of components (K)
 - Avoid singularities and improve stability
 - Allow for informed priors from previous studies
-- Provide full posterior distribution rather than point estimates
+- Provide full posterior distribution rather than point estimates (in full MCMC impelmentation, but SLOW)
+-- compromise: EB for some pi, full inference ... 
 
 ---
 
@@ -1127,6 +1148,21 @@ The mathematical framework:
 - **Prior distribution**: $p(\theta)$ - Initial beliefs about parameter $\theta$
 - **Likelihood**: $p(X|\theta)$ - Probability of data given parameter
 - **Posterior distribution**: $p(\theta|X) \propto p(X|\theta)p(\theta)$ - Updated beliefs
+---
+
+## Bayesian Clinical Trials: Direct Probability Statements
+
+Key insight: Even with flat priors, Bayesian methods give you direct probability statements about parameters
+
+Example: For a treatment effect θ with flat prior and normal likelihood:
+$$p(\theta|data) \propto \text{Normal}(\hat{\theta}, SE^2)$$
+Direct probability statements:
+$P(\theta > 0 | data) = 0.97$ → "97% probability the treatment is beneficial"
+$P(\theta > 0.2 | data) = 0.63$ → "63% probability the effect exceeds clinically meaningful threshold"
+$P(0.1 < \theta < 0.3 | data) = 0.75$ → "75% probability effect is in the moderate range"
+Contrast with frequentist:
+"p < 0.05" → Reject null hypothesis
+"95% CI: [0.1, 0.4]" → In repeated sampling, 95% of intervals would contain true value
 
 **Decision rules** can be based on:
 - Posterior probability: $P(\theta > \delta|X) > \gamma$ 
