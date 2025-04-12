@@ -58,7 +58,7 @@ Bayesian approaches offer elegant solutions to these challenges.
 
 ## Probabilistic Interpretation of Estimates
 
-::: {.columns}
+:::: {.columns}
 ::: {.column width="50%"}
 In the Bayesian framework:
 
@@ -114,7 +114,7 @@ ggplot(plot_data, aes(x = x, y = y)) +
   theme_minimal()
 ```
 :::
-:::
+::::
 
 ## Bayesian vs. Frequentist Intervals
 
@@ -130,10 +130,9 @@ ggplot(plot_data, aes(x = x, y = y)) +
 
 In this primer, we'll explore key Bayesian concepts critical for modern genomics:
 
-1.  **P-values vs. Posterior Probabilities**: 
-Why Bayesian thinking helps avoid misinterpretations
-2.  **Conjugate Models**: Elegant solutions for population genetic inference
-3.  **Mixture Models**: Powerful tools for complex genomic data
+1.  **P-values vs. Posterior Probabilities**: Why Bayesian thinking helps avoid misinterpretations  
+2.  **Conjugate Models**: Elegant solutions for population genetic inference  
+3.  **Mixture Models**: Powerful tools for complex genomic data  
 4.  **Bayesian Clinical & Adaptive Designs**: Learning and adapting as data accumulates
 
 ## Bayes' Theorem - The Core Idea
@@ -188,29 +187,29 @@ This mismatch causes persistent misinterpretations.
 
 ## P-values vs. Bayes Factors: Definitions
 
-**P-value**:
-- $P(data|H_0)$ - probability of data given null hypothesis
-- Measures compatibility of data with null hypothesis
-- Does not directly measure evidence for alternative
+**P-value**:  
+- $P(data|H_0)$ - probability of data given null hypothesis  
+- Measures compatibility of data with null hypothesis  
+- Does not directly measure evidence for alternative  
 
-**Bayes Factor**:
-- $BF_{10} = \frac{P(data|H_1)}{P(data|H_0)}$ - ratio of likelihoods
-- Directly compares evidence for alternative vs. null
-- Tells you how much to update your beliefs
+**Bayes Factor**:  
+- $BF_{10} = \frac{P(data|H_1)}{P(data|H_0)}$ - ratio of likelihoods  
+- Directly compares evidence for alternative vs. null  
+- Tells you how much to update your beliefs  
 
 ## The P-value Fallacy
 
-::: {.columns}
+:::: {.columns}
 ::: {.column width="50%"}
 **Scenario**: Testing a SNP for disease association
 
-**Traditional approach**:
-- Obtain p = 0.001
-- Declare "significant association"
-- Publish result
+**Traditional approach**:  
+- Obtain p = 0.001  
+- Declare "significant association"  
+- Publish result  
 
-**The fallacy**:
-- p = 0.001 means "1 in 1000 chance of seeing this data if no association exists"
+**The fallacy**:  
+- p = 0.001 means "1 in 1000 chance of seeing this data if no association exists"  
 - NOT "999 in 1000 chance the association is real"
 :::
 
@@ -250,7 +249,7 @@ ggplot(df, aes(x = Stage, y = Probability)) +
   theme_minimal(base_size = 14)
 ```
 :::
-:::
+::::
 
 **Key insight**: With a realistic prior of 1/1000, a "significant" p-value of 0.001 only gives ~50% posterior probability of true association!
 
@@ -270,44 +269,46 @@ Meaning even the most favorable interpretation of a p-value provides less eviden
 
 ## What is the Minimum Bayes Factor?
 
-The Minimum Bayes Factor is calculated as:
-MBF≈−e×p×log⁡(p)\text{MBF} \approx -e \times p \times \log(p)MBF≈−e×p×log(p)
+The Minimum Bayes Factor is calculated as:  
+$\text{MBF} \approx -e \times p \times \log(p)$
 
-This formula (derived by Sellke, Bayarri, and Berger) represents the **smallest possible Bayes factor** 
-that could correspond to a given p-value, regardless of the specific alternative hypothesis being tested.
+This formula (derived by Sellke, Bayarri, and Berger) represents the **smallest possible Bayes factor** that could correspond to a given p-value, regardless of the specific alternative hypothesis being tested.
+
 ---
 
 ## Why "Minimum"?
+
 It's called "minimum" because:
 
-- It assumes the most favorable conditions for the alternative hypothesis
-- It represents the strongest possible evidence against the null that could be derived from a p-value
-It's the smallest value the Bayes factor could take (stronger evidence against null = smaller Bayes factor)
+- It assumes the most favorable conditions for the alternative hypothesis  
+- It represents the strongest possible evidence against the null that could be derived from a p-value  
+- It's the smallest value the Bayes factor could take (stronger evidence against null = smaller Bayes factor)
 
 ## Interpretation
 
-The MBF represents the ratio of likelihoods:
-MBF=P(data∣H0)P(data∣H1)\text{MBF} = \frac{P(\text{data}|H_0)}{P(\text{data}|H_1)}MBF=P(data∣H1​)P(data∣H0​)​
+The MBF represents the ratio of likelihoods:  
+$\text{MBF} = \frac{P(\text{data}|H_0)}{P(\text{data}|H_1)}$
 
 For example, with p = 0.05:
 
-MBF = 0.37
-This means the data are at most 1/0.37 ≈ 2.7 times more likely under the alternative than the null
+MBF = 0.37  
+This means the data are at most 1/0.37 ≈ 2.7 times more likely under the alternative than the null  
 Even with the most optimistic assumptions, the evidence against the null is modest
 
 With p = 0.001:
 
-MBF = 0.0083
-This means the data are at most 1/0.0083 ≈ 120 times more likely under the alternative
+MBF = 0.0083  
+This means the data are at most 1/0.0083 ≈ 120 times more likely under the alternative  
 Much stronger evidence, but still not as extreme as the very small p-value might suggest
 
 ## Why This Conversion Matters
+
 This conversion from p-values to MBF is important because:
 
-It provides a more calibrated interpretation of statistical evidence
-It shows that conventional "statistical significance" (p < 0.05) actually represents fairly modest evidence
-It helps researchers avoid overinterpreting p-values
-It establishes a link between frequentist and Bayesian approaches
+- It provides a more calibrated interpretation of statistical evidence  
+- It shows that conventional "statistical significance" (p < 0.05) actually represents fairly modest evidence  
+- It helps researchers avoid overinterpreting p-values  
+- It establishes a link between frequentist and Bayesian approaches  
 
 The key point is that p-values systematically overstate the evidence against the null hypothesis. 
 
@@ -346,15 +347,15 @@ The GWAS significance threshold of p < 5×10⁻⁸ corresponds to much stronger 
 
 Bayes factors have a natural interpretation:
 
-| Bayes Factor (BF_{10}) | Evidence for H1 |
-|---------------------|-----------------|
-| 1 - 3               | Barely worth mentioning |
-| 3 - 10              | Substantial |
-| 10 - 30             | Strong |
-| 30 - 100            | Very strong |
-| > 100               | Extreme |
+| Bayes Factor ($BF_{10}$) | Evidence for H1             |
+|--------------------------|----------------------------|
+| 1 - 3                    | Barely worth mentioning     |
+| 3 - 10                   | Substantial                 |
+| 10 - 30                  | Strong                      |
+| 30 - 100                 | Very strong                 |
+| > 100                    | Extreme                     |
 
-A BF_{10} = 10 means the data are 10 times more likely under H1 than H0.
+A $BF_{10} = 10$ means the data are 10 times more likely under H1 than H0.
 
 ## From Bayes Factor to Posterior Probability
 
@@ -382,51 +383,50 @@ This clearly shows how Bayes factors calibrate our prior beliefs.
 
 In a genome-wide association study:
 
-- Prior probability of true association: ~1/10,000 per variant
-- p-value threshold: 5×10^{-8} 
-- Corresponding minimum Bayes factor: ~10^{-6}
+- Prior probability of true association: ~1/10,000 per variant  
+- p-value threshold: 5×10^{-8}  
+- Corresponding minimum Bayes factor: ~10^{-6}  
 - Posterior probability: ~9%
 
 **Interpretation**: Even at genome-wide significance, most "discoveries" may be false positives without additional evidence!
 
-
 ## A useful formula
+
 There is another way of laying out this kind of calculation, which may be slightly easier to interpret and remember, and also has the advantage of holding even when more than two models are under consideration. From Bayes theorem we have
 
-Pr(Zi=1|xi)=Pr(xi|Zi=1)Pr(Zi=1)/Pr(xi).
+$\Pr(Z_i=1|x_i)=\Pr(x_i|Z_i=1)\Pr(Z_i=1)/\Pr(x_i)$.
 
 and
 
-Pr(Zi=0|xi)=Pr(xi|Zi=0)Pr(Zi=0)/Pr(xi).
+$\Pr(Z_i=0|x_i)=\Pr(x_i|Z_i=0)\Pr(Z_i=0)/\Pr(x_i)$.
 
-Taking the ratio of these gives
-Pr(Zi=1|xi)/Pr(Zi=0|xi)=[Pr(Zi=1)/Pr(Zi=0)]×[Pr(xi|Zi=1)/Pr(xi|Zi=0)].
+Taking the ratio of these gives  
+$\Pr(Z_i=1|x_i)/\Pr(Z_i=0|x_i)=[\Pr(Z_i=1)/\Pr(Z_i=0)]×[\Pr(x_i|Z_i=1)/\Pr(x_i|Z_i=0)]$.
 
-This formula can be conveniently stated in words, using the notion of ``odds“, as follows:
-Posterior Odds = Prior Odds x LR
-or, recalling that the LR is sometimes referred to as the Bayes Factor (BF), we have
-Posterior Odds = Prior Odds x BF.
+This formula can be conveniently stated in words, using the notion of *odds*, as follows:  
+Posterior Odds = Prior Odds × LR  
+or, recalling that the LR is sometimes referred to as the Bayes Factor (BF), we have  
+Posterior Odds = Prior Odds × BF.
 
-Note that the “Odds” of an event E1 vs an event E2 means the ratio of their probabilities. So Pr(Zi=1)/Pr(Zi=0) is the “Odds” of Zi=1 vs Zi=0. It is referred to as the “Prior Odds”, because it is the odds prior to seeing the data x. Similarly the Posterior Odds refers to the Odds of Zi=1 vs Zi=0 “posterior to” (after) seeing the data x.
-
+Note that the “Odds” of an event E1 vs an event E2 means the ratio of their probabilities. So $\Pr(Z_i=1)/\Pr(Z_i=0)$ is the “Prior Odds”, because it is the odds prior to seeing the data $x$. Similarly the Posterior Odds refers to the Odds of $Z_i=1$ vs $Z_i=0$ “posterior to” (after) seeing the data $x$.
 
 ## Benefits of Bayes Factors for Genomics
 
-1. **Calibrated evidence**: Direct measure of evidence strength
-2. **Multiple testing**: Naturally incorporates prior odds
-3. **Replication**: Coherent framework for combining evidence across studies
-4. **Diverse hypotheses**: Can compare non-nested models
-5. **Positive evidence**: Can support null hypothesis, not just reject it
-6. **Study design**: Allows stopping when evidence is sufficient
+1. **Calibrated evidence**: Direct measure of evidence strength  
+2. **Multiple testing**: Naturally incorporates prior odds  
+3. **Replication**: Coherent framework for combining evidence across studies  
+4. **Diverse hypotheses**: Can compare non-nested models  
+5. **Positive evidence**: Can support null hypothesis, not just reject it  
+6. **Study design**: Allows stopping when evidence is sufficient  
 
 ## Key Takeaways
 
-1. P-values answer a different question than most scientists ask
-2. Bayes factors directly compare competing hypotheses
-3. Even "significant" p-values provide weaker evidence than typically assumed
-4. Bayes factors have a natural interpretation as evidence strength
-5. Converting to posterior probabilities requires considering prior odds
-6. In genomics, this perspective helps manage false discovery rates
+1. P-values answer a different question than most scientists ask  
+2. Bayes factors directly compare competing hypotheses  
+3. Even "significant" p-values provide weaker evidence than typically assumed  
+4. Bayes factors have a natural interpretation as evidence strength  
+5. Converting to posterior probabilities requires considering prior odds  
+6. In genomics, this perspective helps manage false discovery rates  
 
 ## The Fallacy of P-values
 
@@ -438,14 +438,13 @@ Note that the “Odds” of an event E1 vs an event E2 means the ratio of their 
 -   This disconnect leads to systematic misinterpretation
 :::
 
-
 ## The Multiple Testing Challenge
 
 Modern genomics routinely tests **thousands to millions** of hypotheses:
 
-- 20,000+ genes in differential expression
-- Millions of variants in GWAS
-- Billions of potential interactions
+- 20,000+ genes in differential expression  
+- Millions of variants in GWAS  
+- Billions of potential interactions  
 
 **The consequence**: Many "significant" findings are actually false positives.
 
@@ -453,13 +452,13 @@ Modern genomics routinely tests **thousands to millions** of hypotheses:
 
 When testing m hypotheses at significance level α:
 
-- Expected number of false positives: m × α
+- Expected number of false positives: m × α  
 - With m = 1,000,000 and α = 0.05: **50,000 false positives!**
 
-**Frequentist solutions**:
-- Bonferroni correction: α/m
-- False Discovery Rate (FDR) control (Benjamini-Hochberg)
-- Family-wise error rate (FWER) control
+**Frequentist solutions**:  
+- Bonferroni correction: α/m  
+- False Discovery Rate (FDR) control (Benjamini-Hochberg)  
+- Family-wise error rate (FWER) control  
 
 ## The Fundamental Issue
 
@@ -477,9 +476,9 @@ To bridge this gap, we need **Bayes' theorem**.
 
 We model each test as:
 
-- $H_0$: No effect (null hypothesis)
-- $H_1$: Real effect (alternative hypothesis)
-- Prior probability: $P(H_1) = \pi_1$
+- $H_0$: No effect (null hypothesis)  
+- $H_1$: Real effect (alternative hypothesis)  
+- Prior probability: $P(H_1) = \pi_1$  
 - Likelihood ratio: $BF = \frac{P(\text{data}|H_1)}{P(\text{data}|H_0)}$
 
 The posterior probability of a true finding:
@@ -558,36 +557,36 @@ $$\text{LFDR}(z) = P(H_0|z) = 1 - P(H_1|z)$$
 
 This is a direct Bayesian statement about the probability of false discovery for each individual test.
 
-Benefits:
-- Test-specific measure of evidence
-- Directly interpretable probability
-- Accounts for prior probability of effects
+Benefits:  
+- Test-specific measure of evidence  
+- Directly interpretable probability  
+- Accounts for prior probability of effects  
 
 ## Empirical Bayes for Multiple Testing
 
 We can estimate components from the data:
 
-1. Proportion of true effects: $\hat{\pi}_1$
-2. Distribution of null statistics: $\hat{f}_0(z)$
-3. Distribution of all statistics: $\hat{f}(z)$
+1. Proportion of true effects: $\hat{\pi}_1$  
+2. Distribution of null statistics: $\hat{f}_0(z)$  
+3. Distribution of all statistics: $\hat{f}(z)$  
 
 Then:
 
 $$\widehat{\text{LFDR}}(z) = \frac{(1-\hat{\pi}_1)\hat{f}_0(z)}{\hat{f}(z)}$$
 
-Popular implementations: qvalue package, fdrtool, locfdr
+Popular implementations: `qvalue` package, `fdrtool`, `locfdr`
 
 ## Comparison with FDR Control
 
-**Frequentist FDR** (Benjamini-Hochberg):
-- Controls expected proportion of false discoveries
-- Same threshold for all tests based on ranked p-values
-- No direct probability interpretation for individual tests
+**Frequentist FDR** (Benjamini-Hochberg):  
+- Controls expected proportion of false discoveries  
+- Same threshold for all tests based on ranked p-values  
+- No direct probability interpretation for individual tests  
 
-**Bayesian approach**:
-- Calculates probability of false discovery for each test
-- Can incorporate prior information on effect prevalence
-- Naturally addresses multiple testing without penalties
+**Bayesian approach**:  
+- Calculates probability of false discovery for each test  
+- Can incorporate prior information on effect prevalence  
+- Naturally addresses multiple testing without penalties  
 
 ## Example: Genomic Applications
 
@@ -651,44 +650,44 @@ Both approaches control false discoveries but with different decision boundaries
 
 ## Advantages of Bayesian Multiple Testing
 
-1. **Direct probabilistic statements**: "95% probability of true effect"
-2. **Incorporates effect prevalence**: Accounts for rarity of true effects
-3. **No arbitrary thresholds**: Posterior probabilities are on probability scale
-4. **Effect size integration**: Naturally considers both significance and magnitude
-5. **Prior information**: Can incorporate domain knowledge
-6. **Decision theory integration**: Allows optimal decision-making based on costs
+1. **Direct probabilistic statements**: "95% probability of true effect"  
+2. **Incorporates effect prevalence**: Accounts for rarity of true effects  
+3. **No arbitrary thresholds**: Posterior probabilities are on probability scale  
+4. **Effect size integration**: Naturally considers both significance and magnitude  
+5. **Prior information**: Can incorporate domain knowledge  
+6. **Decision theory integration**: Allows optimal decision-making based on costs  
 
 ## Extensions
 
 Advanced Bayesian approaches for multiple testing:
 
-1. **Hierarchical models**: Sharing information across tests
-2. **Correlated tests**: Modeling dependency structures between tests
-3. **Spatial/network priors**: Incorporating biological relationships
-4. **Mixture priors**: More flexible alternative distributions
-5. **Adaptive shrinkage**: Data-driven prior specification
-6. **Full Bayesian decision**: Incorporating asymmetric costs of errors
+1. **Hierarchical models**: Sharing information across tests  
+2. **Correlated tests**: Modeling dependency structures between tests  
+3. **Spatial/network priors**: Incorporating biological relationships  
+4. **Mixture priors**: More flexible alternative distributions  
+5. **Adaptive shrinkage**: Data-driven prior specification  
+6. **Full Bayesian decision**: Incorporating asymmetric costs of errors  
 
 ## Key Takeaways
 
-1. Multiple testing is a core challenge in genomics
-2. Bayesian approaches directly address the quantity of interest
-3. Local FDR provides test-specific false discovery probabilities
-4. Empirical Bayes methods estimate key components from data
-5. Posterior probabilities are directly interpretable
-6. The approach extends naturally to complex data structures
+1. Multiple testing is a core challenge in genomics  
+2. Bayesian approaches directly address the quantity of interest  
+3. Local FDR provides test-specific false discovery probabilities  
+4. Empirical Bayes methods estimate key components from data  
+5. Posterior probabilities are directly interpretable  
+6. The approach extends naturally to complex data structures  
 
 ## Hierarchical Bayesian Models: The Problem of Many Groups
 
 In genomics, we often need to estimate many related parameters:
 
-- Effects of thousands of variants
-- Expression levels across multiple tissues
-- Population-specific allele frequencies
-- Gene-specific parameters
+- Effects of thousands of variants  
+- Expression levels across multiple tissues  
+- Population-specific allele frequencies  
+- Gene-specific parameters  
 
-Independent analysis: Ignores similarities between groups
-Complete pooling: Ignores differences between groups
+Independent analysis: Ignores similarities between groups  
+Complete pooling: Ignores differences between groups  
 
 **Hierarchical models provide the best of both worlds.**
 
@@ -733,8 +732,7 @@ library(ggplot2)
 ggplot(plot_data, aes(x = Group, y = Estimate, color = Method, group = Method)) +
   geom_point(size = 3) +
   geom_line(linetype = "dashed") +
-  scale_color_manual(values = c("True" = "black", "No Pooling" = "red", 
-                               "Complete Pooling" = "blue", "Hierarchical" = "green")) +
+  scale_color_manual(values = c("True" = "black", "No Pooling" = "red", "Complete Pooling" = "blue", "Hierarchical" = "green")) +
   labs(title = "Comparing Estimation Methods",
        subtitle = "Hierarchical models balance between no pooling and complete pooling",
        x = "Group", y = "Effect Estimate") +
@@ -746,22 +744,22 @@ ggplot(plot_data, aes(x = Group, y = Estimate, color = Method, group = Method)) 
 
 ## Mathematical Structure
 
-
-
 A typical two-level hierarchical model:
 
-$$\begin{align}
+$$
+\begin{align}
 \text{Data level: } & y_j \sim N(\theta_j, \sigma_j^2) \\
 \text{Group level: } & \theta_j \sim N(\mu, \tau^2) \\
 \text{Hyperprior level: } & \mu \sim N(\mu_0, \sigma_0^2) \\
 & \tau^2 \sim \text{InvGamma}(a, b)
-\end{align}$$
+\end{align}
+$$
 
-Where:
-- $y_j$ is the observed data in group $j$
-- $\theta_j$ is the group-specific parameter
-- $\mu$ and $\tau^2$ are shared across groups
-- Hyperpriors allow learning the amount of sharing
+Where:  
+- $y_j$ is the observed data in group $j$  
+- $\theta_j$ is the group-specific parameter  
+- $\mu$ and $\tau^2$ are shared across groups  
+- Hyperpriors allow learning the amount of sharing  
 
 ## The Beauty of Shrinkage
 
@@ -771,29 +769,31 @@ $$\hat{\theta}_j = \frac{\frac{1}{\sigma_j^2}y_j + \frac{1}{\tau^2}\mu}{\frac{1}
 
 Where $w_j = \frac{\frac{1}{\sigma_j^2}}{\frac{1}{\sigma_j^2} + \frac{1}{\tau^2}}$ is the weight given to the group's data.
 
-Key insights:
-- Uncertain estimates ($\sigma_j^2$ large) are shrunk more toward $\mu$
-- Heterogeneous groups ($\tau^2$ large) experience less shrinkage
-- The amount of sharing is learned from the data itself
+Key insights:  
+- Uncertain estimates ($\sigma_j^2$ large) are shrunk more toward $\mu$  
+- Heterogeneous groups ($\tau^2$ large) experience less shrinkage  
+- The amount of sharing is learned from the data itself  
 
 ## Applications in Genomics
 
 Hierarchical models are ubiquitous in genomics:
 
-- **eQTL Analysis**: Sharing information across tissues
-- **Allele Frequencies**: Borrowing strength across populations
-- **GWAS Meta-analysis**: Combining studies while accounting for heterogeneity
-- **Differential Expression**: Moderation of gene-specific variance estimates
-- **Fine Mapping**: Sharing information across correlated variants
+- **eQTL Analysis**: Sharing information across tissues  
+- **Allele Frequencies**: Borrowing strength across populations  
+- **GWAS Meta-analysis**: Combining studies while accounting for heterogeneity  
+- **Differential Expression**: Moderation of gene-specific variance estimates  
+- **Fine Mapping**: Sharing information across correlated variants  
 
 ## Multivariate Extension: correlated effects
 
 For effects across multiple tissues or conditions:
 
-$$\begin{align}
+$$
+\begin{align}
 \text{Data level: } & \mathbf{y}_j \sim N(\boldsymbol{\theta}_j, \mathbf{S}_j) \\
 \text{Group level: } & \boldsymbol{\theta}_j \sim N(\boldsymbol{\mu}, \boldsymbol{\Sigma}) \\
-\end{align}$$
+\end{align}
+$$
 
 Now $\boldsymbol{\Sigma}$ captures correlations between conditions.
 
@@ -803,24 +803,24 @@ Examples: multivariate adaptive shrinkage (mash), multi-tissue eQTL analysis
 
 We can make hierarchical models more flexible:
 
-- **Mixture of normals** for the prior:
+- **Mixture of normals** for the prior:  
   $$\theta_j \sim \sum_{k=1}^K \pi_k N(\mu_k, \tau_k^2)$$
 
-- **Dirichlet process** priors for unknown grouping:
+- **Dirichlet process** priors for unknown grouping:  
   $$\theta_j \sim DP(\alpha, G_0)$$
 
-These extensions allow for:
-- Multi-modal effect distributions
-- Automatic clustering of similar effects
-- Robust estimation with outliers
+These extensions allow for:  
+- Multi-modal effect distributions  
+- Automatic clustering of similar effects  
+- Robust estimation with outliers  
 
 ## Example: Moderated t-statistics
 
 Limma's moderated t-statistics for gene expression:
 
-1. **Standard approach**: Estimate variance for each gene independently
-2. **Hierarchical approach**: Model gene variances as coming from inverse-gamma prior
-3. **Result**: "Borrow information" across genes to improve variance estimates
+1. **Standard approach**: Estimate variance for each gene independently  
+2. **Hierarchical approach**: Model gene variances as coming from inverse-gamma prior  
+3. **Result**: "Borrow information" across genes to improve variance estimates  
 
 ```{r, echo=FALSE, fig.width=8, fig.height=3.5}
 # Simulate data to illustrate moderated t-statistics
@@ -868,33 +868,32 @@ ggplot(var_data, aes(x = GeneRank)) +
 
 Hierarchical models can be fit using:
 
-1. **Empirical Bayes**: Estimate hyperparameters from data, then obtain group-specific posteriors
-   - Fast and scalable
-   - Used in tools like limma, edgeR, DESeq2
+1. **Empirical Bayes**: Estimate hyperparameters from data, then obtain group-specific posteriors  
+   - Fast and scalable  
+   - Used in tools like limma, edgeR, DESeq2  
 
-2. **Full Bayes**: Sample from full posterior using MCMC
-   - Complete uncertainty quantification
-   - Handles complex dependency structures
-   - More computationally intensive
+2. **Full Bayes**: Sample from full posterior using MCMC  
+   - Complete uncertainty quantification  
+   - Handles complex dependency structures  
+   - More computationally intensive  
 
 ## Practical Advantages
 
-1. **Improved accuracy**: Lower mean squared error than independent estimates
-2. **Uncertainty quantification**: Full posterior distributions
-3. **Efficiency**: Makes better use of limited sample sizes
-4. **Robustness**: Less sensitive to outliers and high-noise groups
-5. **Discovery power**: Increases ability to detect real effects
-6. **Interpretability**: Reveals relationships between groups
+1. **Improved accuracy**: Lower mean squared error than independent estimates  
+2. **Uncertainty quantification**: Full posterior distributions  
+3. **Efficiency**: Makes better use of limited sample sizes  
+4. **Robustness**: Less sensitive to outliers and high-noise groups  
+5. **Discovery power**: Increases ability to detect real effects  
+6. **Interpretability**: Reveals relationships between groups  
 
 ## Key Takeaways
 
-1. Hierarchical models provide a principled approach to sharing information
-2. Automatically balance between pooled and unpooled estimates
-3. Particularly valuable for "small n, large p" settings common in genomics
-4. Allow modeling of data-generating processes at multiple levels
-5. Extend naturally to complex, multivariate settings
-6. Provide computational flexibility from empirical to fully Bayesian approaches
-
+1. Hierarchical models provide a principled approach to sharing information  
+2. Automatically balance between pooled and unpooled estimates  
+3. Particularly valuable for "small n, large p" settings common in genomics  
+4. Allow modeling of data-generating processes at multiple levels  
+5. Extend naturally to complex, multivariate settings  
+6. Provide computational flexibility from empirical to fully Bayesian approaches  
 
 ---
 
@@ -906,11 +905,11 @@ Hierarchical models can be fit using:
 
 **Definition**: A prior is conjugate when the posterior has the same distribution family
 
-**Why they matter**:
-1. **Analytical solutions** - no MCMC needed
-2. **Interpretable parameters** - prior as "pseudo-observations"
-3. **Sequential updating** - yesterday's posterior is today's prior
-4. **Computational efficiency** - critical for large genomic datasets
+**Why they matter**:  
+1. **Analytical solutions** – no MCMC needed  
+2. **Interpretable parameters** – prior as "pseudo-observations"  
+3. **Sequential updating** – yesterday's posterior is today's prior  
+4. **Computational efficiency** – critical for large genomic datasets  
 
 ## figures 
 
@@ -982,24 +981,24 @@ plot_conjugate_updating <- function() {
 # Generate the plot
 plot_conjugate_updating()
 ```
-:::
-:::::
+
+::::
 
 ---
 
 ## Beta-Binomial: Perfect for Allele Frequencies
 
-::::: columns
+:::: {.columns}
 ::: {.column width="50%"}
-**Model**:
-- **Prior**: $\theta \sim \text{Beta}(\alpha, \beta)$
-- **Likelihood**: $X|\theta \sim \text{Binomial}(n, \theta)$
+**Model**:  
+- **Prior**: $\theta \sim \text{Beta}(\alpha, \beta)$  
+- **Likelihood**: $X|\theta \sim \text{Binomial}(n, \theta)$  
 - **Posterior**: $\theta|X \sim \text{Beta}(\alpha + X, \beta + n - X)$
 
-**Applications**:
-- Allele frequency estimation
-- Case-control association
-- Heterozygosity estimation
+**Applications**:  
+- Allele frequency estimation  
+- Case-control association  
+- Heterozygosity estimation  
 - Sequencing error rates
 :::
 
@@ -1072,30 +1071,29 @@ ggplot(plot_data, aes(x = x, y = y, color = Distribution, linetype = Prior)) +
   geom_vline(xintercept = true_af, linetype = "dashed", color = "black") +
   scale_color_manual(values = c("Prior" = "blue", "Posterior" = "red")) +
   labs(title = "Beta-Binomial for Allele Frequency Estimation",
-       subtitle = paste0("True AF = ", true_af, ", Observed = ", 
-                       round(total_alt/total_reads, 3)),
+       subtitle = paste0("True AF = ", true_af, ", Observed = ", round(total_alt/total_reads, 3)),
        x = "Allele Frequency", 
        y = "Density") +
   theme(legend.position = "bottom")
 ```
 :::
-:::::
+::::
 
 ---
 
 ## Dirichlet-Multinomial: For Multiple Alleles
 
-::::: columns
+:::: {.columns}
 ::: {.column width="50%"}
-**Model**:
-- **Prior**: $\vec{\theta} \sim \text{Dirichlet}(\vec{\alpha})$
-- **Likelihood**: $\vec{X}|\vec{\theta} \sim \text{Multinomial}(n, \vec{\theta})$
+**Model**:  
+- **Prior**: $\vec{\theta} \sim \text{Dirichlet}(\vec{\alpha})$  
+- **Likelihood**: $\vec{X}|\vec{\theta} \sim \text{Multinomial}(n, \vec{\theta})$  
 - **Posterior**: $\vec{\theta}|\vec{X} \sim \text{Dirichlet}(\vec{\alpha} + \vec{X})$
 
-**Applications**:
-- Multiple allele frequencies
-- Haplotype frequencies
-- Population admixture proportions
+**Applications**:  
+- Multiple allele frequencies  
+- Haplotype frequencies  
+- Population admixture proportions  
 - Taxonomic abundances
 :::
 
@@ -1167,25 +1165,26 @@ ggplot(plot_data, aes(x = X, y = Y, color = Distribution)) +
   annotate("text", x = 1, y = 0, label = "B") +
   annotate("text", x = 0.5, y = sqrt(3)/2, label = "C")
 ```
-
 :::
+::::
 
-::::::
+::::
+
 ---
 
 ## Conjugate Normal-Normal Model
 
-- One of the most elegant and widely-used conjugate pairs in Bayesian statistics
-- Perfect for analyzing quantitative traits in genomics
-- Gives us a mathematical shortcut for updating beliefs
+- One of the most elegant and widely-used conjugate pairs in Bayesian statistics  
+- Perfect for analyzing quantitative traits in genomics  
+- Gives us a mathematical shortcut for updating beliefs  
 
 ## The Setup
 
 When analyzing a continuous parameter $\mu$ (like an effect size):
 
-- **Prior**: $\mu \sim \mathcal{N}(\mu_0, \sigma_0^2)$
-- **Likelihood**: $X \sim \mathcal{N}(\mu, \sigma^2)$ where $\sigma^2$ is known
-- **Question**: What is $p(\mu|X)$?
+- **Prior**: $\mu \sim \mathcal{N}(\mu_0, \sigma_0^2)$  
+- **Likelihood**: $X \sim \mathcal{N}(\mu, \sigma^2)$ where $\sigma^2$ is known  
+- **Question**: What is $p(\mu|X)$?  
 ---
 
 ## The Mathematical Magic
@@ -1234,8 +1233,8 @@ $$\mu_n = w\mu_0 + (1-w)X$$
 
 Where $w = \frac{\sigma^2}{\sigma^2 + \sigma_0^2} = \frac{\text{data precision}}{\text{total precision}}$
 
-- When data is precise (small $\sigma^2$): we trust the data more
-- When prior is precise (small $\sigma_0^2$): we trust the prior more
+- When data is precise (small $\sigma^2$): we trust the data more  
+- When prior is precise (small $\sigma_0^2$): we trust the prior more  
 
 ## Multiple Observations
 
@@ -1243,16 +1242,16 @@ With multiple observations $X_1,...,X_n$, we get:
 
 $$\mu|(X_1,...,X_n) \sim \mathcal{N}\left(\frac{\frac{\mu_0}{\sigma_0^2} + \frac{n\bar{X}}{\sigma^2}}{\frac{1}{\sigma_0^2} + \frac{n}{\sigma^2}}, \left(\frac{1}{\sigma_0^2} + \frac{n}{\sigma^2}\right)^{-1}\right)$$
 
-- The sample mean $\bar{X}$ is a sufficient statistic
-- More data increases precision linearly
+- The sample mean $\bar{X}$ is a sufficient statistic  
+- More data increases precision linearly  
 
 ## Genomics Application: eQTL Effect Sizes
 
 In genomics, we might use this model for:
 
-- **Prior**: Historical effect sizes for similar variants
-- **Likelihood**: Observed effect in current study
-- **Posterior**: Updated estimate that balances prior knowledge and new data
+- **Prior**: Historical effect sizes for similar variants  
+- **Likelihood**: Observed effect in current study  
+- **Posterior**: Updated estimate that balances prior knowledge and new data  
 
 Example: Effect sizes for expression quantitative trait loci (eQTLs)
 
@@ -1260,35 +1259,33 @@ Example: Effect sizes for expression quantitative trait loci (eQTLs)
 
 Advantages of conjugate Normal-Normal:
 
-1. **Analytical solutions** - no MCMC required
-2. **Computational efficiency** - critical for genomic scale
-3. **Interpretable updates** - precision-weighted averages
-4. **Sequential processing** - can update one observation at a time
+1. **Analytical solutions** – no MCMC required  
+2. **Computational efficiency** – critical for genomic scale  
+3. **Interpretable updates** – precision-weighted averages  
+4. **Sequential processing** – can update one observation at a time  
 
 ## Normal-Normal: Key Takeaways
 
-1. The posterior is also Normal - that's conjugacy!
-2. The posterior mean is a weighted average of prior mean and data
-3. Weights are determined by relative precisions (1/variance)
-4. The posterior precision is the sum of the prior and data precisions
-5. This model provides the foundation for many advanced Bayesian genomic methods
+1. The posterior is also Normal – that's conjugacy!  
+2. The posterior mean is a weighted average of prior mean and data  
+3. Weights are determined by relative precisions (1/variance)  
+4. The posterior precision is the sum of the prior and data precisions  
+5. This model provides the foundation for many advanced Bayesian genomic methods  
 
 ---
 
 ## Extension: Empirical Bayes for Normal Means
 
-- When we don't have a specific prior, we can **estimate it from the data**
-- This approach, known as **Empirical Bayes**, is extremely powerful for genomics
-- Applications include: multiple testing, sparse signal detection, and effect size estimation
+- When we don't have a specific prior, we can **estimate it from the data**  
+- This approach, known as **Empirical Bayes**, is extremely powerful for genomics  
+- Applications include: multiple testing, sparse signal detection, and effect size estimation  
 
 ## Methods Using Normal-Normal Conjugacy
 
-- **Adaptive Shrinkage (ash)**: Uses a mixture of normals as the prior
-- **Multivariate Adaptive Shrinkage (mash)**: Extends to correlated effects across conditions
-- **False Discovery Rate Control**: Through local false discovery rates
-- **Hierarchical Models**: Building multi-level models with partially pooled estimates
-
-
+- **Adaptive Shrinkage (ash)**: Uses a mixture of normals as the prior  
+- **Multivariate Adaptive Shrinkage (mash)**: Extends to correlated effects across conditions  
+- **False Discovery Rate Control**: Through local false discovery rates  
+- **Hierarchical Models**: Building multi-level models with partially pooled estimates  
 
 ---
 
@@ -1296,10 +1293,10 @@ Advantages of conjugate Normal-Normal:
 
 Mixture models are probabilistic models that represent the presence of subpopulations within an overall population:
 
-- **Used when data come from multiple underlying processes**
-- **Represent heterogeneous populations as mixtures of simpler distributions**
-- **Allow clustering without hard assignments**
-- **Incorporate uncertainty in group membership**
+- **Used when data come from multiple underlying processes**  
+- **Represent heterogeneous populations as mixtures of simpler distributions**  
+- **Allow clustering without hard assignments**  
+- **Incorporate uncertainty in group membership**  
 
 ---
 
@@ -1311,31 +1308,31 @@ $$p(x) = \sum_{k=1}^K \pi_k f_k(x|\theta_k)$$
 
 Where:
 
-- $p(x)$ is the overall probability density
-- $K$ is the number of components (subpopulations)
-- $\pi_k$ are the mixing weights ($\sum_{k=1}^K \pi_k = 1$)
-- $f_k(x|\theta_k)$ are the component densities with parameters $\theta_k$
+- $p(x)$ is the overall probability density  
+- $K$ is the number of components (subpopulations)  
+- $\pi_k$ are the mixing weights ($\sum_{k=1}^K \pi_k = 1$)  
+- $f_k(x|\theta_k)$ are the component densities with parameters $\theta_k$  
 
 ---
 
 ## A Closer Look at the Components
 
-::::: columns
+:::: {.columns}
 ::: {.column width="50%"}
 **Key components**:
 
-1. **Component distributions** $f_k(x|\theta_k)$
-   - Each represents a subpopulation
-   - Can be any distribution family
+1. **Component distributions** $f_k(x|\theta_k)$  
+   - Each represents a subpopulation  
+   - Can be any distribution family  
    - Common choices: Gaussian, multinomial, beta
-   
-2. **Mixing weights** $\pi_k$
-   - Proportion of data from each component
-   - Must sum to 1: $\sum_{k=1}^K \pi_k = 1$
+    
+2. **Mixing weights** $\pi_k$  
+   - Proportion of data from each component  
+   - Must sum to 1: $\sum_{k=1}^K \pi_k = 1$  
    - Reflect prior probabilities of group membership
-   
-3. **Latent variables** $z_i$
-   - Unobserved component membership
+    
+3. **Latent variables** $z_i$  
+   - Unobserved component membership  
    - $z_i = k$ means data point $i$ came from component $k$
 :::
 
@@ -1384,7 +1381,7 @@ ggplot() +
   theme(legend.position = "bottom")
 ```
 :::
-:::::
+::::
 
 ---
 
@@ -1404,13 +1401,13 @@ $$L(\theta, \pi | x_1, \ldots, x_n) = \prod_{i=1}^n p(x_i) = \prod_{i=1}^n \sum_
 
 The Expectation-Maximization (EM) algorithm is an iterative method for finding maximum likelihood estimates:
 
-**E-step**: Calculate "responsibilities" - the posterior probability that data point $i$ belongs to component $k$:
+**E-step**: Calculate "responsibilities" – the posterior probability that data point $i$ belongs to component $k$:
 
 $$\gamma_{ik} = P(z_i = k | x_i, \theta) = \frac{\pi_k f_k(x_i|\theta_k)}{\sum_{j=1}^K \pi_j f_j(x_i|\theta_j)}$$
 
 **M-step**: Update parameters using weighted maximum likelihood:
 
-$$\pi_k^{new} = \frac{1}{n}\sum_{i=1}^n \gamma_{ik}$$
+$$\pi_k^{new} = \frac{1}{n}\sum_{i=1}^n \gamma_{ik}$$  
 $$\theta_k^{new} = \arg\max_{\theta_k} \sum_{i=1}^n \gamma_{ik} \log f_k(x_i|\theta_k)$$
 
 ---
@@ -1487,9 +1484,7 @@ ggplot() +
   # Facet by iteration
   facet_wrap(~ Iteration, ncol = 2) +
   # Customize colors
-  scale_color_manual(values = c("Component 1" = "blue", 
-                              "Component 2" = "green", 
-                              "Mixture" = "red")) +
+  scale_color_manual(values = c("Component 1" = "blue", "Component 2" = "green", "Mixture" = "red")) +
   # Add labels
   labs(title = "EM Algorithm Convergence",
        subtitle = "Mixture model fit improves with each iteration",
@@ -1499,45 +1494,48 @@ ggplot() +
   theme(legend.position = "bottom")
 ```
 
-
 ---
 
 ## Worked Example: EM Algorithm Step-by-Step
 
 Let's walk through each step of the EM algorithm for a mixture of two Gaussians:
 
-1. **Initialize parameters**:
-   - Set initial mixing weights: $\pi_1 = \pi_2 = 0.5$
-   - Set initial component means: $\mu_1 = -1, \mu_2 = 1$
-   - Set initial component standard deviations: $\sigma_1 = \sigma_2 = 1$
+1. **Initialize parameters**:  
+   - Set initial mixing weights: $\pi_1 = \pi_2 = 0.5$  
+   - Set initial component means: $\mu_1 = -1, \mu_2 = 1$  
+   - Set initial component standard deviations: $\sigma_1 = \sigma_2 = 1$  
 
-2. **E-step**: For each data point $x_i$, calculate the responsibility of each component:
-   - $\gamma_{i1} = \frac{\pi_1 N(x_i|\mu_1,\sigma_1^2)}{\pi_1 N(x_i|\mu_1,\sigma_1^2) + \pi_2 N(x_i|\mu_2,\sigma_2^2)}$
-   - $\gamma_{i2} = 1 - \gamma_{i1}$
+2. **E-step**: For each data point $x_i$, calculate the responsibility of each component:  
+   - $\gamma_{i1} = \frac{\pi_1 N(x_i|\mu_1,\sigma_1^2)}{\pi_1 N(x_i|\mu_1,\sigma_1^2) + \pi_2 N(x_i|\mu_2,\sigma_2^2)}$  
+   - $\gamma_{i2} = 1 - \gamma_{i1}$  
 
-3. **M-step**: Update the parameters using the responsibilities:
-   - $\pi_1^{new} = \frac{1}{n}\sum_{i=1}^n \gamma_{i1}$ (similarly for $\pi_2^{new}$)
-   - $\mu_1^{new} = \frac{\sum_{i=1}^n \gamma_{i1}x_i}{\sum_{i=1}^n \gamma_{i1}}$ (similarly for $\mu_2^{new}$)
-   - $(\sigma_1^{new})^2 = \frac{\sum_{i=1}^n \gamma_{i1}(x_i-\mu_1^{new})^2}{\sum_{i=1}^n \gamma_{i1}}$ (similarly for $\sigma_2^{new}$)
+3. **M-step**: Update the parameters using the responsibilities:  
+   - $\pi_1^{new} = \frac{1}{n}\sum_{i=1}^n \gamma_{i1}$ (similarly for $\pi_2^{new}$)  
+   - $\mu_1^{new} = \frac{\sum_{i=1}^n \gamma_{i1}x_i}{\sum_{i=1}^n \gamma_{i1}}$ (similarly for $\mu_2^{new}$)  
+   - $(\sigma_1^{new})^2 = \frac{\sum_{i=1}^n \gamma_{i1}(x_i-\mu_1^{new})^2}{\sum_{i=1}^n \gamma_{i1}}$ (similarly for $\sigma_2^{new}$)  
 
 4. **Repeat** until convergence (parameters stop changing significantly)
 
 ---
 
 The EM Algorithm: Mathematical Intuition
-Key insight: We're solving a chicken-and-egg problem
-If we knew component assignments, parameter estimation would be easy
-If we knew parameters, component assignments would be easy
+
+Key insight: We're solving a chicken-and-egg problem  
+If we knew component assignments, parameter estimation would be easy  
+If we knew parameters, component assignments would be easy  
 EM iteratively solves both by using expected assignments
-E-step (Expectation): Calculate expected component memberships
-$$\gamma_{ik} = P(z_i = k | x_i, \theta^{(t)}) = \frac{\pi_k^{(t)} f_k(x_i|\theta_k^{(t)})}{\sum_{j=1}^K \pi_j^{(t)} f_j(x_i|\theta_j^{(t)})}$$
+
+E-step (Expectation): Calculate expected component memberships  
+$$\gamma_{ik} = P(z_i = k | x_i, \theta^{(t)}) = \frac{\pi_k^{(t)} f_k(x_i|\theta_k^{(t)})}{\sum_{j=1}^K \pi_j^{(t)} f_j(x_i|\theta_j^{(t)})}$$  
 Intuition: "How likely is individual i to belong to population k, given our current parameter estimates?"
-M-step (Maximization): Update parameters using weighted averages
-For mixing weights:
-$$\pi_k^{(t+1)} = \frac{1}{n}\sum_{i=1}^n \gamma_{ik}$$
+
+M-step (Maximization): Update parameters using weighted averages  
+For mixing weights:  
+$$\pi_k^{(t+1)} = \frac{1}{n}\sum_{i=1}^n \gamma_{ik}$$  
 Intuition: "The new population frequency is the average membership across all individuals"
-For component means (Gaussian case):
-$$\mu_k^{(t+1)} = \frac{\sum_{i=1}^n \gamma_{ik}x_i}{\sum_{i=1}^n \gamma_{ik}}$$
+
+For component means (Gaussian case):  
+$$\mu_k^{(t+1)} = \frac{\sum_{i=1}^n \gamma_{ik}x_i}{\sum_{i=1}^n \gamma_{ik}}$$  
 Intuition: "The new population mean is a weighted average where individuals are weighted by their probability of belonging to this population"
 
 ---
@@ -1548,39 +1546,37 @@ Bayesian mixture models add priors to the parameters:
 
 $p(\theta, \pi | x_1, \ldots, x_n) \propto p(x_1, \ldots, x_n | \theta, \pi) \times p(\theta, \pi)$
 
-Common prior choices:
-- $\pi \sim \text{Dirichlet}(\alpha_1, \ldots, \alpha_K)$ for mixing weights
+Common prior choices:  
+- $\pi \sim \text{Dirichlet}(\alpha_1, \ldots, \alpha_K)$ for mixing weights  
 - Component-specific priors for $\theta_k$ (e.g., Normal-Inverse-Gamma for Gaussian components)
 
-**Advantages**:
-- Handle uncertainty in the number of components (K)
-- Avoid singularities and improve stability
-- Allow for informed priors from previous studies
-- Provide full posterior distribution rather than point estimates (in full MCMC impelmentation, but SLOW)
--- compromise: EB for some pi, full inference ... 
+**Advantages**:  
+- Handle uncertainty in the number of components (K)  
+- Avoid singularities and improve stability  
+- Allow for informed priors from previous studies  
+- Provide full posterior distribution rather than point estimates (in full MCMC implementation, but SLOW)  
 
 ---
 
 ## Mixture Model Applications in Genomics
 
-::::: columns
+:::: {.columns}
 ::: {.column width="50%"}
-**1. Population Structure**
-- Components = ancestral populations
-- Individual genotypes = admixtures of populations
-- Example: STRUCTURE, ADMIXTURE software
+**1. Population Structure**  
+- Components = ancestral populations  
+- Individual genotypes = admixtures of populations  
+- Example: STRUCTURE, ADMIXTURE software  
 - Used for: demographic history, association studies, conservation
 
-**2. GEnetic effect estimation**
--- Ash v Mash
+**2. Genetic effect estimation**  
+- (e.g., adaptive shrinkage methods like ash/mash for multiple conditions)
 
-**2. Gene Expression Clustering**
-- Components = cell types/states
-- Expression patterns = signatures of cell types
-- Example: Single-cell RNA-seq clustering
+**3. Gene Expression Clustering**  
+- Components = cell types/states  
+- Expression patterns = signatures of cell types  
+- Example: Single-cell RNA-seq clustering  
 - Used for: cell type identification, developmental trajectories
 :::
-
 
 ::: {.column width="50%"}
 ```{r}
@@ -1627,32 +1623,28 @@ ggplot(admix_df, aes(x = Individual, y = Proportion, fill = Population)) +
         axis.ticks.x = element_blank())
 ```
 :::
-:::::
+::::
 
 ---
 
 ## The STRUCTURE Model in Detail
 
-:::::: {.columns}
-
+:::: {.columns}
 ::: {.column width="50%"}
-
 **STRUCTURE**: A Bayesian mixture model for population genetics
 
-**Key components**:
-- Each individual = mixture of $K$ ancestral populations
-- Each population = distinct allele frequencies
+**Key components**:  
+- Each individual = mixture of $K$ ancestral populations  
+- Each population = distinct allele frequencies  
 - Goal: Infer ancestry proportions & population frequencies
 
-**Bayesian formulation**:
-- **Prior**: $q_{ik} \sim \text{Dirichlet}(\alpha)$ (ancestry proportions)
-- **Prior**: $f_{kj} \sim \text{Beta}(\lambda)$ (allele frequencies)
+**Bayesian formulation**:  
+- **Prior**: $q_{ik} \sim \text{Dirichlet}(\alpha)$ (ancestry proportions)  
+- **Prior**: $f_{kj} \sim \text{Beta}(\lambda)$ (allele frequencies)  
 - **Likelihood**: $P(X_{ij} | q_i, f_j)$ (genotype probabilities)
-
 :::
 
 ::: {.column width="50%"}
-
 ```{r}
 #| fig-height: 6
 #| fig-width: 6
@@ -1712,30 +1704,30 @@ p2 <- ggplot(freq_df, aes(x = Marker, y = Population, fill = Frequency)) +
 
 p1 / p2  # patchwork layout
 ```
-
-
 :::
+::::
 
-::::::
 ### **Effect Size Mixtures in GWAS**
 
 **Problem**: Most variants have no effect, but some do
 
-**Solutions**:
-- **Spike-and-slab prior**: Mixture of point mass at zero and continuous distribution
-- **Scale mixture**: Mixture of normal distributions with different variances
+**Solutions**:  
+- **Spike-and-slab prior**: Mixture of point mass at zero and continuous distribution  
+- **Scale mixture**: Mixture of normal distributions with different variances  
 - **Bayesian variable selection**: Latent indicator for whether variant is causal
 
-**Benefits**:
-- Controls false discovery rate
-- Improves power to detect true associations
-- Provides interpretable posterior probabilities
+**Benefits**:  
+- Controls false discovery rate  
+- Improves power to detect true associations  
+- Provides interpretable posterior probabilities  
 - Naturally handles multiple testing
 
+:::: {.columns}
+::: {.column width="50%"}
+*(Illustration of spike-and-slab concept could go here in text form)*
 :::
 
 ::: {.column width="50%"}
-
 ```{r}
 # Create visualization of effect size mixtures
 set.seed(789)
@@ -1774,31 +1766,30 @@ ggplot(effect_df, aes(x = ObservedEffect, fill = IsNull)) +
   theme(legend.position = "bottom")
 ```
 :::
-:::::
+::::
 
-  
 ## Multivariate Normal Mixtures: The mash Approach
 
-::::: columns
+:::: {.columns}
 ::: {.column width="50%"}
 **Key idea**: Share information across related conditions
 
-**Mathematical model**:
--  $\hat{\beta}_j \sim N(\beta_j, S_j)$ (observed effects)
+**Mathematical model**:  
+-  $\hat{\beta}_j \sim N(\beta_j, S_j)$ (observed effects)  
 -  $\beta_j \sim \sum_{k=1}^K \pi_k N(0, U_k)$ (true effects)
 
 ---
 
-**Covariance matrices $U_k$ capture patterns**:
-- Shared effects across all conditions
-- Condition-specific effects
-- Structured correlation patterns
+**Covariance matrices $U_k$ capture patterns**:  
+- Shared effects across all conditions  
+- Condition-specific effects  
+- Structured correlation patterns  
 - Data-driven patterns
 
-**Benefits**:
-- Improves effect estimation through sharing
-- Discovers patterns of effect heterogeneity
-- Controls false discovery rate
+**Benefits**:  
+- Improves effect estimation through sharing  
+- Discovers patterns of effect heterogeneity  
+- Controls false discovery rate  
 - Provides interpretable multivariate posteriors
 :::
 
@@ -1872,30 +1863,26 @@ ggplot(example_long, aes(x = Condition, y = Value, color = EffectType, group = E
   theme(legend.position = "bottom")
 ```
 :::
-:::::
+::::
+
+::::
 
 ---
 
-
 ## Common Challenges with Mixture Models
 
-1. **Identifiability issues**: Component labels can be permuted (label switching)
+1. **Identifiability issues**: Component labels can be permuted (label switching)  
+2. **Local optima**: EM algorithm may converge to suboptimal solutions  
+3. **Initialization sensitivity**: Results depend on starting values  
+4. **Singularities**: Component variance can collapse to zero  
+5. **Determining number of components**: No single best method  
 
-2. **Local optima**: EM algorithm may converge to suboptimal solutions
-
-3. **Initialization sensitivity**: Results depend on starting values
-
-4. **Singularities**: Component variance can collapse to zero
-
-5. **Determining number of components**: No single best method
-
-**Solutions**:
-- Run algorithm multiple times with different initializations
-- Regularization via priors (Bayesian approach)
-- Deterministic annealing or other modified EM variants
-- Model averaging across different K values
-- Cross-validation for model selection
-
+**Solutions**:  
+- Run algorithm multiple times with different initializations  
+- Regularization via priors (Bayesian approach)  
+- Deterministic annealing or other modified EM variants  
+- Model averaging across different K values  
+- Cross-validation for model selection  
 
 ---
 
@@ -1903,45 +1890,47 @@ ggplot(example_long, aes(x = Condition, y = Value, color = EffectType, group = E
 
 The core idea of Bayesian clinical trials is to use probability distributions to quantify uncertainty about parameters:
 
-**Traditional (frequentist) approach**:
-- Fixed design with predetermined sample size
-- Binary decision making (significant or not)
-- No formal incorporation of prior information
+**Traditional (frequentist) approach**:  
+- Fixed design with predetermined sample size  
+- Binary decision making (significant or not)  
+- No formal incorporation of prior information  
 
-**Bayesian approach** offers several advantages:
-- **Sequential analysis**: Update posterior as data accumulates
-- **Adaptive design**: Sample size, treatment allocation can change mid-trial
-- **Probabilistic conclusions**: Direct statements about treatment effects
-- **Prior incorporation**: Previous trial results, biological knowledge
+**Bayesian approach** offers several advantages:  
+- **Sequential analysis**: Update posterior as data accumulates  
+- **Adaptive design**: Sample size, treatment allocation can change mid-trial  
+- **Probabilistic conclusions**: Direct statements about treatment effects  
+- **Prior incorporation**: Previous trial results, biological knowledge  
 
-The mathematical framework:
-- **Prior distribution**: $p(\theta)$ - Initial beliefs about parameter $\theta$
-- **Likelihood**: $p(X|\theta)$ - Probability of data given parameter
-- **Posterior distribution**: $p(\theta|X) \propto p(X|\theta)p(\theta)$ - Updated beliefs
+The mathematical framework:  
+- **Prior distribution**: $p(\theta)$ – Initial beliefs about parameter $\theta$  
+- **Likelihood**: $p(X|\theta)$ – Probability of data given parameter  
+- **Posterior distribution**: $p(\theta|X) \propto p(X|\theta)p(\theta)$ – Updated beliefs  
 ---
-## Bayesian MOdel Average
+
+## Bayesian Model Averaging
+
 ---
 
 ## The Model Selection Problem
 
-Traditional approach:
-1. Define candidate models
-2. Select "best" model using AIC, BIC, etc.
-3. Make inference based on single chosen model
+Traditional approach:  
+1. Define candidate models  
+2. Select "best" model using AIC, BIC, etc.  
+3. Make inference based on single chosen model  
 
 **The problem**: Ignores model uncertainty!
 
-- What if multiple models fit equally well?
-- What if different models make different predictions?
-- What if the "best" model changes with small data changes?
+- What if multiple models fit equally well?  
+- What if different models make different predictions?  
+- What if the "best" model changes with small data changes?  
 
 ## Bayesian Model Averaging
 
 Rather than choosing a single model, we can average over all models:
 
-1. Assign prior probabilities to models: $P(M_k)$
-2. Compute posterior model probabilities: $P(M_k|data)$
-3. Weight predictions by these probabilities
+1. Assign prior probabilities to models: $P(M_k)$  
+2. Compute posterior model probabilities: $P(M_k|data)$  
+3. Weight predictions by these probabilities  
 
 $$P(\theta|data) = \sum_{k=1}^K P(\theta|M_k, data) \times P(M_k|data)$$
 
@@ -1951,11 +1940,11 @@ This accounts for uncertainty in both parameters AND model selection.
 
 For K candidate models $M_1, M_2, \ldots, M_K$:
 
-- Prior model probabilities: $P(M_k)$
-- Posterior model probabilities:
+- Prior model probabilities: $P(M_k)$  
+- Posterior model probabilities:  
   $$P(M_k|data) = \frac{P(data|M_k)P(M_k)}{\sum_{j=1}^K P(data|M_j)P(M_j)}$$
 
-- Marginal likelihood of model $M_k$:
+- Marginal likelihood of model $M_k$:  
   $$P(data|M_k) = \int P(data|\theta_k, M_k)P(\theta_k|M_k)d\theta_k$$
 
 ## Visualizing BMA
@@ -2058,7 +2047,7 @@ BMA combines predictions from multiple models, weighted by their posterior proba
 
 In genetic fine-mapping, we don't know which variants are causal:
 
-- Many possible causal configurations (models)
+- Many possible causal configurations (models)  
 - BMA provides a coherent approach to handle this uncertainty
 
 ```{r, echo=FALSE, fig.width=8, fig.height=4}
@@ -2146,12 +2135,12 @@ Posterior Inclusion Probabilities (PIPs) from BMA provide a robust way to priori
 
 Common applications:
 
-1. **Gene-Environment Interactions**: Uncertainty in interaction model forms
-2. **Gene-Based Association Tests**: Multiple ways to combine variants
-3. **Fine-Mapping**: Uncertainty in causal variant configurations
-4. **Gene Set Analysis**: Uncertainty in pathway definitions
-5. **eQTL Mapping**: Uncertainty in the appropriate expression model
-6. **Polygenic Risk Scores**: Uncertainty in variant selection
+1. **Gene-Environment Interactions**: Uncertainty in interaction model forms  
+2. **Gene-Based Association Tests**: Multiple ways to combine variants  
+3. **Fine-Mapping**: Uncertainty in causal variant configurations  
+4. **Gene Set Analysis**: Uncertainty in pathway definitions  
+5. **eQTL Mapping**: Uncertainty in the appropriate expression model  
+6. **Polygenic Risk Scores**: Uncertainty in variant selection  
 
 ## BMA vs. Model Selection
 
@@ -2172,13 +2161,7 @@ fit3 <- lm(y ~ x + I(x^2) + I(x^3)) # Cubic
 fit4 <- lm(y ~ sin(pi*x) + cos(pi*x)) # Trigonometric
 
 # Calculate BIC
-bic1 <- BIC(fit1)
-bic2 <- BIC(fit2)
-bic3 <- BIC(fit3)
-bic4 <- BIC(fit4)
-
-# Best model by BIC
-bic_values <- c(bic1, bic2, bic3, bic4)
+bic_values <- c(BIC(fit1), BIC(fit2), BIC(fit3), BIC(fit4))
 best_model_idx <- which.min(bic_values)
 best_model <- c("Linear", "Quadratic", "Cubic", "Trigonometric")[best_model_idx]
 
@@ -2195,8 +2178,7 @@ pred3 <- predict(fit3, newdata = data.frame(x = x_grid))
 pred4 <- predict(fit4, newdata = data.frame(x = x_grid))
 
 # BMA prediction
-pred_bma <- pred1 * post_probs[1] + pred2 * post_probs[2] + 
-            pred3 * post_probs[3] + pred4 * post_probs[4]
+pred_bma <- pred1 * post_probs[1] + pred2 * post_probs[2] + pred3 * post_probs[3] + pred4 * post_probs[4]
 
 # True values
 true_grid <- 2 + 0.2*x_grid^2 + 0.1*sin(x_grid*pi)
@@ -2216,20 +2198,17 @@ orig_data <- data.frame(x = x, y = y)
 ggplot() +
   geom_point(data = orig_data, aes(x = x, y = y), alpha = 0.4) +
   geom_line(data = plot_data, aes(x = x, y = y, color = Model, size = Model, linetype = Model)) +
-  scale_color_manual(values = c("Linear" = "blue", "Quadratic" = "green", 
-                               "Cubic" = "purple", "Trigonometric" = "orange",
+  scale_color_manual(values = c("Linear" = "blue", "Quadratic" = "green", "Cubic" = "purple", "Trigonometric" = "orange",
                                "BMA" = "red", "True" = "black")) +
-  scale_size_manual(values = c("Linear" = 0.7, "Quadratic" = 0.7, 
-                              "Cubic" = 0.7, "Trigonometric" = 0.7,
+  scale_size_manual(values = c("Linear" = 0.7, "Quadratic" = 0.7, "Cubic" = 0.7, "Trigonometric" = 0.7,
                               "BMA" = 1.2, "True" = 1.2)) +
-  scale_linetype_manual(values = c("Linear" = "solid", "Quadratic" = "solid", 
-                                  "Cubic" = "solid", "Trigonometric" = "solid",
+  scale_linetype_manual(values = c("Linear" = "solid", "Quadratic" = "solid", "Cubic" = "solid", "Trigonometric" = "solid",
                                   "BMA" = "solid", "True" = "dashed")) +
   labs(title = "Model Selection vs. Model Averaging",
        subtitle = paste0("Model probabilities: Linear=", round(post_probs[1]*100), "%, ",
-                       "Quadratic=", round(post_probs[2]*100), "%, ",
-                       "Cubic=", round(post_probs[3]*100), "%, ",
-                       "Trig=", round(post_probs[4]*100), "%"),
+                         "Quadratic=", round(post_probs[2]*100), "%, ",
+                         "Cubic=", round(post_probs[3]*100), "%, ",
+                         "Trig=", round(post_probs[4]*100), "%"),
        x = "X", y = "Y") +
   theme_minimal(base_size = 14) +
   theme(legend.position = "bottom")
@@ -2239,50 +2218,48 @@ Model averaging often outperforms selection of a single "best" model, especially
 
 ## Computational Approaches
 
-1. **Exact BMA**: Enumerate all models (feasible for small model spaces)
-
-2. **Markov Chain Monte Carlo Model Composition (MC³)**: 
-   - Sample models according to their posterior probabilities
-   - Efficient exploration of large model spaces
-
-3. **Approximations**: 
-   - BIC approximation to marginal likelihoods
-   - Laplace approximation for integration
-   - Variational methods for high-dimensional spaces
+1. **Exact BMA**: Enumerate all models (feasible for small model spaces)  
+2. **Markov Chain Monte Carlo Model Composition (MC³)**:  
+   - Sample models according to their posterior probabilities  
+   - Efficient exploration of large model spaces  
+3. **Approximations**:  
+   - BIC approximation to marginal likelihoods  
+   - Laplace approximation for integration  
+   - Variational methods for high-dimensional spaces  
 
 ## Practical Considerations
 
-1. **Prior model probabilities**: 
-   - Equal priors for all models?
-   - Complexity penalties?
-   - Biologically informed priors?
+1. **Prior model probabilities**:  
+   - Equal priors for all models?  
+   - Complexity penalties?  
+   - Biologically informed priors?  
 
-2. **Model space definition**:
-   - Which models to include?
-   - How to handle model correlation?
+2. **Model space definition**:  
+   - Which models to include?  
+   - How to handle model correlation?  
 
-3. **Inference targets**:
-   - Parameter estimates vs. predictions
-   - Variable importance measures
-   - Model-averaged confidence intervals
+3. **Inference targets**:  
+   - Parameter estimates vs. predictions  
+   - Variable importance measures  
+   - Model-averaged confidence intervals  
 
 ## Key Advantages
 
-1. **Honest uncertainty quantification**: Accounts for model uncertainty
-2. **Improved prediction accuracy**: Particularly for out-of-sample prediction
-3. **Robust inference**: Less sensitive to model misspecification
-4. **Variable importance measures**: Posterior inclusion probabilities
-5. **Decision-theoretic optimality**: Under certain loss functions
-6. **Natural Occam's razor**: Automatically balances fit and complexity
+1. **Honest uncertainty quantification**: Accounts for model uncertainty  
+2. **Improved prediction accuracy**: Particularly for out-of-sample prediction  
+3. **Robust inference**: Less sensitive to model misspecification  
+4. **Variable importance measures**: Posterior inclusion probabilities  
+5. **Decision-theoretic optimality**: Under certain loss functions  
+6. **Natural Occam's razor**: Automatically balances fit and complexity  
 
 ## Key Takeaways
 
-1. Model selection ignores uncertainty in the model itself
-2. Bayesian model averaging provides a principled framework for incorporating model uncertainty
-3. Posterior model probabilities balance fit and complexity
-4. BMA often produces more robust parameter estimates and predictions
-5. Computational methods exist for handling large model spaces
-6. In genomics, BMA is particularly valuable for fine-mapping and complex trait analysis
+1. Model selection ignores uncertainty in the model itself  
+2. Bayesian model averaging provides a principled framework for incorporating model uncertainty  
+3. Posterior model probabilities balance fit and complexity  
+4. BMA often produces more robust parameter estimates and predictions  
+5. Computational methods exist for handling large model spaces  
+6. In genomics, BMA is particularly valuable for fine-mapping and complex trait analysis  
 
 ---
 
@@ -2290,20 +2267,22 @@ Model averaging often outperforms selection of a single "best" model, especially
 
 Key insight: Even with flat priors, Bayesian methods give you direct probability statements about parameters
 
-Example: For a treatment effect θ with flat prior and normal likelihood:
-$$p(\theta|data) \propto \text{Normal}(\hat{\theta}, SE^2)$$
-Direct probability statements:
-$P(\theta > 0 | data) = 0.97$ → "97% probability the treatment is beneficial"
-$P(\theta > 0.2 | data) = 0.63$ → "63% probability the effect exceeds clinically meaningful threshold"
+Example: For a treatment effect θ with flat prior and normal likelihood:  
+$p(\theta|data) \propto \text{Normal}(\hat{\theta}, SE^2)$
+
+Direct probability statements:  
+$P(\theta > 0 | data) = 0.97$ → "97% probability the treatment is beneficial"  
+$P(\theta > 0.2 | data) = 0.63$ → "63% probability the effect exceeds clinically meaningful threshold"  
 $P(0.1 < \theta < 0.3 | data) = 0.75$ → "75% probability effect is in the moderate range"
-Contrast with frequentist:
-"p < 0.05" → Reject null hypothesis
+
+Contrast with frequentist:  
+"p < 0.05" → Reject null hypothesis  
 "95% CI: [0.1, 0.4]" → In repeated sampling, 95% of intervals would contain true value
 
-**Decision rules** can be based on:
-- Posterior probability: $P(\theta > \delta|X) > \gamma$ 
-- Predictive probability of success
-- Expected utility/loss considerations
+**Decision rules** can be based on:  
+- Posterior probability: $P(\theta > \delta|X) > \gamma$  
+- Predictive probability of success  
+- Expected utility/loss considerations  
 
 ---
 
@@ -2311,50 +2290,50 @@ Contrast with frequentist:
 
 **Problem**: Combine evidence across heterogeneous studies
 
-**Model formulation**:
-- Let $y_i$ be the observed effect in study $i$
-- Let $\sigma_i^2$ be the variance (often known from standard error)
-- Let $\theta_i$ be the true effect in study $i$
+**Model formulation**:  
+- Let $y_i$ be the observed effect in study $i$  
+- Let $\sigma_i^2$ be the variance (often known from standard error)  
+- Let $\theta_i$ be the true effect in study $i$  
 
-**Hierarchical model**:
-$y_i | \theta_i, \sigma_i^2 \sim N(\theta_i, \sigma_i^2)$
-$\theta_i | \mu, \tau^2 \sim N(\mu, \tau^2)$
-$\mu \sim N(\mu_0, \sigma_0^2)$
+**Hierarchical model**:  
+$y_i | \theta_i, \sigma_i^2 \sim N(\theta_i, \sigma_i^2)$  
+$\theta_i | \mu, \tau^2 \sim N(\mu, \tau^2)$  
+$\mu \sim N(\mu_0, \sigma_0^2)$  
 $\tau^2 \sim \text{InvGamma}(a, b)$
 
-Where:
-- $\mu$ is the overall mean effect
-- $\tau^2$ is the between-study heterogeneity
-- $\mu_0, \sigma_0^2, a, b$ are hyperparameters
+Where:  
+- $\mu$ is the overall mean effect  
+- $\tau^2$ is the between-study heterogeneity  
+- $\mu_0, \sigma_0^2, a, b$ are hyperparameters  
 ---
 
-**Key advantages**:
-- Naturally accounts for heterogeneity
-- Uncertainty in all parameters
-- Shrinkage of extreme estimates toward the mean
-- Robust to outliers with appropriate priors
+**Key advantages**:  
+- Naturally accounts for heterogeneity  
+- Uncertainty in all parameters  
+- Shrinkage of extreme estimates toward the mean  
+- Robust to outliers with appropriate priors  
 
 ---
 
 ## Bayesian Meta-Analysis: Visualization
 
-::::: columns
+:::: {.columns}
 ::: {.column width="50%"}
-**Traditional approaches**:
-- Fixed effects (assumes same effect size)
-- Random effects (allows variation in effect size)
+**Traditional approaches**:  
+- Fixed effects (assumes same effect size)  
+- Random effects (allows variation in effect size)  
 - Often sensitive to outliers
 
-**Bayesian advantages**:
-- Full posterior distribution for all parameters
-- Can incorporate informative priors
-- Naturally handles small studies (shrinkage)
-- Can model outliers explicitly
+**Bayesian advantages**:  
+- Full posterior distribution for all parameters  
+- Can incorporate informative priors  
+- Naturally handles small studies (shrinkage)  
+- Can model outliers explicitly  
 - Direct probability statements about effects
 
-**Example interpretation**:
-- Posterior probability of benefit = 98%
-- 95% credible interval for effect size: [0.1, 0.5]
+**Example interpretation**:  
+- Posterior probability of benefit = 98%  
+- 95% credible interval for effect size: [0.1, 0.5]  
 - 90% probability heterogeneity is moderate to high
 :::
 
@@ -2432,8 +2411,7 @@ plot_df$Group <- factor(plot_df$Group, levels = c("Individual Studies", "Meta-An
 
 # Order studies
 plot_df$Study <- factor(plot_df$Study, 
-                      levels = c(paste0("Study ", 1:n_studies), 
-                                "Fixed Effects", "Random Effects", "Bayesian Robust"))
+                      levels = c(paste0("Study ", 1:n_studies), "Fixed Effects", "Random Effects", "Bayesian Robust"))
 
 # Create forest plot
 ggplot(plot_df, aes(x = Effect, y = Study, color = Group)) +
@@ -2450,7 +2428,7 @@ ggplot(plot_df, aes(x = Effect, y = Study, color = Group)) +
   theme(legend.position = "bottom")
 ```
 :::
-:::::
+::::
 
 ---
 
@@ -2458,40 +2436,40 @@ ggplot(plot_df, aes(x = Effect, y = Study, color = Group)) +
 
 A powerful framework that allows studies to **evolve** based on accumulating evidence
 
-- Combines statistical efficiency with ethical considerations
-- Particularly powerful for precision medicine approaches
-- Provides direct probability statements about treatment effects
-- Extends naturally to genetic and genomic applications
+- Combines statistical efficiency with ethical considerations  
+- Particularly powerful for precision medicine approaches  
+- Provides direct probability statements about treatment effects  
+- Extends naturally to genetic and genomic applications  
 
 ## Key Idea: Learning While Doing
 
-Traditional (frequentist) trials:
-- Fixed design determined at the outset
-- Sample size calculations based on frequentist power
-- Analysis only after all data collection is complete
+Traditional (frequentist) trials:  
+- Fixed design determined at the outset  
+- Sample size calculations based on frequentist power  
+- Analysis only after all data collection is complete  
 
-Bayesian adaptive trials:
-- Update knowledge continuously as data accumulates
-- Modify aspects of the trial in response to emerging data
-- Make probability-based decisions at interim points
+Bayesian adaptive trials:  
+- Update knowledge continuously as data accumulates  
+- Modify aspects of the trial in response to emerging data  
+- Make probability-based decisions at interim points  
 
 ## The Bayesian Framework
 
 For a treatment effect $\theta$:
 
-- **Prior distribution**: $p(\theta)$ - initial beliefs about the effect
-- **Likelihood**: $p(data|\theta)$ - probability of observing the data
+- **Prior distribution**: $p(\theta)$ – initial beliefs about the effect  
+- **Likelihood**: $p(data|\theta)$ – probability of observing the data  
 - **Posterior distribution**: $p(\theta|data) \propto p(data|\theta)p(\theta)$
 
 As data accumulates, the posterior provides a complete picture of current knowledge.
 
 ## What Can Be Adapted?
 
-1. **Sample size** - stop early for efficacy, futility, or continue for more precision
-2. **Treatment allocation** - assign more patients to promising treatments
-3. **Eligibility criteria** - focus on responsive subgroups
-4. **Dosing** - concentrate on optimal doses
-5. **Endpoints** - prioritize more informative outcomes
+1. **Sample size** – stop early for efficacy, futility, or continue for more precision  
+2. **Treatment allocation** – assign more patients to promising treatments  
+3. **Eligibility criteria** – focus on responsive subgroups  
+4. **Dosing** – concentrate on optimal doses  
+5. **Endpoints** – prioritize more informative outcomes  
 
 All based on predefined decision rules using posterior probabilities.
 
@@ -2499,9 +2477,9 @@ All based on predefined decision rules using posterior probabilities.
 
 A trial may stop early if:
 
-- $P(\theta > 0 | data) > 0.99$ (efficacy - treatment works)
-- $P(\theta < \delta | data) > 0.95$ (futility - treatment doesn't meet threshold)
-- $P(\delta_1 < \theta < \delta_2 | data) > 0.90$ (precision - effect is known with sufficient certainty)
+- $P(\theta > 0 | data) > 0.99$ (efficacy – treatment works)  
+- $P(\theta < \delta | data) > 0.95$ (futility – treatment doesn't meet threshold)  
+- $P(\delta_1 < \theta < \delta_2 | data) > 0.90$ (precision – effect is known with sufficient certainty)
 
 These are direct probability statements about the parameter of interest.
 
@@ -2509,13 +2487,12 @@ These are direct probability statements about the parameter of interest.
 
 As evidence accumulates, allocation probabilities shift:
 
-- Initial: Equal probability to all treatment arms
-- Adaptive: Higher probability to treatments with better outcomes
+- Initial: Equal probability to all treatment arms  
+- Adaptive: Higher probability to treatments with better outcomes  
 
 $$P(\text{assign to treatment } j) \propto P(\text{treatment } j \text{ is best}|\text{current data})$$
 
 Balances learning (exploration) with treating patients optimally (exploitation).
-
 ## Visualizing Adaptive Trials
 
 ```{r, echo=FALSE, fig.height=4}
@@ -2556,65 +2533,63 @@ points(patients[stopping_point], superiority_probs[stopping_point],
 text(patients[stopping_point]+50, superiority_probs[stopping_point], 
      paste("Trial stops after", patients[stopping_point], "patients"))
 ```
-
 Early stopping means fewer patients needed and faster results.
 
 ## Adaptive Enrichment: Genetics Applications
 
 For trials involving genetic subgroups:
 
-1. Start with broad eligibility
-2. As data accumulates, identify responsive genetic profiles
-3. Adapt enrollment to focus on promising subgroups
-4. Potentially obtain approval for genetically defined population
+1. Start with broad eligibility  
+2. As data accumulates, identify responsive genetic profiles  
+3. Adapt enrollment to focus on promising subgroups  
+4. Potentially obtain approval for genetically defined population  
 
 Direct extension of precision medicine principles.
 
 ## Platform Trials: Multiple Treatments
 
-Modern adaptive platform trials can:
-- Test multiple treatments simultaneously
-- Add new treatment arms as they become available
-- Remove ineffective treatments early
-- Share control groups across treatments
+Modern adaptive platform trials can:  
+- Test multiple treatments simultaneously  
+- Add new treatment arms as they become available  
+- Remove ineffective treatments early  
+- Share control groups across treatments  
 
 Examples: I-SPY2 (breast cancer), GBM AGILE (glioblastoma), RECOVERY (COVID-19)
 
 ## Benefits of Bayesian Adaptive Designs
 
-1. **Ethical advantages** - fewer patients on ineffective treatments
-2. **Efficiency** - often require fewer total patients
-3. **Flexibility** - can adapt to unexpected findings
-4. **Subgroup identification** - find responsive populations
-5. **Interpretability** - direct probability statements
-6. **Speed** - potential for earlier conclusions
+1. **Ethical advantages** – fewer patients on ineffective treatments  
+2. **Efficiency** – often require fewer total patients  
+3. **Flexibility** – can adapt to unexpected findings  
+4. **Subgroup identification** – find responsive populations  
+5. **Interpretability** – direct probability statements  
+6. **Speed** – potential for earlier conclusions  
 
 ## Challenges to Consider
 
-1. **Operational complexity** - requires robust infrastructure
-2. **Statistical expertise** - more sophisticated than traditional designs
-3. **Regulatory considerations** - though acceptance is growing
-4. **Prior specification** - sensitivity analyses important
-5. **Simulation required** - operating characteristics must be understood
+1. **Operational complexity** – requires robust infrastructure  
+2. **Statistical expertise** – more sophisticated than traditional designs  
+3. **Regulatory considerations** – though acceptance is growing  
+4. **Prior specification** – sensitivity analyses important  
+5. **Simulation required** – operating characteristics must be understood  
 
 ## From Clinical Trials to Genomics
 
 The same principles apply to genomics research:
 
-- **Adaptive sampling** in sequencing studies
-- **Sequential testing** with genomic data
-- **Multi-stage designs** for genetic discovery
-- **Early stopping** for genomic biomarker validation
-- **Subgroup enrichment** based on genetic profiles
+- **Adaptive sampling** in sequencing studies  
+- **Sequential testing** with genomic data  
+- **Multi-stage designs** for genetic discovery  
+- **Early stopping** for genomic biomarker validation  
+- **Subgroup enrichment** based on genetic profiles  
 
 ## Key Takeaways
 
-1. Bayesian adaptive designs provide a formal framework for learning while doing
-2. Direct probability statements make interpretation straightforward
-3. Adapting aspects of the study can improve efficiency and ethics
-4. The approach is particularly valuable for precision medicine
-5. Methods extend naturally to genomics applications
-
+1. Bayesian adaptive designs provide a formal framework for learning while doing  
+2. Direct probability statements make interpretation straightforward  
+3. Adapting aspects of the study can improve efficiency and ethics  
+4. The approach is particularly valuable for precision medicine  
+5. Methods extend naturally to genomics applications  
 
 ---
 
@@ -2626,48 +2601,48 @@ The same principles apply to genomics research:
 
 $\mathbf{y} = \sum_{l=1}^L \mathbf{X} \boldsymbol{\beta}_l + \boldsymbol{\epsilon}$
 
-Where:
-- $\mathbf{y}$ is the vector of phenotype values ($n$ individuals)
-- $\mathbf{X}$ is the genotype matrix ($n$ individuals × $p$ SNPs)
-- $L$ is the number of causal effects (typically small, e.g., 1-10)
-- Each $\boldsymbol{\beta}_l$ has exactly one non-zero element (single-effect)
-- $\boldsymbol{\epsilon} \sim N(\mathbf{0}, \sigma^2\mathbf{I})$ is the error term
+Where:  
+- $\mathbf{y}$ is the vector of phenotype values ($n$ individuals)  
+- $\mathbf{X}$ is the genotype matrix ($n$ individuals × $p$ SNPs)  
+- $L$ is the number of causal effects (typically small, e.g., 1-10)  
+- Each $\boldsymbol{\beta}_l$ has exactly one non-zero element (single-effect)  
+- $\boldsymbol{\epsilon} \sim N(\mathbf{0}, \sigma^2\mathbf{I})$ is the error term  
 ---
 
-**Bayesian formulation**:
-- Each $\boldsymbol{\beta}_l$ follows a "spike-and-slab" prior:
-  - For each effect $l$, exactly one SNP $j$ is causal
-  - Prior probability SNP $j$ is causal: $\pi_j$ (can be uniform or informed)
-  - Effect size distribution: $\beta_{lj} \sim N(0, \sigma^2_l)$ if causal, 0 otherwise
+**Bayesian formulation**:  
+- Each $\boldsymbol{\beta}_l$ follows a "spike-and-slab" prior:  
+  - For each effect $l$, exactly one SNP $j$ is causal  
+  - Prior probability SNP $j$ is causal: $\pi_j$ (can be uniform or informed)  
+  - Effect size distribution: $\beta_{lj} \sim N(0, \sigma^2_l)$ if causal, 0 otherwise  
 
-**Key outputs**:
-- Posterior Inclusion Probability (PIP) for each SNP
-- 95% credible sets for each effect
-- Posterior distributions of effect sizes
+**Key outputs**:  
+- Posterior Inclusion Probability (PIP) for each SNP  
+- 95% credible sets for each effect  
+- Posterior distributions of effect sizes  
 
 ---
 
 ## SuSiE Fine-Mapping: Visualization
 
-::::: columns
+:::: {.columns}
 ::: {.column width="50%"}
 **Problem**: Identify causal variants in a GWAS locus
 
-**Traditional approach**:
-- Select all SNPs with p < threshold
-- Often includes many correlated SNPs
+**Traditional approach**:  
+- Select all SNPs with p < threshold  
+- Often includes many correlated SNPs  
 - No clear separation of multiple signals
 
-**SuSiE advantages**:
-- Accounts for correlation structure (LD)
-- Separates overlapping signals
-- Provides probabilistic quantification
-- Can incorporate functional priors
+**SuSiE advantages**:  
+- Accounts for correlation structure (LD)  
+- Separates overlapping signals  
+- Provides probabilistic quantification  
+- Can incorporate functional priors  
 - Defines credible sets with clear interpretation
 
-**Example interpretation**:
-- 95% credible set contains 3 SNPs
-- Lead SNP has 80% probability of being causal
+**Example interpretation**:  
+- 95% credible set contains 3 SNPs  
+- Lead SNP has 80% probability of being causal  
 - Probability of at least one causal SNP in the region: 99%
 :::
 
@@ -2741,69 +2716,68 @@ ggplot(fine_map_df, aes(x = Position)) +
   theme_minimal() +
   theme(legend.position = "bottom")
 ```
-
 :::
+::::
 
-::::::
 ---
 
 ## Practical Recommendations for Bayesian Genomics
 
-1. **Start with informative priors when possible**
-   - Use previous studies
-   - Incorporate functional annotations
-   - Consider evolutionary constraints
+1. **Start with informative priors when possible**  
+   - Use previous studies  
+   - Incorporate functional annotations  
+   - Consider evolutionary constraints  
 
-2. **Report posterior probabilities, not just p-values**
-   - P(association | data) is more interpretable than P(data | no association)
-   - Provides direct probability statements about hypotheses
+2. **Report posterior probabilities, not just p-values**  
+   - $P(\text{association} | \text{data})$ is more interpretable than $P(\text{data} | \text{no association})$  
+   - Provides direct probability statements about hypotheses  
 
-3. **Use conjugate models for computational efficiency**
-   - Beta-Binomial for allele frequencies
-   - Dirichlet-Multinomial for haplotype frequencies
-   - Normal-Normal for quantitative traits
+3. **Use conjugate models for computational efficiency**  
+   - Beta-Binomial for allele frequencies  
+   - Dirichlet-Multinomial for haplotype frequencies  
+   - Normal-Normal for quantitative traits  
 
-4. **Consider mixture models for complex data**
-   - Population structure
-   - Heterogeneous effect sizes
-   - Multiple causal variants
+4. **Consider mixture models for complex data**  
+   - Population structure  
+   - Heterogeneous effect sizes  
+   - Multiple causal variants  
 
-5. **Apply decision theory for optimal designs**
-   - Balance false positives and false negatives
-   - Consider costs of follow-up studies
-   - Optimize sample allocation
+5. **Apply decision theory for optimal designs**  
+   - Balance false positives and false negatives  
+   - Consider costs of follow-up studies  
+   - Optimize sample allocation  
 
 ---
 
 ## Summary: When to Use Bayesian Methods
 
-| Problem | Bayesian Approach | Advantage |
-|---------|-------------------|-----------|
-| Multiple testing | Posterior probabilities | Direct interpretation, no arbitrary thresholds |
-| Sparse effects | Mixture priors | Better power, natural sparsity |
-| Heterogeneous effects | Hierarchical models | Borrows strength across contexts |
-| Sequential data collection | Adaptive designs | Efficiency, early stopping |
-| Prior knowledge integration | Informative priors | Improved accuracy, reduced sample size |
-| Complex dependencies | Bayesian networks | Causal inference, missing data handling |
+| Problem                | Bayesian Approach                     | Advantage                                          |
+|------------------------|---------------------------------------|----------------------------------------------------|
+| Multiple testing       | Posterior probabilities               | Direct interpretation, no arbitrary thresholds      |
+| Sparse effects         | Mixture priors                        | Better power, natural sparsity                      |
+| Heterogeneous effects  | Hierarchical models                   | Borrows strength across contexts                    |
+| Sequential data        | Adaptive designs                      | Efficiency, early stopping                          |
+| Prior knowledge integration | Informative priors              | Improved accuracy, reduced sample size              |
+| Complex dependencies   | Bayesian networks                     | Causal inference, missing data handling             |
 
 ---
 
 ## Resources for Bayesian Genomics
 
-**Software**:
-- **R packages**: `rstan`, `brms`, `mashr`, `BGLR`, `INLA`
-- **Python**: `PyMC3`, `Stan`, `Edward`
-- **Specialized**: `STRUCTURE`, `ADMIXTURE`, `SNPTEST`
+**Software**:  
+- **R packages**: `rstan`, `brms`, `mashr`, `BGLR`, `INLA`  
+- **Python**: `PyMC3`, `Stan`, `Edward`  
+- **Specialized**: `STRUCTURE`, `ADMIXTURE`, `SNPTEST`  
 
-**Books**:
-- "Bayesian Data Analysis" by Gelman et al.
-- "Statistical Rethinking" by McElreath
-- "Bayesian Methods for Data Analysis" by Carlin & Louis
+**Books**:  
+- "Bayesian Data Analysis" by Gelman et al.  
+- "Statistical Rethinking" by McElreath  
+- "Bayesian Methods for Data Analysis" by Carlin & Louis  
 
-**Online Resources**:
-- [StatisticalGenetics.info](https://stephenslab.github.io/fiveMinuteStats/)
-- [Stan User Guide](https://mc-stan.org/users/documentation/)
-- [Bayesian Methods for Hackers](https://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/)
+**Online Resources**:  
+- [StatisticalGenetics.info](https://stephenslab.github.io/fiveMinuteStats/)  
+- [Stan User Guide](https://mc-stan.org/users/documentation/)  
+- [Bayesian Methods for Hackers](https://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/)  
 
 ---
 
@@ -2811,6 +2785,6 @@ ggplot(fine_map_df, aes(x = Position)) +
 
 Thank you!! 
 
-- Pradeep Natarajan, MD MMSc
+- Pradeep Natarajan, MD MMSc  
 - Sasha Gusev, PhD
-- Giovanni Parmigiani, PhD
+```

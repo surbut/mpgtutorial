@@ -1,20 +1,31 @@
 ---
-title: "A Practical Primer on Bayesian Statistics"
+  title: "A Practical Primer on Bayesian Statistics for Population Genomics"
 author: "Sarah Urbut, MD PhD"
+affiliation: "Natarajan Lab"
 date: "March 29, 2025"
-format: 
-  revealjs:
-    theme: simple
-    slide-number: true
-    incremental: false
-    transition: slide
-    code-fold: true
-    code-tools: true
-    highlight-style: github
-    css: custom.css
+format: revealjs
+revealjs:
+  theme: simple
+transition: slide
+slide-number: true
+code-fold: true
+highlight-style: github
+footer: "Population Genomics Methods Seminar"
+self-contained: true
+preview-links: true
+execute:
+  echo: false
+warning: false
+message: false
+cache: true
+editor_options:
+  chunk_output_type: inline
 ---
+  
+  ```{r setup, include=FALSE}
+#| label: setup
+#| include: false
 
-```{r setup, include=FALSE}
 # Load necessary packages
 library(tidyverse)
 library(ggplot2)
@@ -25,11 +36,15 @@ library(gridExtra)  # For arranging plots
 
 # Set a clean theme for all plots
 theme_set(theme_minimal(base_size = 12) + 
-          theme(plot.title = element_text(hjust = 0.5),
-                plot.subtitle = element_text(hjust = 0.5)))
+            theme(plot.title = element_text(hjust = 0.5),
+                  plot.subtitle = element_text(hjust = 0.5)))
 
 # Set seed for reproducibility
 set.seed(42)
+
+# Create output directories if they don't exist
+dir.create("figures", showWarnings = FALSE)
+dir.create("data", showWarnings = FALSE)
 ```
 
 ## Overview
@@ -43,7 +58,11 @@ In this seminar, we'll cover:
 5. Clinical trials with flat priors - lessons for genomics
 6. Multivariate normal mixtures (mash)
 
+---
+
 # Introduction to Bayesian Thinking
+
+---
 
 ## Why Bayesian for Population Genomics?
 
@@ -56,21 +75,17 @@ Population genomics presents unique challenges:
 
 Bayesian approaches offer elegant solutions to these challenges.
 
+---
+
 ## Probabilistic Interpretation of Estimates
 
-::: {.columns}
-::: {.column width="50%"}
-In the Bayesian framework:
+```{r bayesian-vs-frequentist}
+#| label: bayesian-vs-frequentist
+#| fig-width: 8
+#| fig-height: 6
+#| fig-cap: "Comparison of Bayesian and Frequentist intervals"
+#| fig-path: figures/bayesian-vs-frequentist.png
 
-- **Parameters are random variables** with distributions, not fixed values
-- **Uncertainty is represented directly** through probability distributions
-- **All evidence is integrated coherently** within a probability framework
-- **Natural quantification of uncertainty** without hypothetical repeated sampling
-- **Interpretation is direct and intuitive** for researchers and clinicians
-:::
-
-::: {.column width="50%"}
-```{r}
 # Create example data for frequentist vs Bayesian comparison
 x <- seq(0.2, 0.8, length = 1000)
 
@@ -113,8 +128,8 @@ ggplot(plot_data, aes(x = x, y = y)) +
        y = "Posterior Density") +
   theme_minimal()
 ```
-:::
-:::
+
+---
 
 ## Bayesian vs. Frequentist Intervals
 
@@ -126,32 +141,43 @@ ggplot(plot_data, aes(x = x, y = y)) +
 | Can be asymmetric, reflecting asymmetric uncertainty | Typically symmetric by construction |
 | Conditioning on the observed data | Based on hypothetical repeated sampling |
 
+---
+
 ## Overview
 
 In this primer, we'll explore key Bayesian concepts critical for modern genomics:
-
-1.  **P-values vs. Posterior Probabilities**: 
-Why Bayesian thinking helps avoid misinterpretations
+  
+  1.  **P-values vs. Posterior Probabilities**: Why Bayesian thinking helps avoid misinterpretations
 2.  **Conjugate Models**: Elegant solutions for population genetic inference
 3.  **Mixture Models**: Powerful tools for complex genomic data
 4.  **Bayesian Clinical & Adaptive Designs**: Learning and adapting as data accumulates
 
-## Bayes' Theorem - The Core Idea
-
-$$P(H|D) = \frac{P(D|H) \times P(H)}{P(D)}$$
-
-Where:
-
-- $P(H|D)$ is the **posterior probability** - what we want to know
+---
+  
+  ## Bayes' Theorem - The Core Idea
+  
+  $$P(H|D) = \frac{P(D|H) \times P(H)}{P(D)}$$
+  
+  Where:
+  
+  - $P(H|D)$ is the **posterior probability** - what we want to know
 - $P(D|H)$ is the **likelihood** - how probable the data is under our hypothesis
 - $P(H)$ is the **prior probability** - what we knew before
 - $P(D)$ is the **evidence** - a normalizing constant
 
 Simply: **Posterior ∝ Likelihood × Prior**
+  
+  ---
+  
+  ## Bayesian Updating: Visual Intuition
+  
+  ```{r bayesian-updating}
+#| label: bayesian-updating
+#| fig-width: 8
+#| fig-height: 6
+#| fig-cap: "Bayesian updating of allele frequency estimate"
+#| fig-path: figures/bayesian-updating.png
 
-## Bayesian Updating: Visual Intuition
-
-```{r bayesian-updating}
 # Create data for three distributions
 x <- seq(0.001, 0.999, length = 1000)
 prior <- data.frame(x = x, y = dbeta(x, 2, 3), Distribution = "Prior: Beta(2,3)")
@@ -172,71 +198,63 @@ ggplot(all_distributions, aes(x = x, y = y, color = Distribution)) +
   theme(legend.position = "bottom")
 ```
 
-# P-values vs. Posterior Probabilities 
-
-## The Question
-
-As scientists, we want to know:
-
-> "What is the probability that my hypothesis is true, given my data?"
+---
+  
+  # P-values vs. Posterior Probabilities 
+  
+  ## The Question
+  
+  As scientists, we want to know:
+  
+  > "What is the probability that my hypothesis is true, given my data?"
 
 But traditional p-values answer a different question:
-
-> "What is the probability of observing data this extreme or more extreme, if the null hypothesis is true?"
+  
+  > "What is the probability of observing data this extreme or more extreme, if the null hypothesis is true?"
 
 This mismatch causes persistent misinterpretations.
 
 ## P-values vs. Bayes Factors: Definitions
 
 **P-value**:
-- $P(data|H_0)$ - probability of data given null hypothesis
+  - $P(data|H_0)$ - probability of data given null hypothesis
 - Measures compatibility of data with null hypothesis
 - Does not directly measure evidence for alternative
 
 **Bayes Factor**:
-- $BF_{10} = \frac{P(data|H_1)}{P(data|H_0)}$ - ratio of likelihoods
+  - $BF_{10} = \frac{P(data|H_1)}{P(data|H_0)}$ - ratio of likelihoods
 - Directly compares evidence for alternative vs. null
 - Tells you how much to update your beliefs
 
 ## The P-value Fallacy
 
-::: {.columns}
-::: {.column width="50%"}
-**Scenario**: Testing a SNP for disease association
+```{r p-value-fallacy}
+#| label: p-value-fallacy
+#| fig-width: 8
+#| fig-height: 4
+#| fig-cap: "The p-value fallacy visualization"
+#| fig-path: figures/p-value-fallacy.png
 
-**Traditional approach**:
-- Obtain p = 0.001
-- Declare "significant association"
-- Publish result
+# Create example data for comparison
+library(ggplot2)
 
-**The fallacy**:
-- p = 0.001 means "1 in 1000 chance of seeing this data if no association exists"
-- NOT "999 in 1000 chance the association is real"
-:::
-
-::: {.column width="50%"}
-```{r}
 # Parameters
 prior_prob <- 1/1000  # Prior probability of true association
 p_value <- 0.001      # Observed p-value
 
-# Convert p-value to z-score
+# Convert p-value to z-score and calculate Bayes factor (approximate)
 z <- qnorm(p_value/2, lower.tail = FALSE)
-
-# Calculate Bayes factor (approximate)
 bf <- exp(z^2/2)
-
-# Calculate posterior probability
 posterior <- (prior_prob * bf) / (prior_prob * bf + (1 - prior_prob))
 
 # Create data for visualization
 df <- data.frame(
   Stage = factor(c("Prior", "p-value", "Posterior"), 
-                levels = c("Prior", "p-value", "Posterior")),
+                 levels = c("Prior", "p-value", "Posterior")),
   Probability = c(prior_prob, 1-p_value, posterior),
   Label = c(paste0(round(prior_prob*100, 2), "%"), 
-           paste0(round((1-p_value)*100, 1), "%"), 
-           paste0(round(posterior*100, 1), "%"))
+            paste0(round((1-p_value)*100, 1), "%"), 
+            paste0(round(posterior*100, 1), "%"))
 )
 
 # Create plot
@@ -245,77 +263,31 @@ ggplot(df, aes(x = Stage, y = Probability)) +
   geom_text(aes(label = Label), vjust = -0.5, size = 5) +
   ylim(0, 1) +
   labs(title = "The p-value Fallacy",
-       subtitle = "p = 0.001 doesn't mean 99.9% chance of true association (^app)",
-       x = "", y = "Probability") +
-  theme_minimal(base_size = 14)
+       subtitle = "How p-values can be misleading without considering prior probabilities",
+       x = "Stage",
+       y = "Probability") +
+  theme_minimal()
 ```
-:::
-:::
 
-**Key insight**: With a realistic prior of 1/1000, a "significant" p-value of 0.001 only gives ~50% posterior probability of true association!
-
-## The Mathematical Connection
-
-Under certain conditions, p-values can be converted to minimum Bayes factors:
-
-$$BF_{min} ≈ -e \times p \times \log(p)$$
-
-Meaning even the most favorable interpretation of a p-value provides less evidence than typically assumed:
-
-| p-value | Minimum Bayes Factor |
-|---------|---------------------|
-| 0.05    | 0.37                |
-| 0.01    | 0.084               |
-| 0.001   | 0.0083              |
-
-## What is the Minimum Bayes Factor?
-
-The Minimum Bayes Factor is calculated as:
-MBF≈−e×p×log⁡(p)\text{MBF} \approx -e \times p \times \log(p)MBF≈−e×p×log(p)
-
-This formula (derived by Sellke, Bayarri, and Berger) represents the **smallest possible Bayes factor** 
-that could correspond to a given p-value, regardless of the specific alternative hypothesis being tested.
----
-
-## Why "Minimum"?
-It's called "minimum" because:
-
-- It assumes the most favorable conditions for the alternative hypothesis
-- It represents the strongest possible evidence against the null that could be derived from a p-value
-It's the smallest value the Bayes factor could take (stronger evidence against null = smaller Bayes factor)
-
-## Interpretation
-
-The MBF represents the ratio of likelihoods:
-MBF=P(data∣H0)P(data∣H1)\text{MBF} = \frac{P(\text{data}|H_0)}{P(\text{data}|H_1)}MBF=P(data∣H1​)P(data∣H0​)​
-
-For example, with p = 0.05:
-
-MBF = 0.37
-This means the data are at most 1/0.37 ≈ 2.7 times more likely under the alternative than the null
-Even with the most optimistic assumptions, the evidence against the null is modest
-
-With p = 0.001:
-
-MBF = 0.0083
-This means the data are at most 1/0.0083 ≈ 120 times more likely under the alternative
-Much stronger evidence, but still not as extreme as the very small p-value might suggest
-
-## Why This Conversion Matters
-This conversion from p-values to MBF is important because:
-
-It provides a more calibrated interpretation of statistical evidence
-It shows that conventional "statistical significance" (p < 0.05) actually represents fairly modest evidence
-It helps researchers avoid overinterpreting p-values
-It establishes a link between frequentist and Bayesian approaches
-
-The key point is that p-values systematically overstate the evidence against the null hypothesis. 
-
-When converted to the Bayes factor scale, even a seemingly impressive p-value often translates to much more moderate evidence against the null hypothesis than most researchers would expect.
-
-## P-values vs. Bayes Factors in Genomics
-
-```{r}
+With a realistic prior of 1/1000, a "significant" p-value of 0.001 only provides a ~50% posterior probability of true association!
+  
+  ## The Mathematical Connection
+  
+  Under certain conditions, p-values can be converted to minimum Bayes factors:
+  
+  $$BF_{min} ≈ -e \times p \times \log(p)$$
+  
+  Meaning even the most favorable interpretation of a p-value provides less evidence than typically assumed:
+  
+  | p-value | Minimum Bayes Factor |
+  |---------|---------------------|
+  | 0.05    | 0.37                |
+  | 0.01    | 0.084               |
+  | 0.001   | 0.0083              |
+  
+  ## P-values vs. Bayes Factors in Genomics
+  
+  ```{r, echo=FALSE, fig.width=8, fig.height=4}
 # Create data
 p_values <- 10^seq(-8, -2, 0.5)
 log10_p <- -log10(p_values)
@@ -345,16 +317,16 @@ The GWAS significance threshold of p < 5×10⁻⁸ corresponds to much stronger 
 ## Interpreting Bayes Factors
 
 Bayes factors have a natural interpretation:
-
-| Bayes Factor (BF_{10}) | Evidence for H1 |
-|---------------------|-----------------|
-| 1 - 3               | Barely worth mentioning |
-| 3 - 10              | Substantial |
-| 10 - 30             | Strong |
-| 30 - 100            | Very strong |
-| > 100               | Extreme |
-
-A BF_{10} = 10 means the data are 10 times more likely under H1 than H0.
+  
+  | Bayes Factor (BF₁₀) | Evidence for H₁ |
+  |---------------------|-----------------|
+  | 1 - 3               | Barely worth mentioning |
+  | 3 - 10              | Substantial |
+  | 10 - 30             | Strong |
+  | 30 - 100            | Very strong |
+  | > 100               | Extreme |
+  
+  A BF₁₀ = 10 means the data are 10 times more likely under H₁ than H₀.
 
 ## From Bayes Factor to Posterior Probability
 
@@ -383,32 +355,11 @@ This clearly shows how Bayes factors calibrate our prior beliefs.
 In a genome-wide association study:
 
 - Prior probability of true association: ~1/10,000 per variant
-- p-value threshold: 5×10^{-8} 
-- Corresponding minimum Bayes factor: ~10^{-6}
+- p-value threshold: 5×10⁻⁸ 
+- Corresponding minimum Bayes factor: ~10⁻⁶
 - Posterior probability: ~9%
 
 **Interpretation**: Even at genome-wide significance, most "discoveries" may be false positives without additional evidence!
-
-
-## A useful formula
-There is another way of laying out this kind of calculation, which may be slightly easier to interpret and remember, and also has the advantage of holding even when more than two models are under consideration. From Bayes theorem we have
-
-Pr(Zi=1|xi)=Pr(xi|Zi=1)Pr(Zi=1)/Pr(xi).
-
-and
-
-Pr(Zi=0|xi)=Pr(xi|Zi=0)Pr(Zi=0)/Pr(xi).
-
-Taking the ratio of these gives
-Pr(Zi=1|xi)/Pr(Zi=0|xi)=[Pr(Zi=1)/Pr(Zi=0)]×[Pr(xi|Zi=1)/Pr(xi|Zi=0)].
-
-This formula can be conveniently stated in words, using the notion of ``odds“, as follows:
-Posterior Odds = Prior Odds x LR
-or, recalling that the LR is sometimes referred to as the Bayes Factor (BF), we have
-Posterior Odds = Prior Odds x BF.
-
-Note that the “Odds” of an event E1 vs an event E2 means the ratio of their probabilities. So Pr(Zi=1)/Pr(Zi=0) is the “Odds” of Zi=1 vs Zi=0. It is referred to as the “Prior Odds”, because it is the odds prior to seeing the data x. Similarly the Posterior Odds refers to the Odds of Zi=1 vs Zi=0 “posterior to” (after) seeing the data x.
-
 
 ## Benefits of Bayes Factors for Genomics
 
@@ -430,7 +381,7 @@ Note that the “Odds” of an event E1 vs an event E2 means the ratio of their 
 
 ## The Fallacy of P-values
 
-::: {.incremental}
+::: incremental
 -   P-values answer a **counterfactual question**: "If there were no effect, how surprising would these data be?"
 
 -   But researchers want to know: "**What is the probability this association is real?**"
@@ -438,6 +389,129 @@ Note that the “Odds” of an event E1 vs an event E2 means the ratio of their 
 -   This disconnect leads to systematic misinterpretation
 :::
 
+---
+
+## The p-value Fallacy: A Clear Example
+
+::::: columns
+::: {.column width="50%"}
+**Scenario**: Testing a SNP for disease association
+
+**Traditional approach**:
+- Obtain p = 0.001
+- Declare "significant association"
+- Publish result
+
+**The fallacy**:
+- p = 0.001 means "1 in 1000 chance of seeing this data if no association exists"
+- NOT "999 in 1000 chance the association is real"
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 5
+# Parameters
+prior_prob <- 1/1000  # Prior probability of true association
+p_value <- 0.001      # Observed p-value
+
+# Convert p-value to z-score
+z <- qnorm(p_value/2, lower.tail = FALSE)
+
+# Calculate Bayes factor (approximate)
+bf <- exp(z^2/2)
+
+# Calculate posterior probability
+posterior <- (prior_prob * bf) / (prior_prob * bf + (1 - prior_prob))
+
+# Create data for visualization
+df <- data.frame(
+  Stage = factor(c("Prior", "p-value", "Posterior"), 
+                levels = c("Prior", "p-value", "Posterior")),
+  Probability = c(prior_prob, 1-p_value, posterior),
+  Label = c(paste0(round(prior_prob*100, 2), "%"), 
+           paste0(round((1-p_value)*100, 1), "%"), 
+           paste0(round(posterior*100, 1), "%"))
+)
+
+# Create plot
+ggplot(df, aes(x = Stage, y = Probability)) +
+  geom_bar(stat = "identity", fill = c("lightblue", "orange", "darkgreen"), width = 0.6) +
+  geom_text(aes(label = Label), vjust = -0.5, size = 5) +
+  ylim(0, 1) +
+  labs(title = "The p-value Fallacy",
+       subtitle = "p = 0.001 doesn't mean 99.9% chance of true association",
+       x = "", y = "Probability") +
+  theme_minimal(base_size = 14)
+```
+:::
+:::::
+
+**Key insight**: With a realistic prior of 1/1000, a "significant" p-value of 0.001 only gives ~50% posterior probability of true association!
+
+---
+
+## A GWAS Example
+
+::::: columns
+::: {.column width="50%"}
+**Same evidence, different conclusions:**
+
+-   SNP with p = 1 × 10⁻⁵ in GWAS
+
+-   Traditional: "Nearly significant!"
+
+-   Bayesian: "Probably a false positive"
+
+**Why the difference?**
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-width: 6
+#| fig-height: 5
+library(ggplot2)
+library(dplyr)
+
+# Function to calculate posterior probability
+calc_posterior <- function(prior, p_value, n_snps=1e6) {
+  # Convert p-value to z-score
+  z <- qnorm(p_value/2, lower.tail = FALSE)
+  # Approximate Bayes factor
+  bf <- exp(z^2/2)
+  # Calculate posterior
+  posterior <- (prior * bf) / (prior * bf + (1 - prior))
+  return(posterior)
+}
+
+# Create data
+p_values <- 10^seq(-8, -2, 0.5)
+posteriors <- sapply(p_values, function(p) calc_posterior(1/10000, p))
+
+# Create plot
+df <- data.frame(
+  p_value = p_values,
+  posterior = posteriors
+)
+
+ggplot(df, aes(x = -log10(p_value), y = posterior)) +
+  geom_line(size = 1.5, color = "blue") +
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "red") +
+  geom_vline(xintercept = -log10(5e-8), linetype = "dashed", color = "red") +
+  annotate("text", x = 8, y = 0.2, label = "GWAS\nsignificance", color = "red") +
+  annotate("text", x = 4, y = 0.55, label = "50% posterior\nprobability", color = "red") +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "P-value vs. Posterior Probability",
+    subtitle = "Prior probability = 1/10,000",
+    x = "-log10(p-value)",
+    y = "Posterior probability of association"
+  )
+```
+:::
+:::::
+
+
+---
 
 ## The Multiple Testing Challenge
 
@@ -488,7 +562,7 @@ $$P(H_1|\text{data}) = \frac{BF \times \pi_1}{BF \times \pi_1 + (1-\pi_1)}$$
 
 ## Visualizing Multiple Hypothesis Testing
 
-```{r}
+```{r, echo=FALSE, fig.width=8, fig.height=4}
 # Create illustration of multiple testing
 set.seed(123)
 
@@ -591,7 +665,10 @@ Popular implementations: qvalue package, fdrtool, locfdr
 
 ## Example: Genomic Applications
 
-```{r}
+```{r, echo=FALSE, fig.width=8, fig.height=4}
+# Create comparison of BH and Bayesian approaches
+library(ggplot2)
+
 # Plot posterior probabilities
 ggplot(plot_data, aes(x = z_score)) +
   geom_point(aes(y = post_prob, color = is_true), alpha = 0.5) +
@@ -610,7 +687,7 @@ Posterior probabilities provide a direct measure of evidence for each test.
 
 ## Decision Boundaries Comparison
 
-```{r}
+```{r, echo=FALSE, fig.width=8, fig.height=4}
 # Create data frame for decisions
 decisions <- data.frame(
   z_score = z_scores,
@@ -628,6 +705,17 @@ bh_false_neg <- sum(!bh_significant & is_true == 1)
 bayes_true_pos <- sum(high_post & is_true == 1)
 bayes_false_pos <- sum(high_post & is_true == 0)
 bayes_false_neg <- sum(!high_post & is_true == 1)
+
+# Create results summary
+results <- data.frame(
+  Method = c("BH FDR", "Bayes PP>0.9"),
+  TruePositives = c(bh_true_pos, bayes_true_pos),
+  FalsePositives = c(bh_false_pos, bayes_false_pos),
+  FalseNegatives = c(bh_false_neg, bayes_false_neg),
+  FDR = c(bh_false_pos/(bh_true_pos+bh_false_pos+1e-10), 
+          bayes_false_pos/(bayes_true_pos+bayes_false_pos+1e-10)),
+  Power = c(bh_true_pos/n_true, bayes_true_pos/n_true)
+)
 
 # Plot
 ggplot(decisions, aes(x = p_value, y = post_prob, color = is_true)) +
@@ -678,6 +766,7 @@ Advanced Bayesian approaches for multiple testing:
 5. Posterior probabilities are directly interpretable
 6. The approach extends naturally to complex data structures
 
+---
 ## Hierarchical Bayesian Models: The Problem of Many Groups
 
 In genomics, we often need to estimate many related parameters:
@@ -694,7 +783,7 @@ Complete pooling: Ignores differences between groups
 
 ## The Power of Partial Pooling
 
-```{r}
+```{r, echo=FALSE, fig.width=8, fig.height=4}
 # Create example data for three approaches
 set.seed(123)
 
@@ -728,6 +817,12 @@ plot_data <- data.frame(
                 levels = c("True", "No Pooling", "Complete Pooling", "Hierarchical"))
 )
 
+# Add sample size information
+sizes_df <- data.frame(
+  Group = factor(1:n_groups),
+  SampleSize = sample_sizes
+)
+
 # Plot
 library(ggplot2)
 ggplot(plot_data, aes(x = Group, y = Estimate, color = Method, group = Method)) +
@@ -745,8 +840,6 @@ ggplot(plot_data, aes(x = Group, y = Estimate, color = Method, group = Method)) 
 **Hierarchical models** adaptively share information across groups: stronger shrinkage for uncertain estimates, less for confident ones.
 
 ## Mathematical Structure
-
-
 
 A typical two-level hierarchical model:
 
@@ -1168,9 +1261,7 @@ ggplot(plot_data, aes(x = X, y = Y, color = Distribution)) +
   annotate("text", x = 0.5, y = sqrt(3)/2, label = "C")
 ```
 
-:::
 
-::::::
 ---
 
 ## Conjugate Normal-Normal Model
@@ -1186,7 +1277,6 @@ When analyzing a continuous parameter $\mu$ (like an effect size):
 - **Prior**: $\mu \sim \mathcal{N}(\mu_0, \sigma_0^2)$
 - **Likelihood**: $X \sim \mathcal{N}(\mu, \sigma^2)$ where $\sigma^2$ is known
 - **Question**: What is $p(\mu|X)$?
----
 
 ## The Mathematical Magic
 
@@ -1633,10 +1723,8 @@ ggplot(admix_df, aes(x = Individual, y = Proportion, fill = Population)) +
 
 ## The STRUCTURE Model in Detail
 
-:::::: {.columns}
-
+::::: columns
 ::: {.column width="50%"}
-
 **STRUCTURE**: A Bayesian mixture model for population genetics
 
 **Key components**:
@@ -1648,77 +1736,79 @@ ggplot(admix_df, aes(x = Individual, y = Proportion, fill = Population)) +
 - **Prior**: $q_{ik} \sim \text{Dirichlet}(\alpha)$ (ancestry proportions)
 - **Prior**: $f_{kj} \sim \text{Beta}(\lambda)$ (allele frequencies)
 - **Likelihood**: $P(X_{ij} | q_i, f_j)$ (genotype probabilities)
-
 :::
 
 ::: {.column width="50%"}
-
 ```{r}
-#| fig-height: 6
-#| fig-width: 6
-#| echo: false
-#| warning: false
-#| message: false
-
-library(ggplot2)
-library(viridis)
-library(patchwork)
-
+# Create a visualization of STRUCTURE-like results
 set.seed(567)
 
+# Parameters
 n_ind <- 100
 n_pop <- 3
 n_markers <- 20
 
+# Create true population allele frequencies
 pop_freqs <- matrix(rbeta(n_pop * n_markers, 0.5, 0.5), nrow = n_pop)
 
-# Create ancestry proportions
+# Create ancestry proportions (3 distinct groups with some admixture)
 q <- matrix(0, nrow = n_ind, ncol = n_pop)
 q[1:40, 1] <- rbeta(40, 10, 1)
 q[41:70, 2] <- rbeta(30, 10, 1)
 q[71:100, 3] <- rbeta(30, 10, 1)
-q <- t(apply(q + 0.05, 1, function(x) x / sum(x)))
 
-# Dataframes
+# Normalize rows to sum to 1
+for (i in 1:n_ind) {
+  # Add small values to ensure all populations represented
+  q[i,] <- q[i,] + 0.05
+  q[i,] <- q[i,] / sum(q[i,])
+}
+
+# Create data for heatmap of ancestry proportions
 q_df <- data.frame(
   Individual = rep(1:n_ind, n_pop),
   Population = factor(rep(paste0("Pop", 1:n_pop), each = n_ind)),
-  Proportion = as.vector(q)
+  Proportion = c(q)
 )
 
+# Create data for allele frequency heatmap
 freq_df <- data.frame(
   Population = factor(rep(paste0("Pop", 1:n_pop), each = n_markers)),
   Marker = factor(rep(paste0("M", 1:n_markers), times = n_pop)),
   Frequency = c(pop_freqs)
 )
 
-# Plots
+# Create plots
 p1 <- ggplot(q_df, aes(x = Individual, y = Population, fill = Proportion)) +
   geom_tile() +
   scale_fill_viridis() +
   labs(title = "Ancestry Proportions",
        subtitle = "Each individual's genetic ancestry",
-       x = "Individual", y = "Ancestral Population") +
-  theme_minimal(base_size = 10) +
-  theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+       x = "Individual", 
+       y = "Ancestral Population") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
 
 p2 <- ggplot(freq_df, aes(x = Marker, y = Population, fill = Frequency)) +
   geom_tile() +
   scale_fill_viridis() +
   labs(title = "Population Allele Frequencies",
        subtitle = "Each population's genetic profile",
-       x = "Genetic Marker", y = "Ancestral Population") +
-  theme_minimal(base_size = 10)
+       x = "Genetic Marker", 
+       y = "Ancestral Population")
 
-p1 / p2  # patchwork layout
+# Arrange plots
+gridExtra::grid.arrange(p1, p2, ncol = 1)
 ```
-
-
 :::
+:::::
 
-::::::
-### **Effect Size Mixtures in GWAS**
+---
 
+## Application: Effect Size Mixtures in GWAS
+
+::::: columns
+::: {.column width="50%"}
 **Problem**: Most variants have no effect, but some do
 
 **Solutions**:
@@ -1731,11 +1821,9 @@ p1 / p2  # patchwork layout
 - Improves power to detect true associations
 - Provides interpretable posterior probabilities
 - Naturally handles multiple testing
-
 :::
 
 ::: {.column width="50%"}
-
 ```{r}
 # Create visualization of effect size mixtures
 set.seed(789)
@@ -1776,7 +1864,7 @@ ggplot(effect_df, aes(x = ObservedEffect, fill = IsNull)) +
 :::
 :::::
 
-  
+
 ## Multivariate Normal Mixtures: The mash Approach
 
 ::::: columns
@@ -2299,208 +2387,208 @@ $P(0.1 < \theta < 0.3 | data) = 0.75$ → "75% probability effect is in the mode
 Contrast with frequentist:
 "p < 0.05" → Reject null hypothesis
 "95% CI: [0.1, 0.4]" → In repeated sampling, 95% of intervals would contain true value
-
-**Decision rules** can be based on:
-- Posterior probability: $P(\theta > \delta|X) > \gamma$ 
-- Predictive probability of success
-- Expected utility/loss considerations
-
----
-
-## Bayesian Meta-Analysis: The Mathematical Framework
-
-**Problem**: Combine evidence across heterogeneous studies
-
-**Model formulation**:
-- Let $y_i$ be the observed effect in study $i$
-- Let $\sigma_i^2$ be the variance (often known from standard error)
-- Let $\theta_i$ be the true effect in study $i$
-
-**Hierarchical model**:
-$y_i | \theta_i, \sigma_i^2 \sim N(\theta_i, \sigma_i^2)$
-$\theta_i | \mu, \tau^2 \sim N(\mu, \tau^2)$
-$\mu \sim N(\mu_0, \sigma_0^2)$
-$\tau^2 \sim \text{InvGamma}(a, b)$
-
-Where:
-- $\mu$ is the overall mean effect
-- $\tau^2$ is the between-study heterogeneity
-- $\mu_0, \sigma_0^2, a, b$ are hyperparameters
----
-
-**Key advantages**:
-- Naturally accounts for heterogeneity
-- Uncertainty in all parameters
-- Shrinkage of extreme estimates toward the mean
-- Robust to outliers with appropriate priors
-
----
-
-## Bayesian Meta-Analysis: Visualization
-
-::::: columns
-::: {.column width="50%"}
-**Traditional approaches**:
-- Fixed effects (assumes same effect size)
-- Random effects (allows variation in effect size)
-- Often sensitive to outliers
-
-**Bayesian advantages**:
-- Full posterior distribution for all parameters
-- Can incorporate informative priors
-- Naturally handles small studies (shrinkage)
-- Can model outliers explicitly
-- Direct probability statements about effects
-
-**Example interpretation**:
-- Posterior probability of benefit = 98%
-- 95% credible interval for effect size: [0.1, 0.5]
-- 90% probability heterogeneity is moderate to high
-:::
-
-::: {.column width="50%"}
-```{r}
-#| fig-height: 6
-# Create a visualization of Bayesian meta-analysis
-set.seed(678)
-
-# Parameters
-n_studies <- 8
-true_effect <- 0.3
-heterogeneity <- 0.1
-
-# Generate study-specific effects
-study_effects <- rnorm(n_studies, true_effect, heterogeneity)
-
-# Make one study an outlier
-study_effects[n_studies] <- -0.2
-
-# Generate observed effects and standard errors
-sample_sizes <- round(runif(n_studies, 100, 500))
-standard_errors <- 1 / sqrt(sample_sizes)
-observed_effects <- rnorm(n_studies, study_effects, standard_errors)
-
-# Create data frame for forest plot
-meta_df <- data.frame(
-  Study = paste0("Study ", 1:n_studies),
-  Effect = observed_effects,
-  SE = standard_errors,
-  LowerCI = observed_effects - 1.96 * standard_errors,
-  UpperCI = observed_effects + 1.96 * standard_errors
-)
-
-# Add meta-analysis results
-# 1. Fixed effects
-fixed_weights <- 1 / standard_errors^2
-fixed_effect <- sum(fixed_weights * observed_effects) / sum(fixed_weights)
-fixed_se <- sqrt(1 / sum(fixed_weights))
-
-# 2. Random effects (simplified)
-tau2 <- max(0, (sum(fixed_weights * (observed_effects - fixed_effect)^2) - (n_studies - 1)) / 
-             (sum(fixed_weights) - sum(fixed_weights^2) / sum(fixed_weights)))
-random_weights <- 1 / (standard_errors^2 + tau2)
-random_effect <- sum(random_weights * observed_effects) / sum(random_weights)
-random_se <- sqrt(1 / sum(random_weights))
-
-# 3. Bayesian robust (simplified - downweights outliers)
-robust_weights <- 1 / (standard_errors^2 + tau2 + 0.1 * (observed_effects - random_effect)^2)
-robust_effect <- sum(robust_weights * observed_effects) / sum(robust_weights)
-robust_se <- sqrt(1 / sum(robust_weights))
-
-# Add to data frame
-meta_results <- data.frame(
-  Study = c("Fixed Effects", "Random Effects", "Bayesian Robust"),
-  Effect = c(fixed_effect, random_effect, robust_effect),
-  SE = c(fixed_se, random_se, robust_se),
-  LowerCI = c(fixed_effect - 1.96 * fixed_se, 
-             random_effect - 1.96 * random_se,
-             robust_effect - 1.96 * robust_se),
-  UpperCI = c(fixed_effect + 1.96 * fixed_se, 
-             random_effect + 1.96 * random_se,
-             robust_effect + 1.96 * robust_se)
-)
-
-# Combine data
-plot_df <- rbind(
-  meta_df,
-  meta_results
-)
-
-# Add a grouping variable
-plot_df$Group <- ifelse(plot_df$Study %in% meta_results$Study, "Meta-Analysis", "Individual Studies")
-plot_df$Group <- factor(plot_df$Group, levels = c("Individual Studies", "Meta-Analysis"))
-
-# Order studies
-plot_df$Study <- factor(plot_df$Study, 
-                      levels = c(paste0("Study ", 1:n_studies), 
-                                "Fixed Effects", "Random Effects", "Bayesian Robust"))
-
-# Create forest plot
-ggplot(plot_df, aes(x = Effect, y = Study, color = Group)) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "gray") +
-  geom_vline(xintercept = true_effect, linetype = "dotted", color = "darkgreen") +
-  geom_point(aes(size = 1/SE)) +
-  geom_errorbarh(aes(xmin = LowerCI, xmax = UpperCI), height = 0.2) +
-  scale_color_manual(values = c("Individual Studies" = "blue", "Meta-Analysis" = "red")) +
-  scale_size_continuous(guide = "none") +
-  labs(title = "Bayesian Meta-Analysis",
-       subtitle = "Green dotted line shows true effect; note how Bayesian robust method handles outlier",
-       x = "Effect Size", 
-       y = "") +
-  theme(legend.position = "bottom")
-```
-:::
-:::::
-
----
-
-## Bayesian Adaptive Trial Designs
-
-A powerful framework that allows studies to **evolve** based on accumulating evidence
-
-- Combines statistical efficiency with ethical considerations
-- Particularly powerful for precision medicine approaches
-- Provides direct probability statements about treatment effects
-- Extends naturally to genetic and genomic applications
-
-## Key Idea: Learning While Doing
-
-Traditional (frequentist) trials:
-- Fixed design determined at the outset
-- Sample size calculations based on frequentist power
-- Analysis only after all data collection is complete
-
-Bayesian adaptive trials:
-- Update knowledge continuously as data accumulates
-- Modify aspects of the trial in response to emerging data
-- Make probability-based decisions at interim points
-
-## The Bayesian Framework
-
-For a treatment effect $\theta$:
-
-- **Prior distribution**: $p(\theta)$ - initial beliefs about the effect
-- **Likelihood**: $p(data|\theta)$ - probability of observing the data
-- **Posterior distribution**: $p(\theta|data) \propto p(data|\theta)p(\theta)$
-
-As data accumulates, the posterior provides a complete picture of current knowledge.
-
-## What Can Be Adapted?
-
-1. **Sample size** - stop early for efficacy, futility, or continue for more precision
-2. **Treatment allocation** - assign more patients to promising treatments
-3. **Eligibility criteria** - focus on responsive subgroups
-4. **Dosing** - concentrate on optimal doses
-5. **Endpoints** - prioritize more informative outcomes
-
-All based on predefined decision rules using posterior probabilities.
-
-## Example: Adaptive Stopping Rules
-
-A trial may stop early if:
-
-- $P(\theta > 0 | data) > 0.99$ (efficacy - treatment works)
-- $P(\theta < \delta | data) > 0.95$ (futility - treatment doesn't meet threshold)
+                       
+                       **Decision rules** can be based on:
+                         - Posterior probability: $P(\theta > \delta|X) > \gamma$ 
+                         - Predictive probability of success
+                       - Expected utility/loss considerations
+                       
+                       ---
+                         
+                         ## Bayesian Meta-Analysis: The Mathematical Framework
+                         
+                         **Problem**: Combine evidence across heterogeneous studies
+                       
+                       **Model formulation**:
+                         - Let $y_i$ be the observed effect in study $i$
+                         - Let $\sigma_i^2$ be the variance (often known from standard error)
+                       - Let $\theta_i$ be the true effect in study $i$
+                         
+                         **Hierarchical model**:
+                         $y_i | \theta_i, \sigma_i^2 \sim N(\theta_i, \sigma_i^2)$
+                         $\theta_i | \mu, \tau^2 \sim N(\mu, \tau^2)$
+                         $\mu \sim N(\mu_0, \sigma_0^2)$
+                         $\tau^2 \sim \text{InvGamma}(a, b)$
+                         
+                         Where:
+                         - $\mu$ is the overall mean effect
+                       - $\tau^2$ is the between-study heterogeneity
+                       - $\mu_0, \sigma_0^2, a, b$ are hyperparameters
+                       ---
+                         
+                         **Key advantages**:
+                         - Naturally accounts for heterogeneity
+                       - Uncertainty in all parameters
+                       - Shrinkage of extreme estimates toward the mean
+                       - Robust to outliers with appropriate priors
+                       
+                       ---
+                         
+                         ## Bayesian Meta-Analysis: Visualization
+                         
+                         ::::: columns
+                       ::: {.column width="50%"}
+                       **Traditional approaches**:
+                         - Fixed effects (assumes same effect size)
+                       - Random effects (allows variation in effect size)
+                       - Often sensitive to outliers
+                       
+                       **Bayesian advantages**:
+                         - Full posterior distribution for all parameters
+                       - Can incorporate informative priors
+                       - Naturally handles small studies (shrinkage)
+                       - Can model outliers explicitly
+                       - Direct probability statements about effects
+                       
+                       **Example interpretation**:
+                         - Posterior probability of benefit = 98%
+                         - 95% credible interval for effect size: [0.1, 0.5]
+                         - 90% probability heterogeneity is moderate to high
+                         :::
+                           
+                           ::: {.column width="50%"}
+                         ```{r}
+                         #| fig-height: 6
+                         # Create a visualization of Bayesian meta-analysis
+                         set.seed(678)
+                         
+                         # Parameters
+                         n_studies <- 8
+                         true_effect <- 0.3
+                         heterogeneity <- 0.1
+                         
+                         # Generate study-specific effects
+                         study_effects <- rnorm(n_studies, true_effect, heterogeneity)
+                         
+                         # Make one study an outlier
+                         study_effects[n_studies] <- -0.2
+                         
+                         # Generate observed effects and standard errors
+                         sample_sizes <- round(runif(n_studies, 100, 500))
+                         standard_errors <- 1 / sqrt(sample_sizes)
+                         observed_effects <- rnorm(n_studies, study_effects, standard_errors)
+                         
+                         # Create data frame for forest plot
+                         meta_df <- data.frame(
+                           Study = paste0("Study ", 1:n_studies),
+                           Effect = observed_effects,
+                           SE = standard_errors,
+                           LowerCI = observed_effects - 1.96 * standard_errors,
+                           UpperCI = observed_effects + 1.96 * standard_errors
+                         )
+                         
+                         # Add meta-analysis results
+                         # 1. Fixed effects
+                         fixed_weights <- 1 / standard_errors^2
+                         fixed_effect <- sum(fixed_weights * observed_effects) / sum(fixed_weights)
+                         fixed_se <- sqrt(1 / sum(fixed_weights))
+                         
+                         # 2. Random effects (simplified)
+                         tau2 <- max(0, (sum(fixed_weights * (observed_effects - fixed_effect)^2) - (n_studies - 1)) / 
+                                       (sum(fixed_weights) - sum(fixed_weights^2) / sum(fixed_weights)))
+                         random_weights <- 1 / (standard_errors^2 + tau2)
+                         random_effect <- sum(random_weights * observed_effects) / sum(random_weights)
+                         random_se <- sqrt(1 / sum(random_weights))
+                         
+                         # 3. Bayesian robust (simplified - downweights outliers)
+                         robust_weights <- 1 / (standard_errors^2 + tau2 + 0.1 * (observed_effects - random_effect)^2)
+                         robust_effect <- sum(robust_weights * observed_effects) / sum(robust_weights)
+                         robust_se <- sqrt(1 / sum(robust_weights))
+                         
+                         # Add to data frame
+                         meta_results <- data.frame(
+                           Study = c("Fixed Effects", "Random Effects", "Bayesian Robust"),
+                           Effect = c(fixed_effect, random_effect, robust_effect),
+                           SE = c(fixed_se, random_se, robust_se),
+                           LowerCI = c(fixed_effect - 1.96 * fixed_se, 
+                                       random_effect - 1.96 * random_se,
+                                       robust_effect - 1.96 * robust_se),
+                           UpperCI = c(fixed_effect + 1.96 * fixed_se, 
+                                       random_effect + 1.96 * random_se,
+                                       robust_effect + 1.96 * robust_se)
+                         )
+                         
+                         # Combine data
+                         plot_df <- rbind(
+                           meta_df,
+                           meta_results
+                         )
+                         
+                         # Add a grouping variable
+                         plot_df$Group <- ifelse(plot_df$Study %in% meta_results$Study, "Meta-Analysis", "Individual Studies")
+                         plot_df$Group <- factor(plot_df$Group, levels = c("Individual Studies", "Meta-Analysis"))
+                         
+                         # Order studies
+                         plot_df$Study <- factor(plot_df$Study, 
+                                                 levels = c(paste0("Study ", 1:n_studies), 
+                                                            "Fixed Effects", "Random Effects", "Bayesian Robust"))
+                         
+                         # Create forest plot
+                         ggplot(plot_df, aes(x = Effect, y = Study, color = Group)) +
+                           geom_vline(xintercept = 0, linetype = "dashed", color = "gray") +
+                           geom_vline(xintercept = true_effect, linetype = "dotted", color = "darkgreen") +
+                           geom_point(aes(size = 1/SE)) +
+                           geom_errorbarh(aes(xmin = LowerCI, xmax = UpperCI), height = 0.2) +
+                           scale_color_manual(values = c("Individual Studies" = "blue", "Meta-Analysis" = "red")) +
+                           scale_size_continuous(guide = "none") +
+                           labs(title = "Bayesian Meta-Analysis",
+                                subtitle = "Green dotted line shows true effect; note how Bayesian robust method handles outlier",
+                                x = "Effect Size", 
+                                y = "") +
+                           theme(legend.position = "bottom")
+                         ```
+                         :::
+                           :::::
+                           
+                           ---
+                           
+                           ## Bayesian Adaptive Trial Designs
+                           
+                           A powerful framework that allows studies to **evolve** based on accumulating evidence
+                         
+                         - Combines statistical efficiency with ethical considerations
+                         - Particularly powerful for precision medicine approaches
+                         - Provides direct probability statements about treatment effects
+                         - Extends naturally to genetic and genomic applications
+                         
+                         ## Key Idea: Learning While Doing
+                         
+                         Traditional (frequentist) trials:
+                           - Fixed design determined at the outset
+                         - Sample size calculations based on frequentist power
+                         - Analysis only after all data collection is complete
+                         
+                         Bayesian adaptive trials:
+                           - Update knowledge continuously as data accumulates
+                         - Modify aspects of the trial in response to emerging data
+                         - Make probability-based decisions at interim points
+                         
+                         ## The Bayesian Framework
+                         
+                         For a treatment effect $\theta$:
+                           
+                           - **Prior distribution**: $p(\theta)$ - initial beliefs about the effect
+                         - **Likelihood**: $p(data|\theta)$ - probability of observing the data
+                         - **Posterior distribution**: $p(\theta|data) \propto p(data|\theta)p(\theta)$
+                           
+                           As data accumulates, the posterior provides a complete picture of current knowledge.
+                         
+                         ## What Can Be Adapted?
+                         
+                         1. **Sample size** - stop early for efficacy, futility, or continue for more precision
+                         2. **Treatment allocation** - assign more patients to promising treatments
+                         3. **Eligibility criteria** - focus on responsive subgroups
+                         4. **Dosing** - concentrate on optimal doses
+                         5. **Endpoints** - prioritize more informative outcomes
+                         
+                         All based on predefined decision rules using posterior probabilities.
+                         
+                         ## Example: Adaptive Stopping Rules
+                         
+                         A trial may stop early if:
+                           
+                           - $P(\theta > 0 | data) > 0.99$ (efficacy - treatment works)
+                         - $P(\theta < \delta | data) > 0.95$ (futility - treatment doesn't meet threshold)
 - $P(\delta_1 < \theta < \delta_2 | data) > 0.90$ (precision - effect is known with sufficient certainty)
 
 These are direct probability statements about the parameter of interest.
@@ -2742,9 +2830,7 @@ ggplot(fine_map_df, aes(x = Position)) +
   theme(legend.position = "bottom")
 ```
 
-:::
 
-::::::
 ---
 
 ## Practical Recommendations for Bayesian Genomics

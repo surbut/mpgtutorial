@@ -1,0 +1,136 @@
+/* Custom CSS for presentation */
+  
+  /* Two-column layout */
+  .columns {
+    display: flex;
+    gap: 1em;
+  }
+
+.column {
+  flex: 1;
+}
+
+/* Make headers stand out more */
+  h2 {
+    color: #2c3e50;
+      border-bottom: 2px solid #3498db;
+    padding-bottom: 0.2em;
+  }
+
+/* Improve table styling */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+  }
+
+th, td {
+  padding: 0.5em;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #f8f8f8;
+}
+
+/* Make slide number less intrusive */
+  .slide-number {
+    font-size: 0.8em;
+    opacity: 0.6;
+  }
+
+/* Better formatting for math equations */
+  .math.display {
+    font-size: 1.1em;
+    margin: 1em 0;
+  }
+
+/* Adjust text for smaller slides */
+  .smaller {
+    font-size: 0.85em;
+  }
+
+/* Highlight boxes for important notes */
+  .note {
+    background-color: #f8f8f8;
+      border-left: 4px solid #3498db;
+    padding: 0.5em 1em;
+    margin: 1em 0;
+  }
+
+.warning {
+  background-color: #fef9e7;
+    border-left: 4px solid #f39c12;
+  padding: 0.5em 1em;
+  margin: 1em 0;
+}
+
+/* Footer styling */
+  .footer {
+    font-size: 0.7em;
+    color: #7f8c8d;
+      position: absolute;
+    bottom: 0.5em;
+    left: 1em;
+  }
+
+/* Code block styling */
+  pre {
+    background-color: #f8f8f8;
+      border-radius: 3px;
+    padding: 0.5em;
+  }
+
+code {
+  font-family: 'Source Code Pro', Consolas, Monaco, 'Andale Mono', monospace;
+}
+
+/* Figure captions */
+  .figure {
+    margin: 1em 0;
+  }
+
+.figure > figcaption {
+  font-size: 0.9em;
+  font-style: italic;
+  color: #7f8c8d;
+    text-align: center;
+  margin-top: 0.5em;
+}
+
+/* Title slide */
+  .title-slide h1 {
+    font-size: 2.2em;
+    margin-bottom: 0.2em;
+  }
+
+.title-slide h2 {
+  font-size: 1.5em;
+  border-bottom: none;
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+.title-slide h3 {
+  font-size: 1.2em;
+  font-style: italic;
+  margin-top: 0;
+}
+
+/* Incremental lists */
+  .incremental li {
+    opacity: 0.25;
+  }
+
+.incremental li.visible {
+  opacity: 1;
+}
+
+/* References */
+  .references {
+    font-size: 0.8em;
+  }
+
+.references li {
+  margin-bottom: 0.5em;
+}

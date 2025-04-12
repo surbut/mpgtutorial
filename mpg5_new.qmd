@@ -1,0 +1,20 @@
+---
+title: "A Practical Primer on Bayesian Statistics for Population Genomics"
+author: "Sarah Urbut, MD PhD"
+date: "March 29, 2025"
+format: revealjs
+theme: simple
+transition: slide
+slide-number: true
+---
+
+## Overview
+
+In this seminar, we'll cover:
+
+1. Introduction to Bayesian thinking and posterior distributions
+2. The p-value fallacy and Bayesian alternatives
+3. Conjugate priors for genetic models (Beta-Binomial, Dirichlet)
+4. Mixture models for population structure 
+5. Clinical trials with flat priors - lessons for genomics
+6. Multivariate normal mixtures (mash) 
