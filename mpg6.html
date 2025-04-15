@@ -471,8 +471,6 @@ What we get: P(Data|Null Hypothesis)</p>
 </section>
 <section id="probabilistic-interpretation-of-estimates" class="slide level2">
 <h2>Probabilistic Interpretation of Estimates</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
 <p>In the Bayesian framework:</p>
 <ul>
 <li><strong>Parameters are random variables</strong> with distributions, not fixed values</li>
@@ -481,18 +479,11 @@ What we get: P(Data|Null Hypothesis)</p>
 <li><strong>Natural quantification of uncertainty</strong> <em>without</em> hypothetical repeated sampling</li>
 <li><strong>Interpretation is direct and intuitive</strong> for researchers and clinicians</li>
 </ul>
-</div><div class="column" style="width:50%;">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure>
-<p><img data-src="mpg6_files/figure-revealjs/unnamed-chunk-2-1.png" width="960"></p>
-</figure>
-</div>
-</div>
-</div>
-</div></div>
 </section>
+<section id="probabilistic-interpretation-of-estimates-1" class="slide level2">
+<h2>Probabilistic Interpretation of Estimates</h2>
+
+<img data-src="mpg6_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
 <section id="bayesian-vs.-frequentist-intervals" class="slide level2">
 <h2>Bayesian vs.&nbsp;Frequentist Intervals</h2>
 <table class="caption-top">
@@ -760,16 +751,6 @@ Even with the most optimistic assumptions, the evidence against the null is mode
 <li>In genomics, this perspective helps manage false discovery rates</li>
 </ol>
 </section>
-<section id="the-fallacy-of-p-values" class="slide level2">
-<h2>The Fallacy of P-values</h2>
-<div>
-<ul>
-<li class="fragment"><p>P-values answer a <strong>counterfactual question</strong>: “If there were no effect, how surprising would these data be?”</p></li>
-<li class="fragment"><p>But researchers want to know: “<strong>What is the probability this association is real?</strong>”</p></li>
-<li class="fragment"><p>This disconnect leads to systematic misinterpretation</p></li>
-</ul>
-</div>
-</section>
 <section id="the-multiple-testing-challenge" class="slide level2">
 <h2>2. The Multiple Testing Challenge</h2>
 <p>Modern genomics routinely tests <strong>thousands to millions</strong> of hypotheses:</p>
@@ -994,10 +975,13 @@ Even with the most optimistic assumptions, the evidence against the null is mode
 <section id="bringing-it-home" class="slide level2">
 <h2>Bringing it home!</h2>
 
-<img data-src="mpg6_files/figure-revealjs/unnamed-chunk-11-1.png" width="960" class="r-stretch"><ul>
+<img data-src="mpg6_files/figure-revealjs/unnamed-chunk-11-1.png" width="960" class="r-stretch"></section>
+<section id="summary" class="slide level2">
+<h2>Summary</h2>
+<ul>
 <li>Observed Effects are noisy</li>
 <li>only considering information in one subgroup ignores the hints we get from abound</li>
-<li>sharing is caring!</li>
+<li>Sharing is caring!</li>
 </ul>
 </section>
 <section id="conjugate-priors-why-theyre-beautiful" class="slide level2">
@@ -1431,11 +1415,35 @@ Intuition: “The new population mean is a weighted average where individuals ar
 </section>
 <section id="key-point-different-distributions-for-different-reasons" class="slide level2">
 <h2>Key Point: Different Distributions for Different Reasons</h2>
-<p><span class="math inline">\(q (ancestry) ~ Dirichlet\)</span> - Because proportions sum to 1 across K populations - K parameters (one for each population) - NOT related to number of allele types</p>
-<p>$f (frequencies) ~ Beta $ - Because each marker has 2 possible alleles - Two parameters (success/failure for that allele) - One Beta distribution per marker per population</p>
+<p><span class="math inline">\(q (ancestry) ~ Dirichlet\)</span> - Because proportions sum to 1 across K populations - K parameters (one for each population) ::: notes - NOT related to number of allele types ::: notes $f (frequencies) ~ Beta $ - Because each marker has 2 possible alleles - Two parameters (success/failure for that allele) - One Beta distribution per marker per population</p>
 </section>
-<section id="understanding-the-q-update-individual-level" class="slide level2">
-<h2>Understanding the q Update (Individual Level)</h2>
+<section id="understanding-the-q-update" class="slide level2">
+<h2>Understanding the q Update</h2>
+<h3 id="individual-level">Individual Level</h3>
+<aside class="notes">
+<ul>
+<li>Here, we’re updating the ancestry proportions (<code>q</code>) for Individual
+<ol type="1">
+<li></li>
+</ol></li>
+<li>For each marker, we calculate the likelihood of the observed allele under each population’s allele frequency.</li>
+<li>For example, for Marker 1 (A), we look up the probability of A in Population 1 (<span class="math inline">\(f_1^A\)</span>) and Population 2 (<span class="math inline">\(f_2^A\)</span>).</li>
+<li>We do this for all markers, summing the log-likelihoods (or likelihoods, depending on the implementation) for each population.</li>
+<li>These sums are then added to the prior Dirichlet parameters (<span class="math inline">\(\alpha_1\)</span>, <span class="math inline">\(\alpha_2\)</span>) to get the updated parameters for the Dirichlet distribution.</li>
+<li>The result is a new estimate of Individual 1’s ancestry proportions, reflecting both the prior and the observed data.</li>
+<li>This process is repeated for each individual in the dataset.</li>
+</ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 <p><strong>Individual 1</strong>: A C A</p>
 <ul>
 <li>Step 1: Calculate Likelihoods <strong>Population 1 Contributions</strong>:</li>
@@ -1458,8 +1466,9 @@ Intuition: “The new population mean is a weighted average where individuals ar
 </section>
 <section id="step-2-dirichlet-update" class="slide level2">
 <h2>Step 2: Dirichlet Update</h2>
-<p><span class="math display">\[q_1 \sim \text{Dirichlet}(\alpha + [\text{Sum\_Pop1}, \text{Sum\_Pop2}])\]</span> where:</p>
-<p><em>-</em> Sum_Pop1 = <span class="math inline">\(L_{11} + L_{21} + L_{31}\)</span> (added to <span class="math inline">\(\alpha_1\)</span>) <em>-</em> Sum_Pop2 = <span class="math inline">\(L_{12} + L_{22} + L_{32}\)</span> (added to <span class="math inline">\(\alpha_2\)</span>)</p>
+<p><span class="math display">\[q_1 \sim \text{Dirichlet}(\alpha + \sum{Pop1}, \sum{Pop2})\]</span> where:</p>
+<p><strong>-</strong> <span class="math inline">\(\sum{Pop1} = L_{11} + L_{21} + L_{31}\)</span> (added to <span class="math inline">\(\alpha_1\)</span>)<br>
+<strong>-</strong> <span class="math inline">\(\sum{Pop2} = L_{12} + L_{22} + L_{32}\)</span> (added to <span class="math inline">\(\alpha_2\)</span>)</p>
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -1476,15 +1485,22 @@ Intuition: “The new population mean is a weighted average where individuals ar
 </section>
 <section id="updating-allele-frequencies-f-with-fixed-ancestry-q" class="slide level2">
 <h2>Updating Allele Frequencies (f) with Fixed Ancestry (q)</h2>
-<p>** Marker 1 (Allele A)</p>
-<p><strong>Individual 1’s ancestry</strong>: <span class="math inline">\(q_1 = (0.7, 0.3)\)</span></p>
-<p><strong>Population 1</strong>: - Contribution from Individual 1: 0.7 (from <span class="math inline">\(q_{11}\)</span>) - Update: <span class="math inline">\(f_1^A \sim \text{Beta}(\lambda + 0.7, \lambda + 0.3)\)</span></p>
-<p><strong>Population 2</strong>: - Contribution from Individual 1: 0.3 (from <span class="math inline">\(q_{12}\)</span>) - Update: <span class="math inline">\(f_2^A \sim \text{Beta}(\lambda + 0.3, \lambda + 0.7)\)</span></p>
+<p><strong>Marker 1 (Allele A)</strong></p>
+<p><strong>Individual 1’s ancestry</strong>: <span class="math inline">\(q_1 = (0.7, 0.3)\)</span><br>
+</p>
+<ul>
+<li><p><strong>Population 1</strong>: - Contribution from Individual 1: 0.7 (from <span class="math inline">\(q_{11}\)</span>)<br>
+Update: <span class="math inline">\(f_1^A \sim \text{Beta}(\lambda + 0.7, \lambda + 0.3)\)</span></p></li>
+<li><p><strong>Population 2</strong>: - Contribution from Individual 1: 0.3 (from <span class="math inline">\(q_{12}\)</span>) Update: <span class="math inline">\(f_2^A \sim \text{Beta}(\lambda + 0.3, \lambda + 0.7)\)</span></p></li>
+</ul>
 </section>
 <section id="marker-2-allele-c" class="slide level2">
 <h2>Marker 2 (Allele C)</h2>
-<p><strong>Population 1</strong> - Contribution from Individual 1: 0.7 (from <span class="math inline">\(q_{11}\)</span>) - Update: <span class="math inline">\(f_1^C \sim \text{Beta}(\lambda + 0.7, \lambda + 0.3)\)</span></p>
-<p><strong>Population 2</strong>: - Contribution from Individual 1: 0.3 (from <span class="math inline">\(q_{12}\)</span>) - Update: <span class="math inline">\(f_2^C \sim \text{Beta}(\lambda + 0.3, \lambda + 0.7)\)</span></p>
+<p><strong>Population 1</strong> - Contribution from Individual 1: 0.7 (from <span class="math inline">\(q_{11}\)</span>)<br>
+- Update: <span class="math inline">\(f_1^C \sim \text{Beta}(\lambda + 0.7, \lambda + 0.3)\)</span><br>
+</p>
+<p><strong>Population 2</strong>: - Contribution from Individual 1: 0.3 (from <span class="math inline">\(q_{12}\)</span>)<br>
+- Update: <span class="math inline">\(f_2^C \sim \text{Beta}(\lambda + 0.3, \lambda + 0.7)\)</span></p>
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
@@ -1502,159 +1518,269 @@ Intuition: “The new population mean is a weighted average where individuals ar
 <section id="the-mcmc-two-step" class="slide level2">
 <h2>The MCMC Two-Step</h2>
 <ol type="1">
-<li><p>Update ancestries given current frequencies: <span class="math inline">\(P(q_i \|\text{data}, f) \propto P(\text{data}\|q_i,f)P(q_i)\)</span></p></li>
+<li><p>Update ancestries given current frequencies: <span class="math inline">\(P(q_i |\text{data}, f) \propto P(\text{data}|q_i,f)P(q_i)\)</span></p></li>
 <li><p>Update frequencies given current ancestries: <span class="math inline">\(P(f_k | \text{data}, q) \propto P(\text{data}|q,f_k)P(f_k)\)</span></p></li>
 </ol>
-<h3 id="effect-size-mixtures-in-gwas"><strong>Effect Size Mixtures in GWAS</strong></h3>
+</section>
+<section id="structure-simulation-ancestry-and-allele-frequency-inference" class="slide level2">
+<h2>STRUCTURE Simulation: Ancestry and Allele Frequency Inference</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb3-2"><a href=""></a><span class="fu">library</span>(viridis)</span>
+<span id="cb3-3"><a href=""></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb3-4"><a href=""></a></span>
+<span id="cb3-5"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">2024</span>)</span>
+<span id="cb3-6"><a href=""></a></span>
+<span id="cb3-7"><a href=""></a><span class="co"># Parameters</span></span>
+<span id="cb3-8"><a href=""></a>n_ind <span class="ot">&lt;-</span> <span class="dv">12</span></span>
+<span id="cb3-9"><a href=""></a>n_pop <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb3-10"><a href=""></a>n_marker <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb3-11"><a href=""></a></span>
+<span id="cb3-12"><a href=""></a><span class="co"># 1. Simulate population allele frequencies (for each marker, each pop)</span></span>
+<span id="cb3-13"><a href=""></a>pop_freqs <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">runif</span>(n_pop <span class="sc">*</span> n_marker, <span class="fl">0.2</span>, <span class="fl">0.8</span>), <span class="at">nrow =</span> n_pop)</span>
+<span id="cb3-14"><a href=""></a><span class="fu">colnames</span>(pop_freqs) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"M"</span>, <span class="dv">1</span><span class="sc">:</span>n_marker)</span>
+<span id="cb3-15"><a href=""></a><span class="fu">rownames</span>(pop_freqs) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Pop"</span>, <span class="dv">1</span><span class="sc">:</span>n_pop)</span>
+<span id="cb3-16"><a href=""></a></span>
+<span id="cb3-17"><a href=""></a><span class="co"># 2. Simulate true ancestry proportions for each individual</span></span>
+<span id="cb3-18"><a href=""></a><span class="co"># We'll make 4 mostly Pop1, 4 mostly Pop2, 4 admixed</span></span>
+<span id="cb3-19"><a href=""></a>q_true <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb3-20"><a href=""></a>  <span class="fu">t</span>(<span class="fu">replicate</span>(<span class="dv">4</span>, <span class="fu">c</span>(<span class="fu">rbeta</span>(<span class="dv">1</span>, <span class="dv">8</span>, <span class="dv">2</span>), <span class="fu">rbeta</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">8</span>)))),   <span class="co"># mostly Pop1</span></span>
+<span id="cb3-21"><a href=""></a>  <span class="fu">t</span>(<span class="fu">replicate</span>(<span class="dv">4</span>, <span class="fu">c</span>(<span class="fu">rbeta</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">8</span>), <span class="fu">rbeta</span>(<span class="dv">1</span>, <span class="dv">8</span>, <span class="dv">2</span>)))),   <span class="co"># mostly Pop2</span></span>
+<span id="cb3-22"><a href=""></a>  <span class="fu">t</span>(<span class="fu">replicate</span>(<span class="dv">4</span>, <span class="fu">c</span>(<span class="fu">rbeta</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">5</span>), <span class="fu">rbeta</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">5</span>))))    <span class="co"># admixed</span></span>
+<span id="cb3-23"><a href=""></a>)</span>
+<span id="cb3-24"><a href=""></a>q_true <span class="ot">&lt;-</span> q_true <span class="sc">/</span> <span class="fu">rowSums</span>(q_true)</span>
+<span id="cb3-25"><a href=""></a><span class="fu">colnames</span>(q_true) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Pop1"</span>, <span class="st">"Pop2"</span>)</span>
+<span id="cb3-26"><a href=""></a></span>
+<span id="cb3-27"><a href=""></a><span class="co"># 3. Simulate genotypes for each individual at each marker</span></span>
+<span id="cb3-28"><a href=""></a><span class="co"># For simplicity, haploid: each allele is drawn from a population with probability = q</span></span>
+<span id="cb3-29"><a href=""></a>geno <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> n_ind, <span class="at">ncol =</span> n_marker)</span>
+<span id="cb3-30"><a href=""></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_ind) {</span>
+<span id="cb3-31"><a href=""></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_marker) {</span>
+<span id="cb3-32"><a href=""></a>    <span class="co"># Choose population for this allele</span></span>
+<span id="cb3-33"><a href=""></a>    pop <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>n_pop, <span class="dv">1</span>, <span class="at">prob =</span> q_true[i, ])</span>
+<span id="cb3-34"><a href=""></a>    <span class="co"># Draw allele: 1 = reference (A), 0 = alt (C)</span></span>
+<span id="cb3-35"><a href=""></a>    geno[i, j] <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="dv">1</span>, <span class="dv">1</span>, pop_freqs[pop, j])</span>
+<span id="cb3-36"><a href=""></a>  }</span>
+<span id="cb3-37"><a href=""></a>}</span>
+<span id="cb3-38"><a href=""></a><span class="fu">colnames</span>(geno) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"M"</span>, <span class="dv">1</span><span class="sc">:</span>n_marker)</span>
+<span id="cb3-39"><a href=""></a><span class="fu">rownames</span>(geno) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Ind"</span>, <span class="dv">1</span><span class="sc">:</span>n_ind)</span>
+<span id="cb3-40"><a href=""></a></span>
+<span id="cb3-41"><a href=""></a><span class="co"># 4. "Estimate" ancestry proportions over iterations (toy EM/MCMC)</span></span>
+<span id="cb3-42"><a href=""></a><span class="co"># We'll start with random q, and update using the observed alleles and pop freqs</span></span>
+<span id="cb3-43"><a href=""></a>n_iter <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb3-44"><a href=""></a>q_est <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="at">dim =</span> <span class="fu">c</span>(n_ind, n_pop, n_iter))</span>
+<span id="cb3-45"><a href=""></a>q_est[,,<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">apply</span>(<span class="fu">matrix</span>(<span class="fu">runif</span>(n_ind <span class="sc">*</span> n_pop), <span class="at">ncol =</span> n_pop), <span class="dv">1</span>, <span class="cf">function</span>(x) x<span class="sc">/</span><span class="fu">sum</span>(x)))</span>
+<span id="cb3-46"><a href=""></a></span>
+<span id="cb3-47"><a href=""></a><span class="cf">for</span> (it <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>n_iter) {</span>
+<span id="cb3-48"><a href=""></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_ind) {</span>
+<span id="cb3-49"><a href=""></a>    <span class="co"># For each population, compute likelihood of observed alleles</span></span>
+<span id="cb3-50"><a href=""></a>    loglike <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, n_pop)</span>
+<span id="cb3-51"><a href=""></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_pop) {</span>
+<span id="cb3-52"><a href=""></a>      <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_marker) {</span>
+<span id="cb3-53"><a href=""></a>        p <span class="ot">&lt;-</span> pop_freqs[k, j]</span>
+<span id="cb3-54"><a href=""></a>        a <span class="ot">&lt;-</span> geno[i, j]</span>
+<span id="cb3-55"><a href=""></a>        loglike[k] <span class="ot">&lt;-</span> loglike[k] <span class="sc">+</span> <span class="fu">dbinom</span>(a, <span class="dv">1</span>, p, <span class="at">log=</span><span class="cn">TRUE</span>)</span>
+<span id="cb3-56"><a href=""></a>      }</span>
+<span id="cb3-57"><a href=""></a>    }</span>
+<span id="cb3-58"><a href=""></a>    <span class="co"># Add prior (Dirichlet(1,1) = uniform)</span></span>
+<span id="cb3-59"><a href=""></a>    post <span class="ot">&lt;-</span> <span class="fu">exp</span>(loglike <span class="sc">-</span> <span class="fu">max</span>(loglike)) <span class="co"># for stability</span></span>
+<span id="cb3-60"><a href=""></a>    post <span class="ot">&lt;-</span> post <span class="sc">/</span> <span class="fu">sum</span>(post)</span>
+<span id="cb3-61"><a href=""></a>    <span class="co"># Update q as convex combination (like EM)</span></span>
+<span id="cb3-62"><a href=""></a>    q_est[i, , it] <span class="ot">&lt;-</span> <span class="fl">0.7</span> <span class="sc">*</span> q_est[i, , it<span class="dv">-1</span>] <span class="sc">+</span> <span class="fl">0.3</span> <span class="sc">*</span> post</span>
+<span id="cb3-63"><a href=""></a>    q_est[i, , it] <span class="ot">&lt;-</span> q_est[i, , it] <span class="sc">/</span> <span class="fu">sum</span>(q_est[i, , it])</span>
+<span id="cb3-64"><a href=""></a>  }</span>
+<span id="cb3-65"><a href=""></a>}</span>
+<span id="cb3-66"><a href=""></a></span>
+<span id="cb3-67"><a href=""></a><span class="co"># 5. Prepare data for plotting</span></span>
+<span id="cb3-68"><a href=""></a></span>
+<span id="cb3-69"><a href=""></a><span class="co"># True ancestry</span></span>
+<span id="cb3-70"><a href=""></a>q_true_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(q_true)</span>
+<span id="cb3-71"><a href=""></a>q_true_df<span class="sc">$</span>Individual <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="dv">1</span><span class="sc">:</span>n_ind)</span>
+<span id="cb3-72"><a href=""></a>q_true_long <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(q_true_df, <span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">"Pop"</span>), <span class="at">names_to =</span> <span class="st">"Population"</span>, <span class="at">values_to =</span> <span class="st">"Proportion"</span>)</span>
+<span id="cb3-73"><a href=""></a></span>
+<span id="cb3-74"><a href=""></a><span class="co"># Estimated ancestry at each iteration</span></span>
+<span id="cb3-75"><a href=""></a>q_est_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(q_est[,,n_iter])</span>
+<span id="cb3-76"><a href=""></a><span class="fu">colnames</span>(q_est_df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Pop1"</span>, <span class="st">"Pop2"</span>)</span>
+<span id="cb3-77"><a href=""></a>q_est_df<span class="sc">$</span>Individual <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="dv">1</span><span class="sc">:</span>n_ind)</span>
+<span id="cb3-78"><a href=""></a>q_est_long <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(q_est_df, <span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">"Pop"</span>), <span class="at">names_to =</span> <span class="st">"Population"</span>, <span class="at">values_to =</span> <span class="st">"Proportion"</span>)</span>
+<span id="cb3-79"><a href=""></a></span>
+<span id="cb3-80"><a href=""></a><span class="co"># Estimated ancestry over all iterations (for a few individuals)</span></span>
+<span id="cb3-81"><a href=""></a>q_iter <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, <span class="cf">function</span>(i) {</span>
+<span id="cb3-82"><a href=""></a>  <span class="fu">as.data.frame</span>(<span class="fu">t</span>(q_est[i,,])) <span class="sc">%&gt;%</span></span>
+<span id="cb3-83"><a href=""></a>    <span class="fu">mutate</span>(<span class="at">Iteration =</span> <span class="dv">1</span><span class="sc">:</span>n_iter, <span class="at">Individual =</span> i)</span>
+<span id="cb3-84"><a href=""></a>})</span>
+<span id="cb3-85"><a href=""></a>q_iter <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(q_iter)</span>
+<span id="cb3-86"><a href=""></a><span class="fu">colnames</span>(q_iter)[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Pop1"</span>, <span class="st">"Pop2"</span>)</span>
+<span id="cb3-87"><a href=""></a>q_iter_long <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(q_iter, <span class="at">cols =</span> <span class="fu">c</span>(<span class="st">"Pop1"</span>, <span class="st">"Pop2"</span>), <span class="at">names_to =</span> <span class="st">"Population"</span>, <span class="at">values_to =</span> <span class="st">"Proportion"</span>)</span>
+<span id="cb3-88"><a href=""></a></span>
+<span id="cb3-89"><a href=""></a><span class="co"># 6. Plot</span></span>
+<span id="cb3-90"><a href=""></a></span>
+<span id="cb3-91"><a href=""></a><span class="co"># STRUCTURE-style barplot: true ancestry</span></span>
+<span id="cb3-92"><a href=""></a>p_true <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(q_true_long, <span class="fu">aes</span>(<span class="at">x =</span> Individual, <span class="at">y =</span> Proportion, <span class="at">fill =</span> Population)) <span class="sc">+</span></span>
+<span id="cb3-93"><a href=""></a>  <span class="fu">geom_col</span>(<span class="at">width =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb3-94"><a href=""></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Pop1"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"Pop2"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb3-95"><a href=""></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"True Ancestry Proportions"</span>, <span class="at">y =</span> <span class="st">"Proportion"</span>, <span class="at">x =</span> <span class="st">"Individual"</span>) <span class="sc">+</span></span>
+<span id="cb3-96"><a href=""></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>)</span>
+<span id="cb3-97"><a href=""></a></span>
+<span id="cb3-98"><a href=""></a><span class="co"># STRUCTURE-style barplot: estimated ancestry (final iteration)</span></span>
+<span id="cb3-99"><a href=""></a>p_est <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(q_est_long, <span class="fu">aes</span>(<span class="at">x =</span> Individual, <span class="at">y =</span> Proportion, <span class="at">fill =</span> Population)) <span class="sc">+</span></span>
+<span id="cb3-100"><a href=""></a>  <span class="fu">geom_col</span>(<span class="at">width =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb3-101"><a href=""></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Pop1"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"Pop2"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb3-102"><a href=""></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Estimated Ancestry (Iteration 10)"</span>, <span class="at">y =</span> <span class="st">"Proportion"</span>, <span class="at">x =</span> <span class="st">"Individual"</span>) <span class="sc">+</span></span>
+<span id="cb3-103"><a href=""></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>)</span>
+<span id="cb3-104"><a href=""></a></span>
+<span id="cb3-105"><a href=""></a><span class="co"># Trajectory plot for a few individuals</span></span>
+<span id="cb3-106"><a href=""></a>p_traj <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(q_iter_long, <span class="fu">aes</span>(<span class="at">x =</span> Iteration, <span class="at">y =</span> Proportion, <span class="at">color =</span> Population)) <span class="sc">+</span></span>
+<span id="cb3-107"><a href=""></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb3-108"><a href=""></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Individual, <span class="at">nrow =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb3-109"><a href=""></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Pop1"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"Pop2"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb3-110"><a href=""></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Ancestry Proportion Trajectories (First 6 Individuals)"</span>, <span class="at">y =</span> <span class="st">"Proportion"</span>, <span class="at">x =</span> <span class="st">"Iteration"</span>) <span class="sc">+</span></span>
+<span id="cb3-111"><a href=""></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span>
+<span id="cb3-112"><a href=""></a></span>
+<span id="cb3-113"><a href=""></a><span class="co"># Heatmap of population allele frequencies</span></span>
+<span id="cb3-114"><a href=""></a>pop_freqs_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(pop_freqs)</span>
+<span id="cb3-115"><a href=""></a>pop_freqs_df<span class="sc">$</span>Population <span class="ot">&lt;-</span> <span class="fu">rownames</span>(pop_freqs)</span>
+<span id="cb3-116"><a href=""></a>pop_freqs_long <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(pop_freqs_df, <span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">"M"</span>), <span class="at">names_to =</span> <span class="st">"Marker"</span>, <span class="at">values_to =</span> <span class="st">"Frequency"</span>)</span>
+<span id="cb3-117"><a href=""></a>p_freq <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(pop_freqs_long, <span class="fu">aes</span>(<span class="at">x =</span> Marker, <span class="at">y =</span> Population, <span class="at">fill =</span> Frequency)) <span class="sc">+</span></span>
+<span id="cb3-118"><a href=""></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb3-119"><a href=""></a>  <span class="fu">scale_fill_viridis</span>(<span class="at">option =</span> <span class="st">"C"</span>) <span class="sc">+</span></span>
+<span id="cb3-120"><a href=""></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Population Allele Frequencies"</span>, <span class="at">x =</span> <span class="st">"Marker"</span>, <span class="at">y =</span> <span class="st">"Population"</span>) <span class="sc">+</span></span>
+<span id="cb3-121"><a href=""></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span>
+<span id="cb3-122"><a href=""></a></span>
+<span id="cb3-123"><a href=""></a><span class="co"># Combine plots</span></span>
+<span id="cb3-124"><a href=""></a>(p_true <span class="sc">|</span> p_est) <span class="sc">/</span> (p_traj <span class="sc">|</span> p_freq) <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">heights =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">1.2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+
+</div>
+<img data-src="mpg6_files/figure-revealjs/unnamed-chunk-19-1.png" width="960" class="r-stretch"></section>
+<section id="effect-size-mixtures-in-gwas" class="slide level2">
+<h2><strong>Effect Size Mixtures in GWAS</strong></h2>
 <p><strong>Problem</strong>: Most variants have no effect, but some do</p>
 <p><strong>Solutions</strong>:<br>
 - <strong>Spike-and-slab prior</strong>: Mixture of point mass at zero and continuous distribution<br>
 - <strong>Scale mixture</strong>: Mixture of normal distributions with different variances<br>
 - <strong>Bayesian variable selection</strong>: Latent indicator for whether variant is causal</p>
-<p><strong>Benefits</strong>:<br>
-- Controls false discovery rate<br>
-- Improves power to detect true associations<br>
-- Provides interpretable posterior probabilities<br>
-- Naturally handles multiple testing</p>
 </section>
 <section id="sound-familiar-multiple-hypothesis-testing" class="slide level2">
 <h2>Sound familiar? Multiple hypothesis testing!</h2>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a><span class="co"># Create visualization of effect size mixtures</span></span>
-<span id="cb3-2"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">789</span>)</span>
-<span id="cb3-3"><a href=""></a></span>
-<span id="cb3-4"><a href=""></a><span class="co"># Parameters</span></span>
-<span id="cb3-5"><a href=""></a>n_variants <span class="ot">&lt;-</span> <span class="dv">500</span></span>
-<span id="cb3-6"><a href=""></a>pi0 <span class="ot">&lt;-</span> <span class="fl">0.95</span>  <span class="co"># Proportion of null effects</span></span>
-<span id="cb3-7"><a href=""></a></span>
-<span id="cb3-8"><a href=""></a><span class="co"># Generate true effects</span></span>
-<span id="cb3-9"><a href=""></a>is_null <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n_variants, <span class="dv">1</span>, pi0)</span>
-<span id="cb3-10"><a href=""></a>true_effects <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, n_variants)</span>
-<span id="cb3-11"><a href=""></a>true_effects[is_null <span class="sc">==</span> <span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="fu">sum</span>(is_null <span class="sc">==</span> <span class="dv">0</span>), <span class="dv">0</span>, <span class="fl">0.5</span>)</span>
-<span id="cb3-12"><a href=""></a></span>
-<span id="cb3-13"><a href=""></a><span class="co"># Add noise to create observed effects</span></span>
-<span id="cb3-14"><a href=""></a>observed_effects <span class="ot">&lt;-</span> true_effects <span class="sc">+</span> <span class="fu">rnorm</span>(n_variants, <span class="dv">0</span>, <span class="fl">0.2</span>)</span>
-<span id="cb3-15"><a href=""></a></span>
-<span id="cb3-16"><a href=""></a><span class="co"># Create data frame for plotting</span></span>
-<span id="cb3-17"><a href=""></a>effect_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb3-18"><a href=""></a>  <span class="at">Variant =</span> <span class="dv">1</span><span class="sc">:</span>n_variants,</span>
-<span id="cb3-19"><a href=""></a>  <span class="at">TrueEffect =</span> true_effects,</span>
-<span id="cb3-20"><a href=""></a>  <span class="at">ObservedEffect =</span> observed_effects,</span>
-<span id="cb3-21"><a href=""></a>  <span class="at">IsNull =</span> <span class="fu">factor</span>(is_null)</span>
-<span id="cb3-22"><a href=""></a>)</span>
-<span id="cb3-23"><a href=""></a></span>
-<span id="cb3-24"><a href=""></a><span class="co"># Plot</span></span>
-<span id="cb3-25"><a href=""></a><span class="fu">ggplot</span>(effect_df, <span class="fu">aes</span>(<span class="at">x =</span> ObservedEffect, <span class="at">fill =</span> IsNull)) <span class="sc">+</span></span>
-<span id="cb3-26"><a href=""></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">40</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">position =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
-<span id="cb3-27"><a href=""></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"red"</span>, <span class="st">"gray70"</span>), </span>
-<span id="cb3-28"><a href=""></a>                   <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Causal"</span>, <span class="st">"Null"</span>),</span>
-<span id="cb3-29"><a href=""></a>                   <span class="at">name =</span> <span class="st">"Variant Type"</span>) <span class="sc">+</span></span>
-<span id="cb3-30"><a href=""></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Mixture of Effect Sizes in GWAS"</span>,</span>
-<span id="cb3-31"><a href=""></a>       <span class="at">subtitle =</span> <span class="st">"Most variants have no effect (null)"</span>,</span>
-<span id="cb3-32"><a href=""></a>       <span class="at">x =</span> <span class="st">"Observed Effect Size"</span>, </span>
-<span id="cb3-33"><a href=""></a>       <span class="at">y =</span> <span class="st">"Count"</span>) <span class="sc">+</span></span>
-<span id="cb3-34"><a href=""></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb3-35"><a href=""></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-
-</div>
-<img data-src="mpg6_files/figure-revealjs/unnamed-chunk-19-1.png" width="960" class="r-stretch"></section>
-<section id="multivariate-normal-mixtures-the-mash-approach" class="slide level2">
-<h2>Multivariate Normal Mixtures: The mash Approach</h2>
-<p><strong>Key idea</strong>: Share information across related conditions</p>
-<p><strong>Mathematical model</strong>:<br>
-- <span class="math inline">\(\hat{\beta}_j \sim N(\beta_j, S_j)\)</span> (observed effects)<br>
-- <span class="math inline">\(\beta_j \sim \sum_{k=1}^K \pi_k N(0, U_k)\)</span> (true effects)</p>
-</section>
-<section class="slide level2">
-
-<p><strong>Covariance matrices</strong> <span class="math inline">\(U_k\)</span> capture patterns:<br>
-- Shared effects across all conditions<br>
-- Condition-specific effects<br>
-- Structured correlation patterns<br>
-- Data-driven patterns</p>
-<p><strong>Benefits</strong>:<br>
-- Improves effect estimation through sharing<br>
-- Discovers patterns of effect heterogeneity<br>
-- Controls false discovery rate<br>
-- Provides interpretable multivariate posteriors</p>
-</section>
-<section id="types-of-shared-effects" class="slide level2">
-<h2>Types of shared effects</h2>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a><span class="co"># Create a visualization of multivariate effects</span></span>
-<span id="cb4-2"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">345</span>)</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a><span class="co"># Create visualization of effect size mixtures</span></span>
+<span id="cb4-2"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">789</span>)</span>
 <span id="cb4-3"><a href=""></a></span>
 <span id="cb4-4"><a href=""></a><span class="co"># Parameters</span></span>
-<span id="cb4-5"><a href=""></a>n_effects <span class="ot">&lt;-</span> <span class="dv">200</span></span>
-<span id="cb4-6"><a href=""></a>n_conditions <span class="ot">&lt;-</span> <span class="dv">4</span></span>
+<span id="cb4-5"><a href=""></a>n_variants <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb4-6"><a href=""></a>pi0 <span class="ot">&lt;-</span> <span class="fl">0.95</span>  <span class="co"># Proportion of null effects</span></span>
 <span id="cb4-7"><a href=""></a></span>
-<span id="cb4-8"><a href=""></a><span class="co"># Create different effect patterns</span></span>
-<span id="cb4-9"><a href=""></a>patterns <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb4-10"><a href=""></a>  <span class="st">"Shared"</span> <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">1</span>, n_conditions),</span>
-<span id="cb4-11"><a href=""></a>  <span class="st">"Condition1"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
-<span id="cb4-12"><a href=""></a>  <span class="st">"Condition2"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
-<span id="cb4-13"><a href=""></a>  <span class="st">"Conditions1&amp;2"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
-<span id="cb4-14"><a href=""></a>  <span class="st">"Conditions3&amp;4"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>)</span>
-<span id="cb4-15"><a href=""></a>)</span>
-<span id="cb4-16"><a href=""></a></span>
-<span id="cb4-17"><a href=""></a><span class="co"># Assign effects to patterns</span></span>
-<span id="cb4-18"><a href=""></a>n_per_pattern <span class="ot">&lt;-</span> n_effects <span class="sc">/</span> <span class="fu">length</span>(patterns)</span>
-<span id="cb4-19"><a href=""></a>true_effects <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow =</span> n_effects, <span class="at">ncol =</span> n_conditions)</span>
-<span id="cb4-20"><a href=""></a><span class="fu">colnames</span>(true_effects) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Condition"</span>, <span class="dv">1</span><span class="sc">:</span>n_conditions)</span>
-<span id="cb4-21"><a href=""></a></span>
-<span id="cb4-22"><a href=""></a>current_idx <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb4-23"><a href=""></a><span class="cf">for</span> (p <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(patterns)) {</span>
-<span id="cb4-24"><a href=""></a>  pattern_name <span class="ot">&lt;-</span> <span class="fu">names</span>(patterns)[p]</span>
-<span id="cb4-25"><a href=""></a>  pattern <span class="ot">&lt;-</span> patterns[[p]]</span>
-<span id="cb4-26"><a href=""></a>  </span>
-<span id="cb4-27"><a href=""></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_per_pattern) {</span>
-<span id="cb4-28"><a href=""></a>    effect_size <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="fl">0.5</span>)</span>
-<span id="cb4-29"><a href=""></a>    true_effects[current_idx, ] <span class="ot">&lt;-</span> pattern <span class="sc">*</span> effect_size</span>
-<span id="cb4-30"><a href=""></a>    current_idx <span class="ot">&lt;-</span> current_idx <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb4-31"><a href=""></a>  }</span>
-<span id="cb4-32"><a href=""></a>}</span>
-<span id="cb4-33"><a href=""></a></span>
-<span id="cb4-34"><a href=""></a><span class="co"># Add noise to create observed effects</span></span>
-<span id="cb4-35"><a href=""></a>observed_effects <span class="ot">&lt;-</span> true_effects <span class="sc">+</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n_effects <span class="sc">*</span> n_conditions, <span class="dv">0</span>, <span class="fl">0.2</span>),</span>
-<span id="cb4-36"><a href=""></a>                                        <span class="at">nrow =</span> n_effects)</span>
-<span id="cb4-37"><a href=""></a></span>
-<span id="cb4-38"><a href=""></a><span class="co"># Select a few examples for visualization</span></span>
-<span id="cb4-39"><a href=""></a>example_indices <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">45</span>, <span class="dv">85</span>, <span class="dv">125</span>, <span class="dv">165</span>)  <span class="co"># One from each pattern</span></span>
-<span id="cb4-40"><a href=""></a>example_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb4-41"><a href=""></a>  <span class="at">Effect =</span> <span class="fu">rep</span>(<span class="fu">paste0</span>(<span class="st">"Effect"</span>, example_indices), <span class="at">each =</span> n_conditions),</span>
-<span id="cb4-42"><a href=""></a>  <span class="at">Condition =</span> <span class="fu">rep</span>(<span class="fu">paste0</span>(<span class="st">"Condition"</span>, <span class="dv">1</span><span class="sc">:</span>n_conditions), <span class="at">times =</span> <span class="fu">length</span>(example_indices)),</span>
-<span id="cb4-43"><a href=""></a>  <span class="at">TrueEffect =</span> <span class="fu">c</span>(<span class="fu">t</span>(true_effects[example_indices, ])),</span>
-<span id="cb4-44"><a href=""></a>  <span class="at">ObservedEffect =</span> <span class="fu">c</span>(<span class="fu">t</span>(observed_effects[example_indices, ]))</span>
-<span id="cb4-45"><a href=""></a>)</span>
-<span id="cb4-46"><a href=""></a></span>
-<span id="cb4-47"><a href=""></a><span class="co"># Reshape for plotting</span></span>
-<span id="cb4-48"><a href=""></a>example_long <span class="ot">&lt;-</span> reshape2<span class="sc">::</span><span class="fu">melt</span>(example_data, </span>
-<span id="cb4-49"><a href=""></a>                             <span class="at">id.vars =</span> <span class="fu">c</span>(<span class="st">"Effect"</span>, <span class="st">"Condition"</span>),</span>
-<span id="cb4-50"><a href=""></a>                             <span class="at">variable.name =</span> <span class="st">"EffectType"</span>,</span>
-<span id="cb4-51"><a href=""></a>                             <span class="at">value.name =</span> <span class="st">"Value"</span>)</span>
-<span id="cb4-52"><a href=""></a></span>
-<span id="cb4-53"><a href=""></a><span class="co"># Create plot</span></span>
-<span id="cb4-54"><a href=""></a><span class="fu">ggplot</span>(example_long, <span class="fu">aes</span>(<span class="at">x =</span> Condition, <span class="at">y =</span> Value, <span class="at">color =</span> EffectType, <span class="at">group =</span> EffectType)) <span class="sc">+</span></span>
-<span id="cb4-55"><a href=""></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb4-56"><a href=""></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb4-57"><a href=""></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Effect, <span class="at">ncol =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb4-58"><a href=""></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"TrueEffect"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"ObservedEffect"</span> <span class="ot">=</span> <span class="st">"red"</span>),</span>
-<span id="cb4-59"><a href=""></a>                    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"True Effect"</span>, <span class="st">"Observed Effect"</span>)) <span class="sc">+</span></span>
-<span id="cb4-60"><a href=""></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Multivariate Effect Patterns"</span>,</span>
-<span id="cb4-61"><a href=""></a>       <span class="at">subtitle =</span> <span class="st">"mash identifies and leverages these patterns"</span>,</span>
-<span id="cb4-62"><a href=""></a>       <span class="at">x =</span> <span class="st">""</span>, </span>
-<span id="cb4-63"><a href=""></a>       <span class="at">y =</span> <span class="st">"Effect Size"</span>,</span>
-<span id="cb4-64"><a href=""></a>       <span class="at">color =</span> <span class="st">""</span>) <span class="sc">+</span></span>
-<span id="cb4-65"><a href=""></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-8"><a href=""></a><span class="co"># Generate true effects</span></span>
+<span id="cb4-9"><a href=""></a>is_null <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n_variants, <span class="dv">1</span>, pi0)</span>
+<span id="cb4-10"><a href=""></a>true_effects <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, n_variants)</span>
+<span id="cb4-11"><a href=""></a>true_effects[is_null <span class="sc">==</span> <span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="fu">sum</span>(is_null <span class="sc">==</span> <span class="dv">0</span>), <span class="dv">0</span>, <span class="fl">0.5</span>)</span>
+<span id="cb4-12"><a href=""></a>true_effects[is_null <span class="sc">==</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="fu">sum</span>(is_null <span class="sc">==</span> <span class="dv">1</span>), <span class="dv">0</span>, <span class="dv">2</span>)</span>
+<span id="cb4-13"><a href=""></a><span class="co"># Add noise to create observed effects</span></span>
+<span id="cb4-14"><a href=""></a>observed_effects <span class="ot">&lt;-</span> true_effects <span class="sc">+</span> <span class="fu">rnorm</span>(n_variants, <span class="dv">0</span>, <span class="fl">0.2</span>)</span>
+<span id="cb4-15"><a href=""></a></span>
+<span id="cb4-16"><a href=""></a><span class="co"># Create data frame for plotting</span></span>
+<span id="cb4-17"><a href=""></a>effect_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb4-18"><a href=""></a>  <span class="at">Variant =</span> <span class="dv">1</span><span class="sc">:</span>n_variants,</span>
+<span id="cb4-19"><a href=""></a>  <span class="at">TrueEffect =</span> true_effects,</span>
+<span id="cb4-20"><a href=""></a>  <span class="at">ObservedEffect =</span> observed_effects,</span>
+<span id="cb4-21"><a href=""></a>  <span class="at">IsNull =</span> <span class="fu">factor</span>(is_null)</span>
+<span id="cb4-22"><a href=""></a>)</span>
+<span id="cb4-23"><a href=""></a></span>
+<span id="cb4-24"><a href=""></a><span class="co"># Plot</span></span>
+<span id="cb4-25"><a href=""></a><span class="fu">ggplot</span>(effect_df, <span class="fu">aes</span>(<span class="at">x =</span> ObservedEffect, <span class="at">fill =</span> IsNull)) <span class="sc">+</span></span>
+<span id="cb4-26"><a href=""></a>  <span class="fu">geom_density</span>(<span class="at">alpha=</span><span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb4-27"><a href=""></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"gray70"</span>, <span class="st">"red"</span>), </span>
+<span id="cb4-28"><a href=""></a>                   <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Null"</span>, <span class="st">"True"</span>),</span>
+<span id="cb4-29"><a href=""></a>                   <span class="at">name =</span> <span class="st">"Variant Type"</span>) <span class="sc">+</span></span>
+<span id="cb4-30"><a href=""></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Mixture of Effect Sizes in GWAS"</span>,</span>
+<span id="cb4-31"><a href=""></a>       <span class="at">subtitle =</span> <span class="st">"Most variants have no effect (null)"</span>,</span>
+<span id="cb4-32"><a href=""></a>       <span class="at">x =</span> <span class="st">"Observed Effect Size"</span>, </span>
+<span id="cb4-33"><a href=""></a>       <span class="at">y =</span> <span class="st">"Count"</span>) <span class="sc">+</span></span>
+<span id="cb4-34"><a href=""></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb4-35"><a href=""></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 
 </div>
 <img data-src="mpg6_files/figure-revealjs/unnamed-chunk-20-1.png" width="960" class="r-stretch"></section>
+<section id="multivariate-normal-mixtures-the-mash-approach" class="slide level2">
+<h2>Multivariate Normal Mixtures: The mash Approach</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href=""></a><span class="co"># Create a visualization of multivariate effects</span></span>
+<span id="cb5-2"><a href=""></a><span class="fu">set.seed</span>(<span class="dv">345</span>)</span>
+<span id="cb5-3"><a href=""></a></span>
+<span id="cb5-4"><a href=""></a><span class="co"># Parameters</span></span>
+<span id="cb5-5"><a href=""></a>n_effects <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb5-6"><a href=""></a>n_conditions <span class="ot">&lt;-</span> <span class="dv">4</span></span>
+<span id="cb5-7"><a href=""></a></span>
+<span id="cb5-8"><a href=""></a><span class="co"># Create different effect patterns</span></span>
+<span id="cb5-9"><a href=""></a>patterns <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb5-10"><a href=""></a>  <span class="st">"Shared"</span> <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">1</span>, n_conditions),</span>
+<span id="cb5-11"><a href=""></a>  <span class="st">"Condition1"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb5-12"><a href=""></a>  <span class="st">"Condition2"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb5-13"><a href=""></a>  <span class="st">"Conditions1&amp;2"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb5-14"><a href=""></a>  <span class="st">"Conditions3&amp;4"</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb5-15"><a href=""></a>)</span>
+<span id="cb5-16"><a href=""></a></span>
+<span id="cb5-17"><a href=""></a><span class="co"># Assign effects to patterns</span></span>
+<span id="cb5-18"><a href=""></a>n_per_pattern <span class="ot">&lt;-</span> n_effects <span class="sc">/</span> <span class="fu">length</span>(patterns)</span>
+<span id="cb5-19"><a href=""></a>true_effects <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow =</span> n_effects, <span class="at">ncol =</span> n_conditions)</span>
+<span id="cb5-20"><a href=""></a><span class="fu">colnames</span>(true_effects) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Condition"</span>, <span class="dv">1</span><span class="sc">:</span>n_conditions)</span>
+<span id="cb5-21"><a href=""></a></span>
+<span id="cb5-22"><a href=""></a>current_idx <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb5-23"><a href=""></a><span class="cf">for</span> (p <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(patterns)) {</span>
+<span id="cb5-24"><a href=""></a>  pattern_name <span class="ot">&lt;-</span> <span class="fu">names</span>(patterns)[p]</span>
+<span id="cb5-25"><a href=""></a>  pattern <span class="ot">&lt;-</span> patterns[[p]]</span>
+<span id="cb5-26"><a href=""></a>  </span>
+<span id="cb5-27"><a href=""></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_per_pattern) {</span>
+<span id="cb5-28"><a href=""></a>    effect_size <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="fl">0.5</span>)</span>
+<span id="cb5-29"><a href=""></a>    true_effects[current_idx, ] <span class="ot">&lt;-</span> pattern <span class="sc">*</span> effect_size</span>
+<span id="cb5-30"><a href=""></a>    current_idx <span class="ot">&lt;-</span> current_idx <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb5-31"><a href=""></a>  }</span>
+<span id="cb5-32"><a href=""></a>}</span>
+<span id="cb5-33"><a href=""></a></span>
+<span id="cb5-34"><a href=""></a><span class="co"># Add noise to create observed effects</span></span>
+<span id="cb5-35"><a href=""></a>observed_effects <span class="ot">&lt;-</span> true_effects <span class="sc">+</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n_effects <span class="sc">*</span> n_conditions, <span class="dv">0</span>, <span class="fl">0.2</span>),</span>
+<span id="cb5-36"><a href=""></a>                                        <span class="at">nrow =</span> n_effects)</span>
+<span id="cb5-37"><a href=""></a></span>
+<span id="cb5-38"><a href=""></a><span class="co"># Select a few examples for visualization</span></span>
+<span id="cb5-39"><a href=""></a>example_indices <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">45</span>, <span class="dv">85</span>, <span class="dv">125</span>, <span class="dv">165</span>)  <span class="co"># One from each pattern</span></span>
+<span id="cb5-40"><a href=""></a>example_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb5-41"><a href=""></a>  <span class="at">Effect =</span> <span class="fu">rep</span>(<span class="fu">paste0</span>(<span class="st">"Effect"</span>, example_indices), <span class="at">each =</span> n_conditions),</span>
+<span id="cb5-42"><a href=""></a>  <span class="at">Condition =</span> <span class="fu">rep</span>(<span class="fu">paste0</span>(<span class="st">"Condition"</span>, <span class="dv">1</span><span class="sc">:</span>n_conditions), <span class="at">times =</span> <span class="fu">length</span>(example_indices)),</span>
+<span id="cb5-43"><a href=""></a>  <span class="at">TrueEffect =</span> <span class="fu">c</span>(<span class="fu">t</span>(true_effects[example_indices, ])),</span>
+<span id="cb5-44"><a href=""></a>  <span class="at">ObservedEffect =</span> <span class="fu">c</span>(<span class="fu">t</span>(observed_effects[example_indices, ]))</span>
+<span id="cb5-45"><a href=""></a>)</span>
+<span id="cb5-46"><a href=""></a></span>
+<span id="cb5-47"><a href=""></a><span class="co"># Reshape for plotting</span></span>
+<span id="cb5-48"><a href=""></a>example_long <span class="ot">&lt;-</span> reshape2<span class="sc">::</span><span class="fu">melt</span>(example_data, </span>
+<span id="cb5-49"><a href=""></a>                             <span class="at">id.vars =</span> <span class="fu">c</span>(<span class="st">"Effect"</span>, <span class="st">"Condition"</span>),</span>
+<span id="cb5-50"><a href=""></a>                             <span class="at">variable.name =</span> <span class="st">"EffectType"</span>,</span>
+<span id="cb5-51"><a href=""></a>                             <span class="at">value.name =</span> <span class="st">"Value"</span>)</span>
+<span id="cb5-52"><a href=""></a></span>
+<span id="cb5-53"><a href=""></a><span class="co"># Create plot</span></span>
+<span id="cb5-54"><a href=""></a><span class="fu">ggplot</span>(example_long, <span class="fu">aes</span>(<span class="at">x =</span> Condition, <span class="at">y =</span> Value, <span class="at">color =</span> EffectType, <span class="at">group =</span> EffectType)) <span class="sc">+</span></span>
+<span id="cb5-55"><a href=""></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb5-56"><a href=""></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb5-57"><a href=""></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Effect, <span class="at">ncol =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb5-58"><a href=""></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"TrueEffect"</span> <span class="ot">=</span> <span class="st">"blue"</span>, <span class="st">"ObservedEffect"</span> <span class="ot">=</span> <span class="st">"red"</span>),</span>
+<span id="cb5-59"><a href=""></a>                    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"True Effect"</span>, <span class="st">"Observed Effect"</span>)) <span class="sc">+</span></span>
+<span id="cb5-60"><a href=""></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Multivariate Effect Patterns"</span>,</span>
+<span id="cb5-61"><a href=""></a>       <span class="at">subtitle =</span> <span class="st">"mash identifies and leverages these patterns"</span>,</span>
+<span id="cb5-62"><a href=""></a>       <span class="at">x =</span> <span class="st">""</span>, </span>
+<span id="cb5-63"><a href=""></a>       <span class="at">y =</span> <span class="st">"Effect Size"</span>,</span>
+<span id="cb5-64"><a href=""></a>       <span class="at">color =</span> <span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb5-65"><a href=""></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+
+</div>
+<img data-src="mpg6_files/figure-revealjs/unnamed-chunk-21-1.png" width="960" class="r-stretch"></section>
 <section id="bayesian-meta-analysis-the-mathematical-framework" class="slide level2">
 <h2>4. Bayesian Meta-Analysis: The Mathematical Framework</h2>
 <p><strong>Problem</strong>: Combine evidence across heterogeneous studies</p>
@@ -1701,7 +1827,7 @@ Intuition: “The new population mean is a weighted average where individuals ar
 <section id="visualization" class="slide level2">
 <h2>Visualization</h2>
 
-<img data-src="mpg6_files/figure-revealjs/unnamed-chunk-21-1.png" width="960" class="r-stretch"></section>
+<img data-src="mpg6_files/figure-revealjs/unnamed-chunk-22-1.png" width="960" class="r-stretch"></section>
 <section id="practical-recommendations-for-bayesian-genomics" class="slide level2">
 <h2>Practical Recommendations for Bayesian Genomics</h2>
 <ol type="1">

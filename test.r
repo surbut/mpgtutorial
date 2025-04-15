@@ -131,6 +131,8 @@ qualifications)
 
 ## Probabilistic Interpretation of Estimates
 
+::::: columns
+::: {.column width="50%"}
 In the Bayesian framework:
 
 -   **Parameters are random variables** with distributions, not fixed
@@ -143,9 +145,9 @@ In the Bayesian framework:
     repeated sampling
 -   **Interpretation is direct and intuitive** for researchers and
     clinicians
+:::
 
-## Probabilistic Interpretation of Estimates
-
+::: {.column width="50%"}
 ```{r}
 # Create example data for frequentist vs Bayesian comparison
 x <- seq(0.2, 0.8, length = 1000)
@@ -189,6 +191,8 @@ ggplot(plot_data, aes(x = x, y = y)) +
        y = "Posterior Density") +
   theme_minimal()
 ```
+:::
+:::::
 
 ## Bayesian vs. Frequentist Intervals
 
@@ -483,6 +487,18 @@ can use this on the wards!).
 5.  Converting to posterior probabilities requires considering prior
     odds\
 6.  In genomics, this perspective helps manage false discovery rates
+
+## The Fallacy of P-values
+
+::: incremental
+-   P-values answer a **counterfactual question**: "If there were no
+    effect, how surprising would these data be?"
+
+-   But researchers want to know: "**What is the probability this
+    association is real?**"
+
+-   This disconnect leads to systematic misinterpretation
+:::
 
 ## 2. The Multiple Testing Challenge
 
@@ -1007,10 +1023,10 @@ p3 <- ggplot(plot_data, aes(x = Group1_mash, y = Group2_mash, color = Pattern)) 
                                plot.subtitle = element_text(size = 20)))
 ```
 
-## Summary
-- Observed Effects are noisy
-- only considering information in one subgroup ignores the hints we get from abound
-- Sharing is caring!
+-   Observed Effects are noisy
+-   only considering information in one subgroup ignores the hints we
+    get from abound
+-   sharing is caring!
 
 ## Conjugate Priors: Why They're Beautiful
 
@@ -1132,15 +1148,15 @@ $$\begin{align}
 
 Imagine tracking minor allele frequency:
 
--   **Start**: Beta(2, 8) - prior belief allele is rare
+- **Start**: Beta(2, 8) - prior belief allele is rare
 
--   **Observe**: AABB AABB ABBB (5 A's, 7 B's)
+- **Observe**: AABB AABB ABBB (5 A's, 7 B's)
 
--   **Updates**: - After 1st group: Beta(4, 10)
+- **Updates**: - After 1st group: Beta(4, 10)
 
--   After 2nd group: Beta(6, 12)
+- After 2nd group: Beta(6, 12)
 
--   After 3rd group: Beta(7, 15)
+- After 3rd group: Beta(7, 15)
 
 ## Why this is beautiful:
 
@@ -1247,14 +1263,14 @@ $\begin{align}
 
 Imagine tracking allele frequencies for three alleles (A, B, C):
 
--   **Prior**: Dirichlet(2, 2, 2)
+- **Prior**: Dirichlet(2, 2, 2)
 
--   equally uncertain about all alleles
+- equally uncertain about all alleles
 
--   **Observe**: 10 A's, 5 B's, 3 C's
+- **Observe**: 10 A's, 5 B's, 3 C's
 
--   **Posterior**: Dirichlet(12, 7, 5) - just add counts to prior
-    parameters!
+- **Posterior**: Dirichlet(12, 7, 5) - just add counts to prior
+parameters!
 
 ### Why this is beautiful:
 
@@ -1834,9 +1850,10 @@ observed allele counts
 - **Prior**: $q_{ik} \sim \text{Dirichlet}(\alpha)$ (ancestry
 proportions, population level alpha)\
 - **Prior**: $f_{kj} \sim \text{Beta}(\lambda)$ (allele frequencies,
-population level lambda, f) - **Likelihood**: $P(X_{ij} | q_i, f_j)$
-(genotype probabilities, i.e., probability of allele count given
-individual ancestry and populations allele frequency)
+population level lambda, f)
+- **Likelihood**: $P(X_{ij} | q_i, f_j)$ (genotype probabilities, i.e.,
+probability of allele count given individual ancestry and populations
+allele frequency)
 
 ## Latent Dirichlety Allocation
 
@@ -1920,242 +1937,97 @@ p1 / p2  # patchwork layout
 
 ## STRUCTURE: A Tale of Unknown Ancestries
 
-Our Data (Haploid Genotypes): Individual M1 M2 M3 \* Ind1: A C A \*
-Ind2: G T G \* Ind3: A T A
+Our Data (Haploid Genotypes):
+Individual M1 M2 M3 
+* Ind1: A C A 
+* Ind2: G T G 
+* Ind3: A T A
 
 We want to find: K=2 ancestral populations
 
 ## Key Point: Different Distributions for Different Reasons
 
-$q (ancestry) ~ Dirichlet$ - Because proportions sum to 1 across K
-populations - K parameters (one for each population) ::: notes - NOT
-related to number of allele types ::: notes \$f (frequencies) \~ Beta
-\$ - Because each marker has 2 possible alleles - Two parameters
-(success/failure for that allele) - One Beta distribution per marker per
-population
+$q (ancestry) ~ Dirichlet$ 
+- Because proportions sum to 1 across K populations 
+- K parameters (one for each population) 
+- NOT related to number of allele types
 
-## Understanding the q Update
+$f (frequencies) ~ Beta $
+- Because each marker has 2 possible alleles 
+- Two parameters (success/failure for that allele) 
+- One Beta distribution per marker per population
 
-### Individual Level
-
-::: notes
--   Here, we're updating the ancestry proportions (`q`) for Individual
-    1.
--   For each marker, we calculate the likelihood of the observed allele
-    under each population's allele frequency.
--   For example, for Marker 1 (A), we look up the probability of A in
-    Population 1 ($f_1^A$) and Population 2 ($f_2^A$).
--   We do this for all markers, summing the log-likelihoods (or
-    likelihoods, depending on the implementation) for each population.
--   These sums are then added to the prior Dirichlet parameters
-    ($\alpha_1$, $\alpha_2$) to get the updated parameters for the
-    Dirichlet distribution.
--   The result is a new estimate of Individual 1's ancestry proportions,
-    reflecting both the prior and the observed data.
--   This process is repeated for each individual in the dataset.
-:::
-
+## Understanding the q Update (Individual Level)
 **Individual 1**: A C A
 
--   Step 1: Calculate Likelihoods **Population 1 Contributions**:
--   Marker 1 (A): $L_{11} = f_1^A$
--   Marker 2 (C): $L_{21} = f_1^C$
--   Marker 3 (A): $L_{31} = f_1^A$
+- Step 1: Calculate Likelihoods
+**Population 1 Contributions**: 
+- Marker 1 (A): $L_{11} = f_1^A$
+- Marker 2 (C): $L_{21} = f_1^C$
+- Marker 3 (A): $L_{31} = f_1^A$
 
 Total for Pop1 = $L_{11} + L_{21} + L_{31}$
 
 ## Example Data
-
 **Individual 1**: A C A
 
 **Population 2 Contributions**:
 
--   Marker 1 (A): $L_{12} = f_2^A$
--   Marker 2 (C): $L_{22} = f_2^C$
--   Marker 3 (A): $L_{32} = f_2^A$
+- Marker 1 (A): $L_{12} = f_2^A$
+- Marker 2 (C): $L_{22} = f_2^C$
+- Marker 3 (A): $L_{32} = f_2^A$
 
 Total for Pop2 = $L_{12} + L_{22} + L_{32}$
 
-## Step 2: Dirichlet Update
+##  Step 2: Dirichlet Update
 
-$$q_1 \sim \text{Dirichlet}(\alpha + \sum{Pop1}, \sum{Pop2})$$ where:
+$$q_1 \sim \text{Dirichlet}(\alpha + [\text{Sum\_Pop1}, \text{Sum\_Pop2}])$$
+where:
 
-**-** $\sum{Pop1} = L_{11} + L_{21} + L_{31}$ (added to $\alpha_1$)\
-**-** $\sum{Pop2} = L_{12} + L_{22} + L_{32}$ (added to $\alpha_2$)
+*-* Sum_Pop1 = $L_{11} + L_{21} + L_{31}$ (added to $\alpha_1$)
+*-* Sum_Pop2 = $L_{12} + L_{22} + L_{32}$ (added to $\alpha_2$)
 
-::: callout-note
-The Dirichlet update incorporates likelihood contributions from both
-populations to estimate how much of Individual 1's ancestry comes from
-each population.
+::: {.callout-note}
+The Dirichlet update incorporates likelihood contributions from both populations to estimate how much of Individual 1's ancestry comes from each population.
 :::
 
 ## Updating Allele Frequencies (f) with Fixed Ancestry (q)
 
-**Marker 1 (Allele A)**
+** Marker 1 (Allele A)
 
-**Individual 1's ancestry**: $q_1 = (0.7, 0.3)$\
+**Individual 1's ancestry**: $q_1 = (0.7, 0.3)$
 
--   **Population 1**: - Contribution from Individual 1: 0.7 (from
-    $q_{11}$)\
-    Update: $f_1^A \sim \text{Beta}(\lambda + 0.7, \lambda + 0.3)$
+**Population 1**:
+- Contribution from Individual 1: 0.7 (from $q_{11}$)
+- Update: $f_1^A \sim \text{Beta}(\lambda + 0.7, \lambda + 0.3)$ 
 
--   **Population 2**: - Contribution from Individual 1: 0.3 (from
-    $q_{12}$)
-    Update: $f_2^A \sim \text{Beta}(\lambda + 0.3, \lambda + 0.7)$
+**Population 2**:
+- Contribution from Individual 1: 0.3 (from $q_{12}$)
+- Update: $f_2^A \sim \text{Beta}(\lambda + 0.3, \lambda + 0.7)$
 
 ## Marker 2 (Allele C)
 
-**Population 1** - Contribution from Individual 1: 0.7 (from $q_{11}$)\
-- Update: $f_1^C \sim \text{Beta}(\lambda + 0.7, \lambda + 0.3)$\
+**Population 1**
+- Contribution from Individual 1: 0.7 (from $q_{11}$)
+- Update: $f_1^C \sim \text{Beta}(\lambda + 0.7, \lambda + 0.3)$
 
-**Population 2**: - Contribution from Individual 1: 0.3 (from $q_{12}$)\
+**Population 2**:
+- Contribution from Individual 1: 0.3 (from $q_{12}$)
 - Update: $f_2^C \sim \text{Beta}(\lambda + 0.3, \lambda + 0.7)$
 
-::: callout-note
-Note that each allele contributes fractionally to each population's
-frequency estimate, weighted by the individual's ancestry proportions.
+::: {.callout-note}
+Note that each allele contributes fractionally to each population's frequency estimate, weighted by the individual's ancestry proportions.
 :::
 
-## The MCMC Two-Step
+##  The MCMC Two-Step
 
-1.  Update ancestries given current frequencies:
-    $P(q_i |\text{data}, f) \propto P(\text{data}|q_i,f)P(q_i)$
+1.  Update ancestries given current frequencies: 
+$P(q_i \|\text{data}, f) \propto P(\text{data}\|q_i,f)P(q_i)$
 
 2.  Update frequencies given current ancestries:
-    $P(f_k | \text{data}, q) \propto P(\text{data}|q,f_k)P(f_k)$
+$P(f_k | \text{data}, q) \propto P(\text{data}|q,f_k)P(f_k)$
 
-
-## STRUCTURE Simulation: Ancestry and Allele Frequency Inference
-
-```{r, echo=TRUE, fig.height=6, fig.width=10, message=FALSE, warning=FALSE}
-library(tidyverse)
-library(viridis)
-library(patchwork)
-
-set.seed(2024)
-
-# Parameters
-n_ind <- 12
-n_pop <- 2
-n_marker <- 3
-
-# 1. Simulate population allele frequencies (for each marker, each pop)
-pop_freqs <- matrix(runif(n_pop * n_marker, 0.2, 0.8), nrow = n_pop)
-colnames(pop_freqs) <- paste0("M", 1:n_marker)
-rownames(pop_freqs) <- paste0("Pop", 1:n_pop)
-
-# 2. Simulate true ancestry proportions for each individual
-# We'll make 4 mostly Pop1, 4 mostly Pop2, 4 admixed
-q_true <- rbind(
-  t(replicate(4, c(rbeta(1, 8, 2), rbeta(1, 2, 8)))),   # mostly Pop1
-  t(replicate(4, c(rbeta(1, 2, 8), rbeta(1, 8, 2)))),   # mostly Pop2
-  t(replicate(4, c(rbeta(1, 5, 5), rbeta(1, 5, 5))))    # admixed
-)
-q_true <- q_true / rowSums(q_true)
-colnames(q_true) <- c("Pop1", "Pop2")
-
-# 3. Simulate genotypes for each individual at each marker
-# For simplicity, haploid: each allele is drawn from a population with probability = q
-geno <- matrix(NA, nrow = n_ind, ncol = n_marker)
-for (i in 1:n_ind) {
-  for (j in 1:n_marker) {
-    # Choose population for this allele
-    pop <- sample(1:n_pop, 1, prob = q_true[i, ])
-    # Draw allele: 1 = reference (A), 0 = alt (C)
-    geno[i, j] <- rbinom(1, 1, pop_freqs[pop, j])
-  }
-}
-colnames(geno) <- paste0("M", 1:n_marker)
-rownames(geno) <- paste0("Ind", 1:n_ind)
-
-# 4. "Estimate" ancestry proportions over iterations (toy EM/MCMC)
-# We'll start with random q, and update using the observed alleles and pop freqs
-n_iter <- 10
-q_est <- array(NA, dim = c(n_ind, n_pop, n_iter))
-q_est[,,1] <- t(apply(matrix(runif(n_ind * n_pop), ncol = n_pop), 1, function(x) x/sum(x)))
-
-for (it in 2:n_iter) {
-  for (i in 1:n_ind) {
-    # For each population, compute likelihood of observed alleles
-    loglike <- rep(0, n_pop)
-    for (k in 1:n_pop) {
-      for (j in 1:n_marker) {
-        p <- pop_freqs[k, j]
-        a <- geno[i, j]
-        loglike[k] <- loglike[k] + dbinom(a, 1, p, log=TRUE)
-      }
-    }
-    # Add prior (Dirichlet(1,1) = uniform)
-    post <- exp(loglike - max(loglike)) # for stability
-    post <- post / sum(post)
-    # Update q as convex combination (like EM)
-    q_est[i, , it] <- 0.7 * q_est[i, , it-1] + 0.3 * post
-    q_est[i, , it] <- q_est[i, , it] / sum(q_est[i, , it])
-  }
-}
-
-# 5. Prepare data for plotting
-
-# True ancestry
-q_true_df <- as.data.frame(q_true)
-q_true_df$Individual <- factor(1:n_ind)
-q_true_long <- pivot_longer(q_true_df, cols = starts_with("Pop"), names_to = "Population", values_to = "Proportion")
-
-# Estimated ancestry at each iteration
-q_est_df <- as.data.frame(q_est[,,n_iter])
-colnames(q_est_df) <- c("Pop1", "Pop2")
-q_est_df$Individual <- factor(1:n_ind)
-q_est_long <- pivot_longer(q_est_df, cols = starts_with("Pop"), names_to = "Population", values_to = "Proportion")
-
-# Estimated ancestry over all iterations (for a few individuals)
-q_iter <- lapply(1:6, function(i) {
-  as.data.frame(t(q_est[i,,])) %>%
-    mutate(Iteration = 1:n_iter, Individual = i)
-})
-q_iter <- bind_rows(q_iter)
-colnames(q_iter)[1:2] <- c("Pop1", "Pop2")
-q_iter_long <- pivot_longer(q_iter, cols = c("Pop1", "Pop2"), names_to = "Population", values_to = "Proportion")
-
-# 6. Plot
-
-# STRUCTURE-style barplot: true ancestry
-p_true <- ggplot(q_true_long, aes(x = Individual, y = Proportion, fill = Population)) +
-  geom_col(width = 1) +
-  scale_fill_manual(values = c("Pop1" = "blue", "Pop2" = "red")) +
-  labs(title = "True Ancestry Proportions", y = "Proportion", x = "Individual") +
-  theme_minimal(base_size = 14)
-
-# STRUCTURE-style barplot: estimated ancestry (final iteration)
-p_est <- ggplot(q_est_long, aes(x = Individual, y = Proportion, fill = Population)) +
-  geom_col(width = 1) +
-  scale_fill_manual(values = c("Pop1" = "blue", "Pop2" = "red")) +
-  labs(title = "Estimated Ancestry (Iteration 10)", y = "Proportion", x = "Individual") +
-  theme_minimal(base_size = 14)
-
-# Trajectory plot for a few individuals
-p_traj <- ggplot(q_iter_long, aes(x = Iteration, y = Proportion, color = Population)) +
-  geom_line(size = 1.2) +
-  facet_wrap(~ Individual, nrow = 2) +
-  scale_color_manual(values = c("Pop1" = "blue", "Pop2" = "red")) +
-  labs(title = "Ancestry Proportion Trajectories (First 6 Individuals)", y = "Proportion", x = "Iteration") +
-  theme_minimal(base_size = 12)
-
-# Heatmap of population allele frequencies
-pop_freqs_df <- as.data.frame(pop_freqs)
-pop_freqs_df$Population <- rownames(pop_freqs)
-pop_freqs_long <- pivot_longer(pop_freqs_df, cols = starts_with("M"), names_to = "Marker", values_to = "Frequency")
-p_freq <- ggplot(pop_freqs_long, aes(x = Marker, y = Population, fill = Frequency)) +
-  geom_tile() +
-  scale_fill_viridis(option = "C") +
-  labs(title = "Population Allele Frequencies", x = "Marker", y = "Population") +
-  theme_minimal(base_size = 12)
-
-# Combine plots
-(p_true | p_est) / (p_traj | p_freq) + plot_layout(heights = c(1, 1.2))
-```
-
-
-## **Effect Size Mixtures in GWAS**
+### **Effect Size Mixtures in GWAS**
 
 **Problem**: Most variants have no effect, but some do
 
@@ -2167,6 +2039,11 @@ variances\
 - **Bayesian variable selection**: Latent indicator for whether variant
 is causal
 
+**Benefits**:\
+- Controls false discovery rate\
+- Improves power to detect true associations\
+- Provides interpretable posterior probabilities\
+- Naturally handles multiple testing
 
 ## Sound familiar? Multiple hypothesis testing!
 
@@ -2182,7 +2059,7 @@ pi0 <- 0.95  # Proportion of null effects
 is_null <- rbinom(n_variants, 1, pi0)
 true_effects <- rep(0, n_variants)
 true_effects[is_null == 0] <- rnorm(sum(is_null == 0), 0, 0.5)
-true_effects[is_null == 1] <- rnorm(sum(is_null == 1), 0, 2)
+
 # Add noise to create observed effects
 observed_effects <- true_effects + rnorm(n_variants, 0, 0.2)
 
@@ -2196,9 +2073,9 @@ effect_df <- data.frame(
 
 # Plot
 ggplot(effect_df, aes(x = ObservedEffect, fill = IsNull)) +
-  geom_density(alpha=0.5) +
-  scale_fill_manual(values = c("gray70", "red"), 
-                   labels = c("Null", "True"),
+  geom_histogram(bins = 40, alpha = 0.7, position = "identity") +
+  scale_fill_manual(values = c("red", "gray70"), 
+                   labels = c("Causal", "Null"),
                    name = "Variant Type") +
   labs(title = "Mixture of Effect Sizes in GWAS",
        subtitle = "Most variants have no effect (null)",
@@ -2210,6 +2087,27 @@ ggplot(effect_df, aes(x = ObservedEffect, fill = IsNull)) +
 
 ## Multivariate Normal Mixtures: The mash Approach
 
+**Key idea**: Share information across related conditions
+
+**Mathematical model**:\
+- $\hat{\beta}_j \sim N(\beta_j, S_j)$ (observed effects)\
+- $\beta_j \sim \sum_{k=1}^K \pi_k N(0, U_k)$ (true effects)
+
+------------------------------------------------------------------------
+
+**Covariance matrices** $U_k$ capture patterns:\
+- Shared effects across all conditions\
+- Condition-specific effects\
+- Structured correlation patterns\
+- Data-driven patterns
+
+**Benefits**:\
+- Improves effect estimation through sharing\
+- Discovers patterns of effect heterogeneity\
+- Controls false discovery rate\
+- Provides interpretable multivariate posteriors
+
+## Types of shared effects
 
 ```{r,echo=TRUE}
 #| fig-height: 6
