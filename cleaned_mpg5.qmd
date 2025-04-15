@@ -251,7 +251,7 @@ ggplot(df, aes(x = Stage, y = Probability)) +
 :::
 ::::
 
-**Key insight**: With a realistic prior of 1/1000, a "significant" p-value of 0.001 only gives ~50% posterior probability of true association!
+**Key insight**: With a realistic prior of 1/1000, a "significant" p-value of 0.001 only gives ~50% posterior probability of true association! (app interlude)
 
 ## The Mathematical Connection
 
@@ -272,7 +272,7 @@ Meaning even the most favorable interpretation of a p-value provides less eviden
 The Minimum Bayes Factor is calculated as:  
 $\text{MBF} \approx -e \times p \times \log(p)$
 
-This formula (derived by Sellke, Bayarri, and Berger) represents the **smallest possible Bayes factor** that could correspond to a given p-value, regardless of the specific alternative hypothesis being tested.
+This formula (derived by Sellke, Bayarri, and Berger) represents the **smallest possible Bayes factor** that could correspond to a given p-value, regardless of the specific alternative hypothesis being tested (i.e p(D|H0)/p(D/H1))
 
 ---
 
@@ -383,7 +383,7 @@ This clearly shows how Bayes factors calibrate our prior beliefs.
 
 In a genome-wide association study:
 
-- Prior probability of true association: ~1/10,000 per variant  
+- Prior probability of true association: ~1/1000 per variant  
 - p-value threshold: 5×10^{-8}  
 - Corresponding minimum Bayes factor: ~10^{-6}  
 - Posterior probability: ~9%
@@ -606,6 +606,63 @@ ggplot(plot_data, aes(x = z_score)) +
 ```
 
 Posterior probabilities provide a direct measure of evidence for each test.
+
+
+## How to?
+
+Bayes' Theorem for GWAS:
+
+P(True|Z) = P(Z|True)×P(True) / [P(Z|True)×P(True) + P(Z|Null)×(1-P(True))]
+
+Where:
+
+- P(Z|Null) ~ N(0,1) 
+- P(Z|True) ~ N(0,1+σ²) 
+- P(True) = prior (e.g., 1/1000) 
+
+## Example Calc
+
+```{r, echo=TRUE}
+# Parameters
+z = 4
+prior = 1/1000
+sigma2 = 4
+
+# Likelihoods
+null_like = dnorm(z, 0, 1)         # = 0.0001334
+alt_like = dnorm(z, 0, sqrt(1+4))  # = 0.0037
+
+# Bayes Factor
+BF = alt_like/null_like            # ≈ 27.7
+
+# Posterior
+post_odds = BF * prior/(1-prior)   # ≈ 0.0277
+post_prob = post_odds/(1+post_odds) # ≈ 0.027 (2.7%)
+```
+
+```{r}
+# Function to calculate posterior for different priors
+calc_posterior <- function(z, prior, sigma2) {
+  null_like = dnorm(z, 0, 1)
+  alt_like = dnorm(z, 0, sqrt(1+sigma2))
+  BF = alt_like/null_like
+  post_odds = BF * prior/(1-prior)
+  post_odds/(1+post_odds)
+}
+
+# Compare different priors
+priors = c(1/10000, 1/1000, 1/100)
+z = 4
+results = sapply(priors, function(p) calc_posterior(z, p, 4))
+
+# Plot results
+ggplot() +
+  geom_col(aes(x=factor(priors), y=results)) +
+  labs(x="Prior", y="Posterior Probability",
+       title="Impact of Prior Choice on Posterior Probability",
+       subtitle="For Z-score = 4") +
+  theme_minimal()
+```
 
 ## Decision Boundaries Comparison
 

@@ -30,6 +30,71 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
   </style>
   <link rel="stylesheet" href="cleaned_mpg5_files/libs/revealjs/dist/theme/quarto.css">
   <link rel="stylesheet" href="custom.css">
@@ -509,7 +574,7 @@ Sarah Urbut, MD PhD
 </div>
 </div>
 </div></div>
-<p><strong>Key insight</strong>: With a realistic prior of 1/1000, a “significant” p-value of 0.001 only gives ~50% posterior probability of true association!</p>
+<p><strong>Key insight</strong>: With a realistic prior of 1/1000, a “significant” p-value of 0.001 only gives ~50% posterior probability of true association! (app interlude)</p>
 </section>
 <section id="the-mathematical-connection" class="slide level2">
 <h2>The Mathematical Connection</h2>
@@ -543,7 +608,7 @@ Sarah Urbut, MD PhD
 <h2>What is the Minimum Bayes Factor?</h2>
 <p>The Minimum Bayes Factor is calculated as:<br>
 <span class="math inline">\(\text{MBF} \approx -e \times p \times \log(p)\)</span></p>
-<p>This formula (derived by Sellke, Bayarri, and Berger) represents the <strong>smallest possible Bayes factor</strong> that could correspond to a given p-value, regardless of the specific alternative hypothesis being tested.</p>
+<p>This formula (derived by Sellke, Bayarri, and Berger) represents the <strong>smallest possible Bayes factor</strong> that could correspond to a given p-value, regardless of the specific alternative hypothesis being tested (i.e p(D|H0)/p(D/H1))</p>
 </section>
 <section id="why-minimum" class="slide level2">
 <h2>Why “Minimum”?</h2>
@@ -802,10 +867,45 @@ Posterior Odds = Prior Odds × BF.</p>
 
 <img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"><p>Posterior probabilities provide a direct measure of evidence for each test.</p>
 </section>
+<section id="how-to" class="slide level2">
+<h2>How to?</h2>
+<p>Bayes’ Theorem for GWAS:</p>
+<p>P(True|Z) = P(Z|True)×P(True) / [P(Z|True)×P(True) + P(Z|Null)×(1-P(True))]</p>
+<p>Where:</p>
+<ul>
+<li>P(Z|Null) ~ N(0,1)</li>
+<li>P(Z|True) ~ N(0,1+σ²)</li>
+<li>P(True) = prior (e.g., 1/1000)</li>
+</ul>
+</section>
+<section id="example-calc" class="slide level2">
+<h2>Example Calc</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="co"># Parameters</span></span>
+<span id="cb1-2"><a href=""></a>z <span class="ot">=</span> <span class="dv">4</span></span>
+<span id="cb1-3"><a href=""></a>prior <span class="ot">=</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">1000</span></span>
+<span id="cb1-4"><a href=""></a>sigma2 <span class="ot">=</span> <span class="dv">4</span></span>
+<span id="cb1-5"><a href=""></a></span>
+<span id="cb1-6"><a href=""></a><span class="co"># Likelihoods</span></span>
+<span id="cb1-7"><a href=""></a>null_like <span class="ot">=</span> <span class="fu">dnorm</span>(z, <span class="dv">0</span>, <span class="dv">1</span>)         <span class="co"># = 0.0001334</span></span>
+<span id="cb1-8"><a href=""></a>alt_like <span class="ot">=</span> <span class="fu">dnorm</span>(z, <span class="dv">0</span>, <span class="fu">sqrt</span>(<span class="dv">1</span><span class="sc">+</span><span class="dv">4</span>))  <span class="co"># = 0.0037</span></span>
+<span id="cb1-9"><a href=""></a></span>
+<span id="cb1-10"><a href=""></a><span class="co"># Bayes Factor</span></span>
+<span id="cb1-11"><a href=""></a>BF <span class="ot">=</span> alt_like<span class="sc">/</span>null_like            <span class="co"># ≈ 27.7</span></span>
+<span id="cb1-12"><a href=""></a></span>
+<span id="cb1-13"><a href=""></a><span class="co"># Posterior</span></span>
+<span id="cb1-14"><a href=""></a>post_odds <span class="ot">=</span> BF <span class="sc">*</span> prior<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>prior)   <span class="co"># ≈ 0.0277</span></span>
+<span id="cb1-15"><a href=""></a>post_prob <span class="ot">=</span> post_odds<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span>post_odds) <span class="co"># ≈ 0.027 (2.7%)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+
+<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
 <section id="decision-boundaries-comparison" class="slide level2">
 <h2>Decision Boundaries Comparison</h2>
 
-<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-6-1.png" width="960" class="r-stretch"><p>Both approaches control false discoveries but with different decision boundaries.</p>
+<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-8-1.png" width="960" class="r-stretch"><p>Both approaches control false discoveries but with different decision boundaries.</p>
 </section>
 <section id="advantages-of-bayesian-multiple-testing" class="slide level2">
 <h2>Advantages of Bayesian Multiple Testing</h2>
@@ -875,7 +975,7 @@ Complete pooling: Ignores differences between groups</p>
 <section id="the-power-of-partial-pooling" class="slide level2">
 <h2>The Power of Partial Pooling</h2>
 
-<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"><p><strong>Hierarchical models</strong> adaptively share information across groups: stronger shrinkage for uncertain estimates, less for confident ones.</p>
+<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"><p><strong>Hierarchical models</strong> adaptively share information across groups: stronger shrinkage for uncertain estimates, less for confident ones.</p>
 </section>
 <section id="mathematical-structure" class="slide level2">
 <h2>Mathematical Structure</h2>
@@ -956,7 +1056,7 @@ Complete pooling: Ignores differences between groups</p>
 <li><strong>Result</strong>: “Borrow information” across genes to improve variance estimates</li>
 </ol>
 
-<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-8-1.png" width="768" class="r-stretch"></section>
+<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-10-1.png" width="768" class="r-stretch"></section>
 <section id="computational-approaches" class="slide level2">
 <h2>Computational Approaches</h2>
 <p>Hierarchical models can be fit using:</p>
@@ -1029,7 +1129,7 @@ Complete pooling: Ignores differences between groups</p>
 <section id="figures" class="slide level2">
 <h2>figures</h2>
 
-<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"><p>::::</p>
+<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-11-1.png" width="960" class="r-stretch"><p>::::</p>
 </section>
 <section id="beta-binomial-perfect-for-allele-frequencies" class="slide level2">
 <h2>Beta-Binomial: Perfect for Allele Frequencies</h2>
@@ -1049,7 +1149,7 @@ Complete pooling: Ignores differences between groups</p>
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-10-1.png" width="960"></p>
+<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-12-1.png" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1074,7 +1174,7 @@ Complete pooling: Ignores differences between groups</p>
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-11-1.png" width="960"></p>
+<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-13-1.png" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1281,7 +1381,7 @@ p(\mu|X) &amp;\propto \exp\left(-\frac{1}{2}\left[\frac{(X-\mu)^2}{\sigma^2} + \
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-12-1.png" width="960"></p>
+<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-14-1.png" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1307,7 +1407,7 @@ p(\mu|X) &amp;\propto \exp\left(-\frac{1}{2}\left[\frac{(X-\mu)^2}{\sigma^2} + \
 <section id="em-algorithm-step-by-step-example" class="slide level2">
 <h2>EM Algorithm: Step-by-Step Example</h2>
 
-<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-13-1.png" width="960" class="r-stretch"></section>
+<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-15-1.png" width="960" class="r-stretch"></section>
 <section id="worked-example-em-algorithm-step-by-step" class="slide level2">
 <h2>Worked Example: EM Algorithm Step-by-Step</h2>
 <p>Let’s walk through each step of the EM algorithm for a mixture of two Gaussians:</p>
@@ -1389,7 +1489,7 @@ Intuition: “The new population mean is a weighted average where individuals ar
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-14-1.png" width="960"></p>
+<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-16-1.png" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1414,7 +1514,7 @@ Intuition: “The new population mean is a weighted average where individuals ar
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-15-1.png" width="576"></p>
+<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-17-1.png" width="576"></p>
 </figure>
 </div>
 </div>
@@ -1439,7 +1539,7 @@ Intuition: “The new population mean is a weighted average where individuals ar
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-16-1.png" width="960"></p>
+<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-18-1.png" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1470,7 +1570,7 @@ Intuition: “The new population mean is a weighted average where individuals ar
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-17-1.png" width="960"></p>
+<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-19-1.png" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1561,7 +1661,7 @@ Intuition: “The new population mean is a weighted average where individuals ar
 <section id="visualizing-bma" class="slide level2">
 <h2>Visualizing BMA</h2>
 
-<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-18-1.png" width="768" class="r-stretch"><p>BMA combines predictions from multiple models, weighted by their posterior probabilities, leading to more robust inference.</p>
+<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-20-1.png" width="768" class="r-stretch"><p>BMA combines predictions from multiple models, weighted by their posterior probabilities, leading to more robust inference.</p>
 </section>
 <section id="bma-for-fine-mapping" class="slide level2">
 <h2>BMA for Fine-Mapping</h2>
@@ -1572,7 +1672,7 @@ Intuition: “The new population mean is a weighted average where individuals ar
 <li>BMA provides a coherent approach to handle this uncertainty</li>
 </ul>
 
-<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-19-1.png" width="768" class="r-stretch"><p>Posterior Inclusion Probabilities (PIPs) from BMA provide a robust way to prioritize likely causal variants.</p>
+<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-21-1.png" width="768" class="r-stretch"><p>Posterior Inclusion Probabilities (PIPs) from BMA provide a robust way to prioritize likely causal variants.</p>
 </section>
 <section id="model-averaging-in-genomics" class="slide level2">
 <h2>Model Averaging in Genomics</h2>
@@ -1594,7 +1694,7 @@ Intuition: “The new population mean is a weighted average where individuals ar
 <section id="bma-vs.-model-selection" class="slide level2">
 <h2>BMA vs.&nbsp;Model Selection</h2>
 
-<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-20-1.png" width="768" class="r-stretch"><p>Model averaging often outperforms selection of a single “best” model, especially for prediction.</p>
+<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-22-1.png" width="768" class="r-stretch"><p>Model averaging often outperforms selection of a single “best” model, especially for prediction.</p>
 </section>
 <section id="computational-approaches-1" class="slide level2">
 <h2>Computational Approaches</h2>
@@ -1742,7 +1842,7 @@ Intuition: “The new population mean is a weighted average where individuals ar
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-21-1.png" width="960"></p>
+<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-23-1.png" width="960"></p>
 </figure>
 </div>
 </div>
@@ -1823,7 +1923,7 @@ Intuition: “The new population mean is a weighted average where individuals ar
 <p><span class="math display">\[P(\text{assign to treatment } j) \propto P(\text{treatment } j \text{ is best}|\text{current data})\]</span></p>
 <p>Balances learning (exploration) with treating patients optimally (exploitation). ## Visualizing Adaptive Trials</p>
 
-<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-22-1.png" width="960" class="r-stretch"><p>Early stopping means fewer patients needed and faster results.</p>
+<img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-24-1.png" width="960" class="r-stretch"><p>Early stopping means fewer patients needed and faster results.</p>
 </section>
 <section id="adaptive-enrichment-genetics-applications" class="slide level2">
 <h2>Adaptive Enrichment: Genetics Applications</h2>
@@ -1955,7 +2055,7 @@ Intuition: “The new population mean is a weighted average where individuals ar
 <div class="cell-output-display">
 <div>
 <figure>
-<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-23-1.png" width="960"></p>
+<p><img data-src="cleaned_mpg5_files/figure-revealjs/unnamed-chunk-25-1.png" width="960"></p>
 </figure>
 </div>
 </div>
