@@ -11,7 +11,7 @@
   <meta name="generator" content="quarto-1.5.57">
 
   <meta name="author" content="Sarah Urbut, MD PhD">
-  <meta name="dcterms.date" content="2025-03-29">
+  <meta name="dcterms.date" content="2025-04-17">
   <title>A Practical Primer on Bayesian Statistics</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -402,7 +402,7 @@ Sarah Urbut, MD PhD
 </div>
 </div>
 
-  <p class="date">2025-03-29</p>
+  <p class="date">2025-04-17</p>
 </section>
 <section id="overview" class="slide level2">
 <h2>Overview</h2>
@@ -526,8 +526,8 @@ What we get: P(Data|Null Hypothesis)</p>
 <li><strong>Interpretation is direct and intuitive</strong> for researchers and clinicians</li>
 </ul>
 </section>
-<section id="probabilistic-interpretation-of-estimates-1" class="slide level2">
-<h2>Probabilistic Interpretation of Estimates</h2>
+<section id="on-the-surface-the-same-but-whos-running" class="slide level2">
+<h2>On the surface the same but … who’s running?</h2>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -575,9 +575,7 @@ What we get: P(Data|Null Hypothesis)</p>
 </details>
 
 </div>
-<img data-src="mpg6_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
-<section id="bayesian-vs.-frequentist-intervals" class="slide level2 notes">
-<h2>Bayesian vs.&nbsp;Frequentist Intervals</h2>
+<img data-src="mpg6_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"><aside class="notes">
 <table class="caption-top">
 <colgroup>
 <col style="width: 47%">
@@ -612,6 +610,17 @@ What we get: P(Data|Null Hypothesis)</p>
 </tr>
 </tbody>
 </table>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="bayes-theorem---the-core-idea" class="slide level2">
 <h2>Bayes’ Theorem - The Core Idea</h2>
@@ -893,23 +902,20 @@ Even with the most optimistic assumptions, the evidence against the null is mode
 </li>
 <li>Bayes factors have a natural interpretation as evidence strength<br>
 </li>
-<li>Converting to posterior probabilities requires considering prior odds<br>
-</li>
-<li>In genomics, this perspective helps manage false discovery rates</li>
+<li>Converting to posterior probabilities requires considering prior odds —</li>
 </ol>
-</section></section>
-<section>
-<section id="the-multiple-testing-challenge" class="title-slide slide level1 center">
-<h1>2. The Multiple Testing Challenge</h1>
-<p>Modern genomics routinely tests <strong>thousands to millions</strong> of hypotheses:</p>
+</section>
+<section id="the-multiple-testing-challenge" class="slide level2">
+<h2>2. The Multiple Testing Challenge</h2>
+<p>Modern genomics routinely tests <strong>MANY</strong> hypotheses:</p>
 <ul>
-<li>20,000+ genes in differential expression<br>
+<li>20,000+ genes in differential expression: <a href="https://www.pnas.org/doi/10.1073/pnas.1530509100">Storey et al</a><br>
 </li>
-<li>Millions of variants in GWAS<br>
+<li>Millions of variants in GWAS: <a href="https://academic.oup.com/biostatistics/article-abstract/18/2/275/2557030?redirectedFrom=fulltext">Stephens et al</a><br>
 </li>
-<li>Billions of potential interactions</li>
+<li>Compounded potential interactions across multiple phenotypes: <a href="https://www.nature.com/articles/s41588-018-0268-8">Urbut al</a></li>
 </ul>
-<p><strong>The consequence</strong>: Many “significant” findings are actually false positives.</p>
+<p><strong>The consequence</strong>: Many “significant” findings are actually false positives: but which ones?</p>
 </section>
 <section id="the-traditional-approach" class="slide level2">
 <h2>The Traditional Approach</h2>
@@ -1059,23 +1065,31 @@ p(\beta) &amp;\sim \sum_k \pi_k N(0,\sigma_{k}^2)
 <span id="cb6-21"><a href=""></a>  <span class="at">IsNull =</span> <span class="fu">factor</span>(is_null)</span>
 <span id="cb6-22"><a href=""></a>)</span>
 <span id="cb6-23"><a href=""></a></span>
-<span id="cb6-24"><a href=""></a><span class="co"># Plot</span></span>
-<span id="cb6-25"><a href=""></a><span class="fu">ggplot</span>(effect_df, <span class="fu">aes</span>(<span class="at">x =</span> ObservedEffect, <span class="at">fill =</span> IsNull)) <span class="sc">+</span></span>
-<span id="cb6-26"><a href=""></a>  <span class="fu">geom_density</span>(<span class="at">alpha=</span><span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb6-27"><a href=""></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"gray70"</span>, <span class="st">"red"</span>), </span>
-<span id="cb6-28"><a href=""></a>                   <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Null"</span>, <span class="st">"True"</span>),</span>
-<span id="cb6-29"><a href=""></a>                   <span class="at">name =</span> <span class="st">"Variant Type"</span>) <span class="sc">+</span></span>
-<span id="cb6-30"><a href=""></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Mixture of Effect Sizes in GWAS"</span>,</span>
-<span id="cb6-31"><a href=""></a>       <span class="at">subtitle =</span> <span class="st">"Most variants have no effect (null)"</span>,</span>
-<span id="cb6-32"><a href=""></a>       <span class="at">x =</span> <span class="st">"Observed Effect Size"</span>, </span>
-<span id="cb6-33"><a href=""></a>       <span class="at">y =</span> <span class="st">"Count"</span>) <span class="sc">+</span></span>
-<span id="cb6-34"><a href=""></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb6-35"><a href=""></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-24"><a href=""></a><span class="co"># Calculate LFDR for each z-score</span></span>
+<span id="cb6-25"><a href=""></a>calc_lfdr <span class="ot">&lt;-</span> <span class="cf">function</span>(z, <span class="at">pi1=</span><span class="fl">0.10</span>, <span class="at">sigma=</span><span class="dv">4</span>) {  <span class="co"># Match the parameters used to generate data</span></span>
+<span id="cb6-26"><a href=""></a>  f0 <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(z, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb6-27"><a href=""></a>  f1 <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(z, <span class="dv">0</span>, <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">+</span> sigma<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb6-28"><a href=""></a>  f <span class="ot">&lt;-</span> (<span class="dv">1</span><span class="sc">-</span>pi1)<span class="sc">*</span>f0 <span class="sc">+</span> pi1<span class="sc">*</span>f1</span>
+<span id="cb6-29"><a href=""></a>  (<span class="dv">1</span><span class="sc">-</span>pi1)<span class="sc">*</span>f0<span class="sc">/</span>f</span>
+<span id="cb6-30"><a href=""></a>}</span>
+<span id="cb6-31"><a href=""></a></span>
+<span id="cb6-32"><a href=""></a></span>
+<span id="cb6-33"><a href=""></a><span class="co"># Plot</span></span>
+<span id="cb6-34"><a href=""></a><span class="fu">ggplot</span>(effect_df, <span class="fu">aes</span>(<span class="at">x =</span> ObservedEffect, <span class="at">fill =</span> IsNull)) <span class="sc">+</span></span>
+<span id="cb6-35"><a href=""></a>  <span class="fu">geom_density</span>(<span class="at">alpha=</span><span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb6-36"><a href=""></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"gray70"</span>, <span class="st">"red"</span>), </span>
+<span id="cb6-37"><a href=""></a>                   <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Null"</span>, <span class="st">"True"</span>),</span>
+<span id="cb6-38"><a href=""></a>                   <span class="at">name =</span> <span class="st">"Variant Type"</span>) <span class="sc">+</span></span>
+<span id="cb6-39"><a href=""></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Mixture of Effect Sizes in GWAS"</span>,</span>
+<span id="cb6-40"><a href=""></a>       <span class="at">subtitle =</span> <span class="st">"Most variants have no effect (null)"</span>,</span>
+<span id="cb6-41"><a href=""></a>       <span class="at">x =</span> <span class="st">"Observed Effect Size"</span>, </span>
+<span id="cb6-42"><a href=""></a>       <span class="at">y =</span> <span class="st">"Count"</span>) <span class="sc">+</span></span>
+<span id="cb6-43"><a href=""></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb6-44"><a href=""></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 
 </div>
-<img data-src="mpg6_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"><p>:::</p>
-</section>
+<img data-src="mpg6_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"></section>
 <section id="empirical-bayes-approach" class="slide level2">
 <h2>Empirical Bayes Approach</h2>
 <p>Key contributions:</p>
@@ -1084,6 +1098,17 @@ p(\beta) &amp;\sim \sum_k \pi_k N(0,\sigma_{k}^2)
 <li><strong>Adaptive shrinkage</strong>: Stronger shrinkage for uncertain estimates</li>
 <li><strong>Correlation structure</strong>: Account for LD and other dependencies</li>
 </ol>
+<div class="callout callout-none no-icon callout-style-simple">
+<div class="callout-body">
+<div class="callout-content">
+<ol type="1">
+<li><strong>ashr</strong>: Adaptive shrinkage for effect sizes</li>
+<li><strong>mashr</strong>: Multivariate adaptive shrinkage</li>
+<li><strong>flashier</strong>: Sparse factor analysis (more on aladynoulli to come)</li>
+</ol>
+</div>
+</div>
+</div>
 </section>
 <section id="empirical-bayes-approach-1" class="slide level2">
 <h2>Empirical Bayes Approach</h2>
@@ -1130,11 +1155,6 @@ p(\beta) &amp;\sim \sum_k \pi_k N(0,\sigma_{k}^2)
 <img data-src="mpg6_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
 <section id="practical-implementation" class="slide level2">
 <h2>Practical Implementation</h2>
-<ol type="1">
-<li><strong>ashr</strong>: Adaptive shrinkage for effect sizes</li>
-<li><strong>mashr</strong>: Multivariate adaptive shrinkage</li>
-<li><strong>flashier</strong>: Sparse factor analysis (more on aladynoulli to come … )</li>
-</ol>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1304,7 +1324,10 @@ p(\beta) &amp;\sim \sum_k \pi_k N(0,\sigma_{k}^2)
 \text{Effects across groups: } &amp; \mathbf{B}_j \sim N(\mathbf{0}, \mathbf{U}_k) \\
 \text{Mixture model: } &amp; p(\mathbf{B}_j) = \sum_{k=1}^K \pi_k N(\mathbf{0}, \mathbf{U}_k)
 \end{align*}\]</span></p>
-<p>Where <span class="math inline">\(\mathbf{U}_k\)</span> captures different patterns of sharing: - Equal effects across groups - Group-specific effects - Correlated effects - Structured patterns</p>
+<p>Where <span class="math inline">\(\mathbf{U}_k\)</span> captures different patterns of sharing: - Equal effects across groups<br>
+- Group-specific effects<br>
+- Correlated effects<br>
+- Structured patterns</p>
 </section>
 <section id="understanding-covariance-matrices-in-multivariate-normal-distribution" class="slide level2">
 <h2>Understanding Covariance Matrices in Multivariate Normal Distribution</h2>
@@ -1314,7 +1337,9 @@ p(\beta) &amp;\sim \sum_k \pi_k N(0,\sigma_{k}^2)
 \sigma^2_1 &amp; \rho\sigma_1\sigma_2 \\
 \rho\sigma_1\sigma_2 &amp; \sigma^2_2
 \end{pmatrix}\]</span></p>
-<p>where: - <span class="math inline">\(\sigma^2_1\)</span> and <span class="math inline">\(\sigma^2_2\)</span> are the variances for each trait - <span class="math inline">\(\rho\)</span> is the correlation coefficient - <span class="math inline">\(\rho\sigma_1\sigma_2\)</span> represents the covariance.</p>
+<p>where: - <span class="math inline">\(\sigma^2_1\)</span> and <span class="math inline">\(\sigma^2_2\)</span>: trait variances<br>
+- <span class="math inline">\(\rho\)</span> is the correlation coefficient<br>
+- <span class="math inline">\(\rho\sigma_1\sigma_2\)</span> represents the covariance.</p>
 </section>
 <section id="more-math" class="slide level2">
 <h2>More math</h2>
@@ -1326,13 +1351,12 @@ p(\beta) &amp;\sim \sum_k \pi_k N(0,\sigma_{k}^2)
 <li>When (<span class="math inline">\(\rho\)</span> = 0):
 <ul>
 <li>Effects are independent</li>
-<li>Contours form circles/ellipses aligned with axes - approaches univariate shrinkage but ..</li>
+<li>approaches univariate shrinkage but ..</li>
 </ul></li>
 <li>When (<span class="math inline">\(\rho\)</span> <span class="math inline">\(\neq\)</span> 0):
 <ul>
-<li>Effects are correlated</li>
-<li>Contours form rotated ellipses</li>
-<li>Direction of rotation determined by sign of ()</li>
+<li>Effects are correlated, ‘spread’ of cloud <span class="math inline">\(\rho\)</span></li>
+<li>Slope determined by relative <em>variance</em></li>
 </ul></li>
 </ol>
 </section>
@@ -1358,9 +1382,9 @@ p(\beta) &amp;\sim \sum_k \pi_k N(0,\sigma_{k}^2)
 <section id="summary" class="slide level2">
 <h2>Summary</h2>
 <ul>
-<li>Observed Effects are noisy</li>
-<li>only considering information in one subgroup ignores the hints we get from abound</li>
-<li>Sharing is caring!</li>
+<li><p><strong>Observed Effects are noisy</strong></p></li>
+<li><p><strong>Only considering only information in one subgroup ignores the <em>hints</em> we get from abound</strong></p></li>
+<li><p><strong>Sharing is caring!</strong></p></li>
 </ul>
 </section></section>
 <section>
@@ -1471,7 +1495,7 @@ p(\beta) &amp;\sim \sum_k \pi_k N(0,\sigma_{k}^2)
 <img data-src="mpg6_files/figure-revealjs/unnamed-chunk-12-1.png" width="960" class="r-stretch"></section>
 <section id="simple-example" class="slide level2">
 <h2>Simple Example:</h2>
-<p>Imagine tracking minor allele frequency:</p>
+<p>Why TB was a geneticist: Imagine tracking minor allele frequency:</p>
 <ul>
 <li><p><strong>Start</strong>: Beta(2, 8) - prior belief allele is rare</p></li>
 <li><p><strong>Observe</strong>: AABB AABB ABBB (5 A’s, 7 B’s)</p></li>
@@ -1489,6 +1513,19 @@ p(\beta) &amp;\sim \sum_k \pi_k N(0,\sigma_{k}^2)
 <li>(<span class="math inline">\(\beta\)</span>) = prior failures + observed failures</li>
 <li>Posterior mean = (<span class="math inline">\(\frac{\alpha}{\alpha + \beta}\)</span>)</li>
 </ol>
+<aside class="notes">
+<p>sum of a and b is like precision, higher concentration at mean mean is a/a+b</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="continuous-updating" class="slide level2">
 <h2>Continuous updating</h2>
@@ -1563,7 +1600,20 @@ p(\beta) &amp;\sim \sum_k \pi_k N(0,\sigma_{k}^2)
 </details>
 
 </div>
-<img data-src="mpg6_files/figure-revealjs/unnamed-chunk-13-1.png" width="960" class="r-stretch"></section>
+<img data-src="mpg6_files/figure-revealjs/unnamed-chunk-13-1.png" width="960" class="r-stretch"><aside class="notes">
+<p>truth was 0.5</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
 <section id="dirichlet-multinomial-for-multiple-alleles" class="slide level2">
 <h2>Dirichlet-Multinomial: For Multiple Alleles</h2>
 <p><strong>Model</strong>:<br>
@@ -2210,22 +2260,14 @@ Each <em>population</em> = distinct allele frequencies<br>
 <h2>Visualization: If we know the truth</h2>
 
 <img data-src="mpg6_files/figure-revealjs/unnamed-chunk-18-1.png" width="576" class="r-stretch"></section>
-<section id="understanding-the-q-update" class="slide level2">
-<h2>Understanding the q Update</h2>
-<h3 id="individual-level">Individual Level</h3>
+<section id="understanding-the-q-update-at-the-individual-level" class="slide level2">
+<h2>Understanding the q Update: At the Individual Level</h2>
+<p><strong>Individual 1</strong>: A C A</p>
+<p><span class="math inline">\(\log(P(Data|Pop1)) = \log(f_1^A) + \log(f_1^C) + \log(f_1^A)\)</span></p>
+<p><span class="math inline">\(\log(P(Data|Pop2)) = \log(f_2^A) + \log(f_2^C) + \log(f_2^A)\)</span></p>
+<p>Total for Pop1 = <span class="math inline">\(L_{11} + L_{21} + L_{31}\)</span></p>
 <aside class="notes">
-<ul>
-<li>Here, we’re updating the ancestry proportions (<code>q</code>) for Individual
-<ol type="1">
-<li></li>
-</ol></li>
-<li>For each marker, we calculate the likelihood of the observed allele under each population’s allele frequency.</li>
-<li>For example, for Marker 1 (A), we look up the probability of A in Population 1 (<span class="math inline">\(f_1^A\)</span>) and Population 2 (<span class="math inline">\(f_2^A\)</span>).</li>
-<li>We do this for all markers, summing the log-likelihoods (or likelihoods, depending on the implementation) for each population.</li>
-<li>These sums are then added to the prior Dirichlet parameters (<span class="math inline">\(\alpha_1\)</span>, <span class="math inline">\(\alpha_2\)</span>) to get the updated parameters for the Dirichlet distribution.</li>
-<li>The result is a new estimate of Individual 1’s ancestry proportions, reflecting both the prior and the observed data.</li>
-<li>This process is repeated for each individual in the dataset.</li>
-</ul>
+<p>Here, we’re updating the ancestry proportions (<code>q</code>) for Individual 1. For each marker, we calculate the likelihood of the observed allele under each population’s allele frequency. For example, for Marker 1 (A), we look up the probability of A in Population 1 (<span class="math inline">\(f_1^A\)</span>) and Population 2 (<span class="math inline">\(f_2^A\)</span>). We do this for all markers, summing the log-likelihoods (or likelihoods, depending on the implementation) for each population. These sums are then added to the prior Dirichlet parameters to get the updated parameters for the Dirichlet distribution. The result is a new estimate of Individual 1’s ancestry proportions, reflecting both the prior and the observed data. This process is repeated for each individual in the dataset</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -2237,28 +2279,6 @@ Each <em>population</em> = distinct allele frequencies<br>
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
-<p><strong>Individual 1</strong>: A C A</p>
-<ul>
-<li>Step 1: Calculate Likelihoods using known population frequencies:</li>
-<li><span class="math inline">\(F_{11} =[0.7, 0.3]\)</span>, <span class="math inline">\(F_{12} [0.4, 0.6]\)</span>,<span class="math inline">\(F_{13} =[ 0.8, 0.2]\)</span></li>
-<li><strong>Population 1 Contributions</strong>:</li>
-<li>Marker 1 (A): <span class="math inline">\(L_{11} = f_1^A\)</span></li>
-<li>Marker 2 (C): <span class="math inline">\(L_{21} = f_1^C\)</span></li>
-<li>Marker 3 (A): <span class="math inline">\(L_{31} = f_1^A\)</span></li>
-</ul>
-<p>Total for Pop1 = <span class="math inline">\(L_{11} + L_{21} + L_{31}\)</span></p>
-</section>
-<section id="example-data" class="slide level2">
-<h2>Example Data</h2>
-<p><strong>Individual 1</strong>: A C A</p>
-<p><span class="math inline">\(F_{21} =[0.1, 0.9]\)</span>, <span class="math inline">\(F_{22} [0.3, 0.7]\)</span>,<span class="math inline">\(F_{23} =[ 0.2, 0.8]\)</span></p>
-<p><strong>Population 2 Contributions</strong>:</p>
-<ul>
-<li>Marker 1 (A): <span class="math inline">\(L_{12} = f_2^A\)</span></li>
-<li>Marker 2 (C): <span class="math inline">\(L_{22} = f_2^C\)</span></li>
-<li>Marker 3 (A): <span class="math inline">\(L_{32} = f_2^A\)</span></li>
-</ul>
-<p>Total for Pop2 = <span class="math inline">\(L_{12} + L_{22} + L_{32}\)</span></p>
 </section>
 <section id="step-2-dirichlet-update" class="slide level2">
 <h2>Step 2: Dirichlet Update</h2>
@@ -2551,9 +2571,6 @@ Update: <span class="math inline">\(f_1^A \sim \text{Beta}(\lambda + 0.7, \lambd
 <!--        y = "Effect Size", -->
 <!--        color = "") + -->
 <!--   theme(legend.position = "bottom") -->
-</section>
-<section id="section" class="slide level2">
-<h2><!-- ``` --></h2>
 </section></section>
 <section>
 <section id="bayesian-clinical-trials" class="title-slide slide level1 center">
@@ -2853,10 +2870,10 @@ Update: <span class="math inline">\(f_1^A \sim \text{Beta}(\lambda + 0.7, \lambd
 <li><strong>Apply decision theory for optimal designs</strong></li>
 </ol>
 <aside class="notes">
-<p>Start with informative priors when possible<strong> - Use previous studies<br>
+<p>Start with informative priors when possible <strong>- Use previous studies<br>
 - Incorporate functional annotations<br>
 - Consider evolutionary constraints Report posterior probabilities, not just p-values</strong> - <span class="math inline">\(P(\text{association} | \text{data})\)</span> is more interpretable than <span class="math inline">\(P(\text{data} | \text{no association})\)</span><br>
-- Provides direct probability statements about hypotheses Use conjugate models for computational efficiency<strong> - Beta-Binomial for allele frequencies<br>
+- Provides direct probability statements about hypotheses Use conjugate models for computational efficiency <strong>- Beta-Binomial for allele frequencies<br>
 - Dirichlet-Multinomial for haplotype frequencies<br>
 - Normal-Normal for quantitative traits Consider mixture models for complex data</strong> - Population structure<br>
 - Heterogeneous effect sizes<br>
