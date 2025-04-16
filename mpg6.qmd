@@ -1008,9 +1008,11 @@ p3 <- ggplot(plot_data, aes(x = Group1_mash, y = Group2_mash, color = Pattern)) 
 ```
 
 ## Summary
-- Observed Effects are noisy
-- only considering information in one subgroup ignores the hints we get from abound
-- Sharing is caring!
+
+-   Observed Effects are noisy
+-   only considering information in one subgroup ignores the hints we
+    get from abound
+-   Sharing is caring!
 
 ## Conjugate Priors: Why They're Beautiful
 
@@ -1940,7 +1942,7 @@ population
 
 ::: notes
 -   Here, we're updating the ancestry proportions (`q`) for Individual
-    1.
+    1.  
 -   For each marker, we calculate the likelihood of the observed allele
     under each population's allele frequency.
 -   For example, for Marker 1 (A), we look up the probability of A in
@@ -2000,8 +2002,8 @@ each population.
     Update: $f_1^A \sim \text{Beta}(\lambda + 0.7, \lambda + 0.3)$
 
 -   **Population 2**: - Contribution from Individual 1: 0.3 (from
-    $q_{12}$)
-    Update: $f_2^A \sim \text{Beta}(\lambda + 0.3, \lambda + 0.7)$
+    $q_{12}$) Update:
+    $f_2^A \sim \text{Beta}(\lambda + 0.3, \lambda + 0.7)$
 
 ## Marker 2 (Allele C)
 
@@ -2016,14 +2018,13 @@ Note that each allele contributes fractionally to each population's
 frequency estimate, weighted by the individual's ancestry proportions.
 :::
 
-## The MCMC Two-Step
+## The Variational Bayes Two-Step
 
 1.  Update ancestries given current frequencies:
     $P(q_i |\text{data}, f) \propto P(\text{data}|q_i,f)P(q_i)$
 
 2.  Update frequencies given current ancestries:
     $P(f_k | \text{data}, q) \propto P(\text{data}|q,f_k)P(f_k)$
-
 
 ## STRUCTURE Simulation: Ancestry and Allele Frequency Inference
 
@@ -2154,7 +2155,6 @@ p_freq <- ggplot(pop_freqs_long, aes(x = Marker, y = Population, fill = Frequenc
 (p_true | p_est) / (p_traj | p_freq) + plot_layout(heights = c(1, 1.2))
 ```
 
-
 ## **Effect Size Mixtures in GWAS**
 
 **Problem**: Most variants have no effect, but some do
@@ -2166,7 +2166,6 @@ distribution\
 variances\
 - **Bayesian variable selection**: Latent indicator for whether variant
 is causal
-
 
 ## Sound familiar? Multiple hypothesis testing!
 
@@ -2209,7 +2208,6 @@ ggplot(effect_df, aes(x = ObservedEffect, fill = IsNull)) +
 ```
 
 ## Multivariate Normal Mixtures: The mash Approach
-
 
 ```{r,echo=TRUE}
 #| fig-height: 6
@@ -2483,12 +2481,11 @@ p1 + p2 +
 - **Specialized**: `STRUCTURE`, `ADMIXTURE`, `SNPTEST`
 
 **Books**:\
-- "Bayesian Data Analysis" by Gelman et al.\
--- "Understanding Uncertainty", by David Lindley   -- "The Art of
-Statistics" David Spiegelhalter\
--- "Bayesian Approaches to Clinical Trials" David Spiegelhalter\
--- "Elements of Statistical Learning" Hastie, Tibshirani et al\
--- "Statistical Rethinking" by McElreath\
+["Bayesian Data Analysis"](https://sites.stat.columbia.edu/gelman/book/BDA3.pdf) by Gelman et al.\
+["Understanding Uncertainty"](https://www.al-edu.com/wp-content/uploads/2014/05/Lindley-D.V.-Understanding-uncertainty-2006.pdf), by David Lindley\
+"The Art of Statistics" David Spiegelhalter\
+"Bayesian Approaches to Clinical Trials" David Spiegelhalter\
+["Elements of Statistical Learning"](https://hastie.su.domains/ElemStatLearn/) Hastie, Tibshirani et al\
 
 ## **Online Resources**:
 
