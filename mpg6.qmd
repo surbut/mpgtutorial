@@ -67,7 +67,7 @@ more unlikely under the alternative!
 
 ## Example
 
-```{r}
+```{r,echo=TRUE}
 # Create example of evidence paradox
 z <- seq(-5, 5, length.out = 1000)
 null_density <- dnorm(z, 0, 1)
@@ -146,7 +146,7 @@ In the Bayesian framework:
 
 ## Probabilistic Interpretation of Estimates
 
-```{r}
+```{r echo=TRUE}
 # Create example data for frequentist vs Bayesian comparison
 x <- seq(0.2, 0.8, length = 1000)
 
@@ -190,6 +190,7 @@ ggplot(plot_data, aes(x = x, y = y)) +
   theme_minimal()
 ```
 
+::: notes
 ## Bayesian vs. Frequentist Intervals
 
 | Bayesian Credible Interval | Frequentist Confidence Interval |
@@ -199,6 +200,7 @@ ggplot(plot_data, aes(x = x, y = y)) +
 | Incorporates prior information | No mechanism to incorporate prior information (why would you run?) |
 | Can be asymmetric, reflecting asymmetric uncertainty | Typically symmetric by construction |
 | Conditioning on the observed data | Based on hypothetical repeated (theoretical) sampling |
+:::
 
 ## Bayes' Theorem - The Core Idea
 
@@ -216,7 +218,7 @@ Simply: **Posterior ∝ Likelihood × Prior**
 
 ## Bayesian Updating: Visual Intuition
 
-```{r bayesian-updating}
+```{r echo=TRUE, bayesian-updating}
 # Create data for three distributions
 x <- seq(0.001, 0.999, length = 1000)
 prior <- data.frame(x = x, y = dbeta(x, 2, 3), Distribution = "Prior: Beta(2,3)")
@@ -236,21 +238,6 @@ ggplot(all_distributions, aes(x = x, y = y, color = Distribution)) +
        y = "Density") +
   theme(legend.position = "bottom")
 ```
-
-# P-values vs. Posterior Probabilities
-
-## The Question
-
-As scientists, we want to know:
-
-> "What is the probability that my hypothesis is true, given my data?"
-
-But traditional p-values answer a different question:
-
-> "What is the probability of observing data this extreme or more
-> extreme, if the null hypothesis is true?"
-
-This mismatch causes persistent misinterpretations.
 
 ## P-values vs. Bayes Factors: Definitions
 
@@ -283,7 +270,7 @@ association exists"\
 
 ## Visualize
 
-```{r}
+```{r echo=TRUE}
 # Parameters
 prior_prob <- 1/1000  # Prior probability of true association
 p_value <- 0.001      # Observed p-value
@@ -326,7 +313,8 @@ P!](https://surbut.shinyapps.io/shinypval/)
 ## The Mathematical Connection
 
 Under certain conditions, p-values can be converted to minimum Bayes
-factors:
+factors, see [Sellke, Bayarri, and
+Berger](https://hannig.cloudapps.unc.edu/STOR654/handouts/SellkeBayarriBerger2001.pdf).
 
 $$BF_{min} ≈ -e \times p \times \log(p)$$
 
@@ -339,7 +327,8 @@ less evidence than typically assumed:
 | 0.01    | 0.084                |
 | 0.001   | 0.0083               |
 
-## What is the Minimum Bayes Factor?
+::: notes
+What is the Minimum Bayes Factor?
 
 The Minimum Bayes Factor is calculated as:\
 $\text{MBF} \approx -e \times p \times \log(p)$
@@ -349,20 +338,17 @@ This formula (derived by Sellke, Bayarri, and Berger) represents the
 p-value, regardless of the specific alternative hypothesis being tested
 (i.e p(D\|H0)/p(D/H1))
 
-------------------------------------------------------------------------
-
-## Why "Minimum"?
+Why "Minimum"?
 
 It's called "minimum" because:
 
 -   It assumes the most favorable conditions for the alternative
-    hypothesis\
+    hypothesis
 -   It represents the strongest possible evidence against the null that
-    could be derived from a p-value\
+    could be derived from a p-value
 -   It's the smallest value the Bayes factor could take (stronger
     evidence against null = smaller Bayes factor)
-
-## Interpretation
+-   
 
 The MBF represents the ratio of likelihoods:\
 $\text{MBF} = \frac{P(\text{data}|H_0)}{P(\text{data}|H_1)}$
@@ -371,58 +357,73 @@ For example, with p = 0.05: MBF = 0.37 This means the data are at most
 1/0.37 ≈ 2.7 times more likely under the alternative than the null\
 Even with the most optimistic assumptions, the evidence against the null
 is modest
-
-## Why This Conversion Matters
-
-This conversion from p-values to MBF is important because:
-
--   It provides a more calibrated interpretation of statistical
-    evidence\
--   It shows that conventional "statistical significance" (p \< 0.05)
-    actually represents fairly modest evidence\
--   It helps researchers avoid overinterpreting p-values\
--   It establishes a link between frequentist and Bayesian approaches
-
-## p-values systematically overstate the evidence against the null hypothesis.
-
-When converted to the Bayes factor scale, even a seemingly impressive
-p-value often translates to much more moderate evidence against the null
-hypothesis than most researchers would expect.
-
-## P-values vs. Bayes Factors in Genomics
-
-```{r}
-# Create data
-p_values <- 10^seq(-8, -2, 0.5)
-log10_p <- -log10(p_values)
-min_bf <- -exp(1) * p_values * log(p_values)
-log10_min_bf <- -log10(min_bf)
-
-# Create plot data
-plot_data <- data.frame(
-  log10_p = log10_p,
-  log10_min_bf = log10_min_bf
-)
-
-# Plot
-ggplot(plot_data, aes(x = log10_p, y = log10_min_bf)) +
-  geom_line(size = 1.5, color = "blue") +
-  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
-  geom_vline(xintercept = -log10(5e-8), linetype = "dotted", color = "darkgreen") +
-  annotate("text", x = 8, y = 4, label = "GWAS significance\nthreshold", color = "darkgreen") +
-  labs(title = "Strength of Evidence: P-values vs. Bayes Factors",
-       x = "-log10(p-value)",
-       y = "-log10(Minimum Bayes Factor)") +
-  theme_minimal(base_size = 14)
-```
-
-The GWAS significance threshold of p \< 5×10⁻⁸ corresponds to much
-stronger evidence than p = 0.05.
-
-::: callout-note
-Berger and Sellke (1987) showed that p-values systematically overstate
-evidence against the null [@berger1987]
 :::
+
+<!-- P-values systematically overstate the evidence against the null hypothesis. -->
+
+<!-- When converted to the Bayes factor scale, even a seemingly impressive -->
+
+<!-- p-value often translates to much more moderate evidence against the null -->
+
+<!-- hypothesis than most researchers would expect. -->
+
+<!-- ## P-values vs. Bayes Factors in Genomics -->
+
+<!-- ```{r} -->
+
+<!-- # Create data -->
+
+<!-- p_values <- 10^seq(-8, -2, 0.5) -->
+
+<!-- log10_p <- -log10(p_values) -->
+
+<!-- min_bf <- -exp(1) * p_values * log(p_values) -->
+
+<!-- log10_min_bf <- -log10(min_bf) -->
+
+<!-- # Create plot data -->
+
+<!-- plot_data <- data.frame( -->
+
+<!--   log10_p = log10_p, -->
+
+<!--   log10_min_bf = log10_min_bf -->
+
+<!-- ) -->
+
+<!-- # Plot -->
+
+<!-- ggplot(plot_data, aes(x = log10_p, y = log10_min_bf)) + -->
+
+<!--   geom_line(size = 1.5, color = "blue") + -->
+
+<!--   geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") + -->
+
+<!--   geom_vline(xintercept = -log10(5e-8), linetype = "dotted", color = "darkgreen") + -->
+
+<!--   annotate("text", x = 8, y = 4, label = "GWAS significance\nthreshold", color = "darkgreen") + -->
+
+<!--   labs(title = "Strength of Evidence: P-values vs. Bayes Factors", -->
+
+<!--        x = "-log10(p-value)", -->
+
+<!--        y = "-log10(Minimum Bayes Factor)") + -->
+
+<!--   theme_minimal(base_size = 14) -->
+
+<!-- ``` -->
+
+<!-- The GWAS significance threshold of p \< 5×10⁻⁸ corresponds to much -->
+
+<!-- stronger evidence than p = 0.05. -->
+
+<!-- ::: callout-note -->
+
+<!-- Berger and Sellke (1987) showed that p-values systematically overstate -->
+
+<!-- evidence against the null [@berger1987] -->
+
+<!-- ::: -->
 
 ## Interpreting Bayes Factors
 
@@ -462,7 +463,8 @@ $$\frac{P(H_1|data)}{P(H_0|data)} = BF_{10} \times \frac{P(H_1)}{P(H_0)}$$
 This clearly shows how Bayes factors calibrate our prior beliefs (and we
 can use this on the wards!).
 
-## Benefits of Bayes Factors for Genomics
+::: notes
+Benefits of Bayes Factors for Genomics
 
 1.  **Calibrated evidence**: Direct measure of evidence strength\
 2.  **Multiple testing**: Naturally incorporates prior odds\
@@ -472,6 +474,7 @@ can use this on the wards!).
 5.  **Positive evidence**: Can support null hypothesis, not just reject
     it\
 6.  **Study design**: Allows stopping when evidence is sufficient
+:::
 
 ## Key Takeaways
 
@@ -484,7 +487,7 @@ can use this on the wards!).
     odds\
 6.  In genomics, this perspective helps manage false discovery rates
 
-## 2. The Multiple Testing Challenge
+# 2. The Multiple Testing Challenge
 
 Modern genomics routinely tests **thousands to millions** of hypotheses:
 
@@ -500,16 +503,16 @@ positives.
 When testing m hypotheses at significance level α:
 
 -   Expected number of false positives: m × α\
--   With m = 1,000,000 and α = 0.05: **50,000 false positives!**
+-   With m = 1,000,000 and $\alpha$ = 0.05: **50,000 false positives!**
 
 **Frequentist solutions**:\
 - Bonferroni correction: α/m\
 - False Discovery Rate (FDR) control (Benjamini-Hochberg)\
-- Family-wise error rate (FWER) control (Drawing time)?)
+- Family-wise error rate (FWER) control (**Drawing time**)?)
 
 ## Visualizing Multiple Hypothesis Testing
 
-```{r}
+```{r echo=TRUE}
 # Set parameters
 set.seed(123)
 m <- 10000  # Total number of tests
@@ -582,9 +585,85 @@ Where:
 
 \- $f(z)$ = observed distribution
 
-## plotting
+::: notes
+Why LFDR is Better
 
-```{r,echo=TRUE}
+1.  **Test-specific**: Each test gets its own probability of being false
+2.  **Direct interpretation**: "This test has 5% chance of being false"
+3.  **Natural handling of correlation**: No need for independence
+    assumptions
+4.  **Flexible**: Can incorporate prior information about effect sizes
+:::
+
+## The Mathematical Framework
+
+In multiple testing, we have two distributions:
+
+1.  **Null Distribution** ($f_0$): $$f_0(z) = \mathcal{N}(0, se^2)$$
+    This is the standard normal distribution for tests where $H_0$ is
+    true.
+
+2.  **Alternative Distribution** ($f_1$):
+    $$f_1(z) = \mathcal{N}(0, se^2 + \sigma^2)$$ This is a normal
+    distribution with increased *true effect* variance for tests where
+    $H_1$ is true.
+
+## The Mathematical Framework
+
+3.  **Overall Distribution** ($f$):
+    $$f(z) = (1-\pi_1)f_0(z) + \pi_1f_1(z)$$ A mixture of null and
+    alternative distributions (estimate posterior probability of
+    non-null components) **Homework (or in class exercise**!
+
+$$\begin{aligned}
+\hat{\beta}&\sim N(\beta,se^2)\\
+\beta &\sim N(0,\sigma^2)\\
+p(\beta) &\sim \sum_k \pi_k N(0,\sigma_{k}^2)
+\end{aligned}$$
+
+## Real data: Mixture of noisy and real effects
+
+```{r eval=TRUE,echo=T}
+# Create visualization of effect size mixtures
+set.seed(789)
+
+# Parameters
+n_variants <- 500
+pi0 <- 0.95  # Proportion of null effects
+
+# Generate true effects
+is_null <- rbinom(n_variants, 1, pi0)
+true_effects <- rep(0, n_variants)
+true_effects[is_null == 0] <- rnorm(sum(is_null == 0), 0, 0.5)
+true_effects[is_null == 1] <- rnorm(sum(is_null == 1), 0, 2)
+# Add noise to create observed effects
+observed_effects <- true_effects + rnorm(n_variants, 0, 0.2)
+
+# Create data frame for plotting
+effect_df <- data.frame(
+  Variant = 1:n_variants,
+  TrueEffect = true_effects,
+  ObservedEffect = observed_effects,
+  IsNull = factor(is_null)
+)
+
+# Plot
+ggplot(effect_df, aes(x = ObservedEffect, fill = IsNull)) +
+  geom_density(alpha=0.5) +
+  scale_fill_manual(values = c("gray70", "red"), 
+                   labels = c("Null", "True"),
+                   name = "Variant Type") +
+  labs(title = "Mixture of Effect Sizes in GWAS",
+       subtitle = "Most variants have no effect (null)",
+       x = "Observed Effect Size", 
+       y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+:::
+
+```{r,echo=FALSE,eval=TRUE}
 
 set.seed(123)
 n_tests <- 10000
@@ -618,32 +697,24 @@ plot_data <- data.frame(
   )
 )
 
-# Plot with some improvements
-ggplot(plot_data, aes(x = z_score, y = lfdr, color = is_true)) +
-  geom_point(alpha = 0.2, size = 0.5) +  # Smaller points, more transparency
-  geom_hline(yintercept = 0.1, linetype = "dashed", color = "darkgreen") +
-  scale_color_manual(values = c("0" = "gray70", "1" = "blue"),
-                    labels = c("Null", "True Effect"),
-                    name = "Truth") +
-  labs(title = "Local False Discovery Rate",
-       subtitle = paste0("π₁ = ", pi1, ", σ = ", sigma),
-       x = "Z-score", 
-       y = "LFDR") +
-  theme_minimal(base_size = 16) +
-  coord_cartesian(xlim = c(-6, 6))  # F
+# # Plot with some improvements
+# ggplot(plot_data, aes(x = z_score, y = lfdr, color = as.factor(is_true))) +
+#   geom_point() +  # Smaller points, more transparency
+#   geom_hline(yintercept = 0.1, linetype = "dashed", color = "darkgreen")+facet_wrap(~as.factor(is_true))+
+#   #scale_color_manual(values = c("0" = "gray70", "1" = "blue"),
+#                     #labels = c("Null", "True Effect"),
+#                     #name = "Truth") +
+#   labs(title = "Local False Discovery Rate",
+#        subtitle = paste0("π1 = ", pi1, ", Sigma = ", sigma),
+#        x = "Z-score", 
+#        y = "LFDR") +
+#   theme_minimal(base_size = 16) +
+#   coord_cartesian(xlim = c(-6, 6))  # F
 ```
-
-## Why LFDR is Better
-
-1.  **Test-specific**: Each test gets its own probability of being false
-2.  **Direct interpretation**: "This test has 5% chance of being false"
-3.  **Natural handling of correlation**: No need for independence
-    assumptions
-4.  **Flexible**: Can incorporate prior information about effect sizes
 
 ## Empirical Bayes Approach
 
-Matthew Stephens' key contributions:
+Key contributions:
 
 1.  **Estimate from data**: Learn $\pi_1$ and effect size distribution
     from the data
@@ -652,12 +723,12 @@ Matthew Stephens' key contributions:
 
 ## Empirical Bayes Approach
 
-```{r}
+```{r,echo=TRUE}
 
 # Visualization of adaptive shrinkage
 set.seed(456)
 n_tests <- 1000
-pi1 <- 0.1
+pi1 <- 0.10
 sigma <- 2
 
 # Generate data
@@ -675,12 +746,13 @@ posterior_means <- observed_effects * (1 - calc_lfdr(observed_effects, pi1, sigm
 shrinkage_data <- data.frame(
   Observed = observed_effects,
   True = true_effects,
-  Shrunk = posterior_means
+  Shrunk = posterior_means,
+  is_null=is_null
 )
 
 # Plot
-ggplot(shrinkage_data, aes(x = Observed, y = Shrunk)) +
-  geom_point(alpha = 0.5) +
+ggplot(shrinkage_data, aes(x = Observed, y = Shrunk,col=as.factor(is_null))) +
+  geom_point() +
   geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
   labs(title = "Adaptive Shrinkage",
        subtitle = "Stronger shrinkage for uncertain estimates",
@@ -696,24 +768,7 @@ ggplot(shrinkage_data, aes(x = Observed, y = Shrunk)) +
 3.  **flashier**: Sparse factor analysis (more on aladynoulli to come
     ... )
 
-## The Mathematical Framework
-
-In multiple testing, we have two distributions:
-
-1.  **Null Distribution** ($f_0$): $$f_0(z) = \mathcal{N}(0, se^2)$$
-    This is the standard normal distribution for tests where $H_0$ is
-    true.
-
-2.  **Alternative Distribution** ($f_1$):
-    $$f_1(z) = \mathcal{N}(0, se^2 + \sigma^2)$$ This is a normal
-    distribution with increased variance for tests where $H_1$ is true.
-
-3.  **Overall Distribution** ($f$):
-    $$f(z) = (1-\pi_1)f_0(z) + \pi_1f_1(z)$$ A mixture of null and
-    alternative distributions (estimate posterior probability of
-    non-null components) Homework!
-
-```{r, fig.width=15, fig.height=10}
+```{r echo=TRUE, fig.width=15, fig.height=10}
 # Create visualization of the distributions
 set.seed(123)
 z <- seq(-5, 5, length.out = 1000)
@@ -760,7 +815,8 @@ ggplot(dist_data, aes(x = z, y = density, color = Distribution)) +
 
 ```
 
-## Effect of Prior Variance on Shrinkage
+::: notes
+Effect of Prior Variance on Shrinkage
 
 The prior variance ($\sigma^2$) directly affects how much we shrink our
 estimates:
@@ -778,10 +834,9 @@ estimates:
     -   More willing to accept large effect sizes
 
     -   Lower threshold for calling something significant
+:::
 
-------------------------------------------------------------------------
-
-```{r, fig.width=15, fig.height=10}
+```{r echo=TRUE, fig.width=15, fig.height=10}
 # Demonstrate shrinkage with different prior variances
 set.seed(456)
 n_tests <- 1000
@@ -830,8 +885,7 @@ ggplot(shrinkage_data, aes(x = Observed, y = Shrunk, color = PriorVar)) +
         plot.subtitle = element_text(size = 18))
 ```
 
-------------------------------------------------------------------------
-
+::: notes
 This relationship between prior variance and shrinkage is crucial in
 genomics:
 
@@ -840,6 +894,7 @@ genomics:
 -   For common variants or large studies: Can use larger $\sigma^2$
 -   For follow-up studies: Can use previous effect size estimates to
     inform $\sigma^2$
+:::
 
 ## Multivariate Adaptive Shrinkage (mash)
 
@@ -866,8 +921,8 @@ $$\mathbf{U}\_k =
 \rho\sigma_1\sigma_2 & \sigma^2_2
 \end{pmatrix}$$
 
-where: - $\sigma\^2_1$ and $\sigma\^2_2$ are the variances for each
-trait - $\rho$ is the correlation coefficient - $\rho\sigma\_1\sigma\_2$
+where: - $\sigma^2_1$ and $\sigma^2_2$ are the variances for each
+trait - $\rho$ is the correlation coefficient - $\rho\sigma_1\sigma_2$
 represents the covariance.
 
 ## More math
@@ -875,13 +930,14 @@ represents the covariance.
 The multivariate normal density is then:
 
 $$\mathbf{x}\|\mathbf{U}\_k) = \frac{1}{2\pi|\mathbf{U}_k|^{1/2}}
-\exp\left(-\frac{1}{2}\mathbf{x}\^T\mathbf{U}\_k\^{-1}\mathbf{x}\right)$$
+\exp\left(-\frac{1}{2}\mathbf{x}^T\mathbf{U}\_k^{-1}\mathbf{x}\right)$$
 
 Different covariance matrices (\mathbf{U}\_k) lead to different shapes:
 
 1.  When ($\rho$ = 0):
     -   Effects are independent
-    -   Contours form circles/ellipses aligned with axes
+    -   Contours form circles/ellipses aligned with axes - approaches
+        univariate shrinkage but ..
 2.  When ($\rho$ $\neq$ 0):
     -   Effects are correlated
     -   Contours form rotated ellipses
@@ -1014,38 +1070,52 @@ p3 <- ggplot(plot_data, aes(x = Group1_mash, y = Group2_mash, color = Pattern)) 
     get from abound
 -   Sharing is caring!
 
-## Conjugate Priors: Why They're Beautiful
+# 3. Conjugate Priors: Why They're Beautiful
 
 **Definition**: A prior is conjugate when the posterior has the same
 distribution family as the prior.
 
+***Three Examples*** **for Genomics: Beta, Dirichlet, Normal**
+
 Let's see this mathematically:
 
-## Conjugate Priors: Why They're Beautiful
+<!-- ## Conjugate Priors: Why They're Beautiful -->
 
-For example, in the Normal-Normal case: \[ \begin{align}
-\text{Prior: } & \theta \sim N(\mu_0, \sigma^2_0) \\
-\text{Likelihood: } & X|\theta \sim N(\theta, \sigma^2) \\
-\text{Posterior: } & \theta|X \sim N\left(\frac{\sigma^2_0 X + \sigma^2\mu_0}{\sigma^2_0 + \sigma^2}, \frac{\sigma^2_0\sigma^2}{\sigma^2_0 + \sigma^2}\right)
-\end{align}
+<!-- For example, in the Normal-Normal case: \[ \begin{align} -->
 
-The beauty is that: 1. Prior starts as Normal 2. Data comes from Normal
-3. Posterior ends up Normal 4. Just with updated parameters!
+<!-- \text{Prior: } & \theta \sim N(\mu_0, \sigma^2_0) \\ -->
 
-This makes computation tractable and interpretation intuitive - we're
-just updating our beliefs while staying in the same family of
-distributions.
+<!-- \text{Likelihood: } & X|\theta \sim N(\theta, \sigma^2) \\ -->
+
+<!-- \text{Posterior: } & \theta|X \sim N\left(\frac{\sigma^2_0 X + \sigma^2\mu_0}{\sigma^2_0 + \sigma^2}, \frac{\sigma^2_0\sigma^2}{\sigma^2_0 + \sigma^2}\right) -->
+
+<!-- \end{align} -->
+
+<!-- The beauty is that: 1. Prior starts as Normal 2. Data comes from Normal -->
+
+<!-- 3. Posterior ends up Normal 4. Just with updated parameters! -->
+
+<!-- This makes computation tractable and interpretation intuitive - we're -->
+
+<!-- just updating our beliefs while staying in the same family of -->
+
+<!-- distributions. -->
+
+## Beta-Binomial Conjugacy: Adding Counts Intuition, Perfect for Allele Frequencies
+
+The $\beta(\alpha, \beta)$ distribution updates by simply adding
+successes to ($\alpha$) and failures to ($\beta$)!
+
+$$\begin{align}
+\text{Prior: } & \theta \sim \text{Beta}(\alpha_0, \beta_0) \\
+\text{Data: } & \text{Observe: } s \text{ successes, } f \text{ failures} \\
+\text{Posterior: } & \theta \sim \text{Beta}(\alpha_0 + s, \beta_0 + f)
+\end{align}$$
+
 
 ## Beta-Binomial: Perfect for Allele Frequencies
 
-**Model**:\
-- **Prior**: $\theta \sim \text{Beta}(\alpha, \beta)$\
-- **Likelihood**: $X|\theta \sim \text{Binomial}(n, \theta)$\
-- **Posterior**: $\theta|X \sim \text{Beta}(\alpha + X, \beta + n - X)$
-
-## Beta-Binomial: Perfect for Allele Frequencies
-
-```{r}
+```{r echo=TRUE}
 #| fig-height: 5
 # Create a visualization of Beta-Binomial for allele frequencies
 set.seed(123)
@@ -1119,16 +1189,6 @@ plot_data$Distribution <- factor(plot_data$Distribution,
   theme(legend.position = "bottom")
 ```
 
-## Beta-Binomial Conjugacy: Adding Counts Intuition
-
-The $\beta(\alpha, \beta)$ distribution updates by simply adding
-successes to ($\alpha$) and failures to ($\beta$)!
-
-$$\begin{align}
-\text{Prior: } & \theta \sim \text{Beta}(\alpha_0, \beta_0) \\
-\text{Data: } & \text{Observe: } s \text{ successes, } f \text{ failures} \\
-\text{Posterior: } & \theta \sim \text{Beta}(\alpha_0 + s, \beta_0 + f)
-\end{align}$$
 
 ## Simple Example:
 
@@ -1146,15 +1206,15 @@ Imagine tracking minor allele frequency:
 
 ## Why this is beautiful:
 
-1.  Each A (success) adds 1 to (\$\alpha\$)
-2.  Each B (failure) adds 1 to (\$\beta\$)
+1.  Each A (success) adds 1 to $\alpha$
+2.  Each B (failure) adds 1 to $\beta$
 3.  ($\alpha$) = prior successes + observed successes
 4.  ($\beta$) = prior failures + observed failures
 5.  Posterior mean = ($\frac{\alpha}{\alpha + \beta}$)
 
 ## Continuous updating
 
-```{r}
+```{r echo=TRUE}
 #| fig-height: 5
 # Create a function to generate conjugate updating visualization
 plot_conjugate_updating <- function() {
@@ -1258,18 +1318,18 @@ Imagine tracking allele frequencies for three alleles (A, B, C):
 -   **Posterior**: Dirichlet(12, 7, 5) - just add counts to prior
     parameters!
 
-### Why this is beautiful:
-
+::: notes
 1.  Each observation simply adds 1 to its category's parameter
-2.  (\$\alpha\_k\$) can be thought of as "pseudo-counts"
-3.  Larger prior (\$\alpha\$)'s = stronger prior beliefs
+2.  \$\alpha\_k\$ can be thought of as "pseudo-counts"
+3.  Larger prior \$\alpha\$)s = stronger prior beliefs
 4.  Sum of (\$\alpha\$)'s = sample size of prior belief
 5.  Posterior mean for category k:
     (\$\frac{\alpha_k + x_k}{\sum(\alpha_i + x_i)}\$)
+:::
 
 ## Why this is beautiful:
 
-```{r}
+```{r echo=TRUE}
 #| fig-height: 5
 # Create a visualization of Dirichlet-Multinomial
 set.seed(234)
@@ -1355,9 +1415,7 @@ When analyzing a continuous parameter $\mu$ (like an effect size):
 -   **Likelihood**: $X \sim \mathcal{N}(\mu, \sigma^2)$ where $\sigma^2$
     is known\
 
--   
-
-    ## **Question**: What is $p(\mu|X)$?
+**Question**: What is $p(\mu|X)$?
 
 ## The Mathematical Magic
 
@@ -1420,7 +1478,8 @@ $$\mu|(X_1,...,X_n) \sim \mathcal{N}\left(\frac{\frac{\mu_0}{\sigma_0^2} + \frac
 -   The sample mean $\bar{X}$ is a sufficient statistic\
 -   More data increases precision linearly
 
-## Genomics Application: eQTL Effect Sizes
+::: callout
+Genomics Application: eQTL Effect Sizes
 
 In genomics, we might use this model for:
 
@@ -1430,6 +1489,7 @@ In genomics, we might use this model for:
     new data
 
 Example: Effect sizes for expression quantitative trait loci (eQTLs)
+:::
 
 ## The Power of Conjugate Priors
 
@@ -1440,14 +1500,25 @@ Advantages of conjugate Normal-Normal:
 3.  **Interpretable updates** – precision-weighted averages\
 4.  **Sequential processing** – can update one observation at a time
 
-## Normal-Normal: Key Takeaways
+::: callout
+-   **Adaptive Shrinkage (ash)**: Uses a mixture of normals as the
+    prior\
+-   **Multivariate Adaptive Shrinkage (mash)**: Extends to correlated
+    effects across conditions\
+-   **False Discovery Rate Control**: Through local false discovery
+    rates\
+-   **Hierarchical Models**: Building multi-level models with partially
+    pooled estimates
+:::
 
+::: notes
 1.  The posterior is also Normal – that's conjugacy!\
 2.  The posterior mean is a weighted average of prior mean and data\
 3.  Weights are determined by relative precisions (1/variance)\
 4.  The posterior precision is the sum of the prior and data precisions\
 5.  This model provides the foundation for many advanced Bayesian
     genomic methods
+:::
 
 ------------------------------------------------------------------------
 
@@ -1460,31 +1531,21 @@ Advantages of conjugate Normal-Normal:
 -   Applications include: multiple testing, sparse signal detection, and
     effect size estimation
 
-## Methods Using Normal-Normal Conjugacy
-
--   **Adaptive Shrinkage (ash)**: Uses a mixture of normals as the
-    prior\
--   **Multivariate Adaptive Shrinkage (mash)**: Extends to correlated
-    effects across conditions\
--   **False Discovery Rate Control**: Through local false discovery
-    rates\
--   **Hierarchical Models**: Building multi-level models with partially
-    pooled estimates
-
 ------------------------------------------------------------------------
 
-# Mixture Models for Complex Data: What Are Mixture Models?
+# 4. Mixture Models for Complex Data: What Are Mixture Models?
 
 Mixture models are probabilistic models that represent the presence of
 subpopulations within an overall population:
 
--   **Used when data come from multiple underlying processes**\
--   **Represent heterogeneous populations as mixtures of simpler
-    distributions**\
--   **Allow clustering without hard assignments**\
--   **Incorporate uncertainty in group membership**
+**Used when data come from multiple underlying processes**\
+**Represent heterogeneous populations as mixtures of simpler
+distributions**\
 
-------------------------------------------------------------------------
+::: notes
+Allow clustering without hard assignments Incorporate uncertainty in
+group membership
+:::
 
 ## Mixture Model: Mathematical Formulation
 
@@ -1505,24 +1566,20 @@ Where:
 ## A Closer Look at the Components
 
 ::::: columns
-::: {.column width="50%"}
+::: {.column width="40%"}
 **Key components**:
 
-1.  **Component distributions** $f_k(x|\theta_k)$
-    -   Each represents a subpopulation\
-    -   Can be any distribution family\
-    -   Common choices: Gaussian, multinomial, beta
+1.  **Component distributions** $f_k(x|\theta_k)$ Subpopulation
+    likelihood
 2.  **Mixing weights** $\pi_k$
-    -   Proportion of data from each component\
-    -   Must sum to 1: $\sum_{k=1}^K \pi_k = 1$\
-    -   Reflect prior probabilities of group membership
-3.  **Latent variables** $z_i$
-    -   Unobserved component membership\
-    -   $z_i = k$ means data point $i$ came from component $k$
+    <!-- -   Proportion of data from each component\ --> Reflect prior
+    probabilities of group membership
+3.  **Latent variables** $z_i$ Unobserved component membership
+    <!-- -   $z_i = k$ means data point $i$ came from component $k$ -->
 :::
 
-::: {.column width="50%"}
-```{r}
+::: {.column width="60%"}
+```{r echo=TRUE}
 #| fig-height: 6
 # Create a simple mixture model visualization
 set.seed(123)
@@ -1603,7 +1660,7 @@ $$\theta_k^{new} = \arg\max_{\theta_k} \sum_{i=1}^n \gamma_{ik} \log f_k(x_i|\th
 
 ## EM Algorithm: Step-by-Step Example
 
-```{r}
+```{r echo=TRUE}
 #| fig-height: 6
 # Simplified EM visualization
 set.seed(789)
@@ -1699,6 +1756,9 @@ Gaussians:
     of each component:
     -   $\gamma_{i1} = \frac{\pi_1 N(x_i|\mu_1,\sigma_1^2)}{\pi_1 N(x_i|\mu_1,\sigma_1^2) + \pi_2 N(x_i|\mu_2,\sigma_2^2)}$\
     -   $\gamma_{i2} = 1 - \gamma_{i1}$
+
+## Worked Example: EM Algorithm Step-by-Step
+
 3.  **M-step**: Update the parameters using the responsibilities:
     -   $\pi_1^{new} = \frac{1}{n}\sum_{i=1}^n \gamma_{i1}$ (similarly
         for $\pi_2^{new}$)\
@@ -1707,10 +1767,10 @@ Gaussians:
     -   $(\sigma_1^{new})^2 = \frac{\sum_{i=1}^n \gamma_{i1}(x_i-\mu_1^{new})^2}{\sum_{i=1}^n \gamma_{i1}}$
         (similarly for $\sigma_2^{new}$)
 4.  **Repeat** until convergence (parameters stop changing
-    significantly)
+    significantly) (link interlude <https://surbut.shinyapps.io/shinyP/>
+    with cool Bayesian intervals)
 
-------------------------------------------------------------------------
-
+::: notes
 The EM Algorithm: Mathematical Intuition
 
 Key insight: We're solving a chicken-and-egg problem\
@@ -1734,27 +1794,25 @@ $$\mu_k^{(t+1)} = \frac{\sum_{i=1}^n \gamma_{ik}x_i}{\sum_{i=1}^n \gamma_{ik}}$$
 Intuition: "The new population mean is a weighted average where
 individuals are weighted by their probability of belonging to this
 population (link interlude <https://surbut.shinyapps.io/shinyP/> )
+:::
 
 ------------------------------------------------------------------------
 
 ## Bayesian Mixture Models
 
 Bayesian mixture models add priors to the parameters:
-
 $p(\theta, \pi | x_1, \ldots, x_n) \propto p(x_1, \ldots, x_n | \theta, \pi) \times p(\theta, \pi)$
 
 Common prior choices:\
-- $\pi \sim \text{Dirichlet}(\alpha_1, \ldots, \alpha_K)$ for mixing
+$\pi \sim \text{Dirichlet}(\alpha_1, \ldots, \alpha_K)$ for mixing
 weights\
-- Component-specific priors for $\theta_k$ (e.g., Normal-Inverse-Gamma
+**Component-specific priors for** $\theta_k$ (e.g., Normal-Inverse-Gamma
 for Gaussian components)
 
 **Advantages**:\
-- Handle uncertainty in the number of components (K)\
-- Avoid singularities and improve stability\
+- Handle **uncertainty**\
 - Allow for informed priors from previous studies\
-- Provide full posterior distribution rather than point estimates (in
-full MCMC implementation, but SLOW)
+- Provide full posterior distribution rather than point estimates
 
 ------------------------------------------------------------------------
 
@@ -1773,10 +1831,11 @@ conditions)
 **3. Gene Expression Clustering**\
 - Components = cell types/states\
 - Expression patterns = signatures of cell types\
-- Example: Single-cell RNA-seq clustering\
-- Used for: cell type identification, developmental trajectories
+- Example: Single-cell RNA-seq clustering, stay tuned ...\
 
-```{r}
+## Why science is still beautiful ...
+
+```{r echo=TRUE}
 #| fig-height: 6
 # Create a visualization of population structure
 set.seed(456)
@@ -1826,21 +1885,31 @@ ggplot(admix_df, aes(x = Individual, y = Proportion, fill = Population)) +
 
 **STRUCTURE**: A Bayesian mixture model for population genetics
 
-**Key components**:\
-- Each individual = mixture of $K$ ancestral populations\
-- Each population = distinct allele frequencies\
-- Goal: Infer ancestry proportions & population frequencies from
+**Key components**:
+
+Each *individual* = mixture of $K$ ancestral populations\
+Each *population* = distinct allele frequencies\
+**Goal**: Infer ancestry proportions & population frequencies from
 observed allele counts
 
 **Bayesian formulation**:\
-- **Prior**: $q_{ik} \sim \text{Dirichlet}(\alpha)$ (ancestry
-proportions, population level alpha)\
-- **Prior**: $f_{kj} \sim \text{Beta}(\lambda)$ (allele frequencies,
-population level lambda, f) - **Likelihood**: $P(X_{ij} | q_i, f_j)$
-(genotype probabilities, i.e., probability of allele count given
-individual ancestry and populations allele frequency)
+**Prior**: $q_{ik} \sim \text{Dirichlet}(\alpha)$ ancestry proportions\
+**Prior**: $f_{kj} \sim \text{Beta}(\lambda)$ allele frequencices\
+**Likelihood**: $P(X_{ij} | q_i, f_j)$ conditional likelihood of
+observed allele, given parameters
 
-## Latent Dirichlety Allocation
+::: notes
+Our Data (Haploid Genotypes): Individual M1 M2 M3 \* Ind1: A C A \*
+Ind2: G T G \* Ind3: A T A We want to find: K=2 ancestral populations q
+(ancestry) \~ Dirichlet - Because proportions sum to 1 across K
+populations - K parameters (one for each population) ::: notes - NOT
+related to number of allele types ::: notes \$f (frequencies) \~ Beta
+\$ - Because each marker has 2 possible alleles - Two parameters
+(success/failure for that allele) - One Beta distribution per marker per
+population
+:::
+
+## Latent Dirichlet Allocation
 
 Topic Models (LDA):
 
@@ -1850,7 +1919,7 @@ Topic Models (LDA):
 
 \- Words drawn from topics z \~ Multinomial(θ)
 
-STRUCTURE:
+**STRUCTURE:**
 
 \- Individual ancestry proportions q \~ Dirichlet(α)
 
@@ -1860,7 +1929,7 @@ STRUCTURE:
 
 ## Visualization: If we know the truth
 
-```{r}
+```{r echo=TRUE}
 #| fig-height: 6
 #| fig-width: 6
 #| echo: false
@@ -1920,22 +1989,6 @@ p2 <- ggplot(freq_df, aes(x = Marker, y = Population, fill = Frequency)) +
 p1 / p2  # patchwork layout
 ```
 
-## STRUCTURE: A Tale of Unknown Ancestries
-
-Our Data (Haploid Genotypes): Individual M1 M2 M3 \* Ind1: A C A \*
-Ind2: G T G \* Ind3: A T A
-
-We want to find: K=2 ancestral populations
-
-## Key Point: Different Distributions for Different Reasons
-
-$q (ancestry) ~ Dirichlet$ - Because proportions sum to 1 across K
-populations - K parameters (one for each population) ::: notes - NOT
-related to number of allele types ::: notes \$f (frequencies) \~ Beta
-\$ - Because each marker has 2 possible alleles - Two parameters
-(success/failure for that allele) - One Beta distribution per marker per
-population
-
 ## Understanding the q Update
 
 ### Individual Level
@@ -1959,7 +2012,9 @@ population
 
 **Individual 1**: A C A
 
--   Step 1: Calculate Likelihoods **Population 1 Contributions**:
+-   Step 1: Calculate Likelihoods using known population frequencies:
+-   $F_{11} =[0.7, 0.3]$, $F_{12} [0.4, 0.6]$,$F_{13} =[ 0.8, 0.2]$
+-   **Population 1 Contributions**:
 -   Marker 1 (A): $L_{11} = f_1^A$
 -   Marker 2 (C): $L_{21} = f_1^C$
 -   Marker 3 (A): $L_{31} = f_1^A$
@@ -1969,6 +2024,8 @@ Total for Pop1 = $L_{11} + L_{21} + L_{31}$
 ## Example Data
 
 **Individual 1**: A C A
+
+$F_{21} =[0.1, 0.9]$, $F_{22} [0.3, 0.7]$,$F_{23} =[ 0.2, 0.8]$
 
 **Population 2 Contributions**:
 
@@ -1995,7 +2052,7 @@ each population.
 
 **Marker 1 (Allele A)**
 
-**Individual 1's ancestry**: $q_1 = (0.7, 0.3)$\
+**Individual 1's ancestry**: $q_1 = (0.7, 0.3)$
 
 -   **Population 1**: - Contribution from Individual 1: 0.7 (from
     $q_{11}$)\
@@ -2018,7 +2075,7 @@ Note that each allele contributes fractionally to each population's
 frequency estimate, weighted by the individual's ancestry proportions.
 :::
 
-## The Variational Bayes Two-Step
+## The Variational Bayes Two-Step... building on the EM
 
 1.  Update ancestries given current frequencies:
     $P(q_i |\text{data}, f) \propto P(\text{data}|q_i,f)P(q_i)$
@@ -2167,120 +2224,237 @@ variances\
 - **Bayesian variable selection**: Latent indicator for whether variant
 is causal
 
-## Sound familiar? Multiple hypothesis testing!
+<!-- **Sound familiar? Multiple hypothesis testing!** -->
 
-```{r, echo=TRUE}
-# Create visualization of effect size mixtures
-set.seed(789)
+<!-- ##  -->
 
-# Parameters
-n_variants <- 500
-pi0 <- 0.95  # Proportion of null effects
+<!-- ```{r, echo=TRUE} -->
+<!-- # Create visualization of effect size mixtures -->
+<!-- set.seed(789) -->
 
-# Generate true effects
-is_null <- rbinom(n_variants, 1, pi0)
-true_effects <- rep(0, n_variants)
-true_effects[is_null == 0] <- rnorm(sum(is_null == 0), 0, 0.5)
-true_effects[is_null == 1] <- rnorm(sum(is_null == 1), 0, 2)
-# Add noise to create observed effects
-observed_effects <- true_effects + rnorm(n_variants, 0, 0.2)
+<!-- # Parameters -->
+<!-- n_variants <- 500 -->
+<!-- pi0 <- 0.95  # Proportion of null effects -->
 
-# Create data frame for plotting
-effect_df <- data.frame(
-  Variant = 1:n_variants,
-  TrueEffect = true_effects,
-  ObservedEffect = observed_effects,
-  IsNull = factor(is_null)
-)
+<!-- # Generate true effects -->
+<!-- is_null <- rbinom(n_variants, 1, pi0) -->
+<!-- true_effects <- rep(0, n_variants) -->
+<!-- true_effects[is_null == 0] <- rnorm(sum(is_null == 0), 0, 0.5) -->
+<!-- true_effects[is_null == 1] <- rnorm(sum(is_null == 1), 0, 2) -->
+<!-- # Add noise to create observed effects -->
+<!-- observed_effects <- true_effects + rnorm(n_variants, 0, 0.2) -->
 
-# Plot
-ggplot(effect_df, aes(x = ObservedEffect, fill = IsNull)) +
-  geom_density(alpha=0.5) +
-  scale_fill_manual(values = c("gray70", "red"), 
-                   labels = c("Null", "True"),
-                   name = "Variant Type") +
-  labs(title = "Mixture of Effect Sizes in GWAS",
-       subtitle = "Most variants have no effect (null)",
-       x = "Observed Effect Size", 
-       y = "Count") +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-```
+<!-- # Create data frame for plotting -->
+<!-- effect_df <- data.frame( -->
+<!--   Variant = 1:n_variants, -->
+<!--   TrueEffect = true_effects, -->
+<!--   ObservedEffect = observed_effects, -->
+<!--   IsNull = factor(is_null) -->
+<!-- ) -->
 
-## Multivariate Normal Mixtures: The mash Approach
+<!-- # Plot -->
+<!-- ggplot(effect_df, aes(x = ObservedEffect, fill = IsNull)) + -->
+<!--   geom_density(alpha=0.5) + -->
+<!--   scale_fill_manual(values = c("gray70", "red"),  -->
+<!--                    labels = c("Null", "True"), -->
+<!--                    name = "Variant Type") + -->
+<!--   labs(title = "Mixture of Effect Sizes in GWAS", -->
+<!--        subtitle = "Most variants have no effect (null)", -->
+<!--        x = "Observed Effect Size",  -->
+<!--        y = "Count") + -->
+<!--   theme_minimal() + -->
+<!--   theme(legend.position = "bottom") -->
+<!-- ``` -->
 
-```{r,echo=TRUE}
-#| fig-height: 6
-# Create a visualization of multivariate effects
-set.seed(345)
+<!-- ## Multivariate Normal Mixtures: The mash Approach -->
 
-# Parameters
-n_effects <- 200
-n_conditions <- 4
+<!-- ```{r,echo=TRUE} -->
+<!-- #| fig-height: 6 -->
+<!-- # Create a visualization of multivariate effects -->
+<!-- set.seed(345) -->
 
-# Create different effect patterns
-patterns <- list(
-  "Shared" = rep(1, n_conditions),
-  "Condition1" = c(1, 0, 0, 0),
-  "Condition2" = c(0, 1, 0, 0),
-  "Conditions1&2" = c(1, 1, 0, 0),
-  "Conditions3&4" = c(0, 0, 1, 1)
-)
+<!-- # Parameters -->
+<!-- n_effects <- 200 -->
+<!-- n_conditions <- 4 -->
 
-# Assign effects to patterns
-n_per_pattern <- n_effects / length(patterns)
-true_effects <- matrix(0, nrow = n_effects, ncol = n_conditions)
-colnames(true_effects) <- paste0("Condition", 1:n_conditions)
+<!-- # Create different effect patterns -->
+<!-- patterns <- list( -->
+<!--   "Shared" = rep(1, n_conditions), -->
+<!--   "Condition1" = c(1, 0, 0, 0), -->
+<!--   "Condition2" = c(0, 1, 0, 0), -->
+<!--   "Conditions1&2" = c(1, 1, 0, 0), -->
+<!--   "Conditions3&4" = c(0, 0, 1, 1) -->
+<!-- ) -->
 
-current_idx <- 1
-for (p in 1:length(patterns)) {
-  pattern_name <- names(patterns)[p]
-  pattern <- patterns[[p]]
-  
-  for (i in 1:n_per_pattern) {
-    effect_size <- rnorm(1, 0, 0.5)
-    true_effects[current_idx, ] <- pattern * effect_size
-    current_idx <- current_idx + 1
-  }
+<!-- # Assign effects to patterns -->
+<!-- n_per_pattern <- n_effects / length(patterns) -->
+<!-- true_effects <- matrix(0, nrow = n_effects, ncol = n_conditions) -->
+<!-- colnames(true_effects) <- paste0("Condition", 1:n_conditions) -->
+
+<!-- current_idx <- 1 -->
+<!-- for (p in 1:length(patterns)) { -->
+<!--   pattern_name <- names(patterns)[p] -->
+<!--   pattern <- patterns[[p]] -->
+
+<!--   for (i in 1:n_per_pattern) { -->
+<!--     effect_size <- rnorm(1, 0, 0.5) -->
+<!--     true_effects[current_idx, ] <- pattern * effect_size -->
+<!--     current_idx <- current_idx + 1 -->
+<!--   } -->
+<!-- } -->
+
+<!-- # Add noise to create observed effects -->
+<!-- observed_effects <- true_effects + matrix(rnorm(n_effects * n_conditions, 0, 0.2), -->
+<!--                                         nrow = n_effects) -->
+
+<!-- # Select a few examples for visualization -->
+<!-- example_indices <- c(5, 45, 85, 125, 165)  # One from each pattern -->
+<!-- example_data <- data.frame( -->
+<!--   Effect = rep(paste0("Effect", example_indices), each = n_conditions), -->
+<!--   Condition = rep(paste0("Condition", 1:n_conditions), times = length(example_indices)), -->
+<!--   TrueEffect = c(t(true_effects[example_indices, ])), -->
+<!--   ObservedEffect = c(t(observed_effects[example_indices, ])) -->
+<!-- ) -->
+
+<!-- # Reshape for plotting -->
+<!-- example_long <- reshape2::melt(example_data,  -->
+<!--                              id.vars = c("Effect", "Condition"), -->
+<!--                              variable.name = "EffectType", -->
+<!--                              value.name = "Value") -->
+
+<!-- # Create plot -->
+<!-- ggplot(example_long, aes(x = Condition, y = Value, color = EffectType, group = EffectType)) + -->
+<!--   geom_point(size = 3) + -->
+<!--   geom_line(size = 1) + -->
+<!--   facet_wrap(~ Effect, ncol = 3) + -->
+<!--   scale_color_manual(values = c("TrueEffect" = "blue", "ObservedEffect" = "red"), -->
+<!--                     labels = c("True Effect", "Observed Effect")) + -->
+<!--   labs(title = "Multivariate Effect Patterns", -->
+<!--        subtitle = "mash identifies and leverages these patterns", -->
+<!--        x = "",  -->
+<!--        y = "Effect Size", -->
+<!--        color = "") + -->
+<!--   theme(legend.position = "bottom") -->
+<!-- ``` -->
+------------
+# 5. Bayesian Clinical Trials:
+
+Observe OR of 1.5O
+```{r}
+
+library(ggplot2)
+library(tidyverse)
+library(gridExtra)
+
+# Function to calculate posterior parameters
+get_posterior <- function(prior_mean, prior_sd, data_mean, data_sd) {
+  post_sd <- 1/sqrt(1/prior_sd^2 + 1/data_sd^2)
+  post_mean <- post_sd^2 * (prior_mean/prior_sd^2 + data_mean/data_sd^2)
+  return(list(mean = post_mean, sd = post_sd))
 }
 
-# Add noise to create observed effects
-observed_effects <- true_effects + matrix(rnorm(n_effects * n_conditions, 0, 0.2),
-                                        nrow = n_effects)
+# Create data for plotting
+x <- seq(-1, 2, length.out = 1000)
 
-# Select a few examples for visualization
-example_indices <- c(5, 45, 85, 125, 165)  # One from each pattern
-example_data <- data.frame(
-  Effect = rep(paste0("Effect", example_indices), each = n_conditions),
-  Condition = rep(paste0("Condition", 1:n_conditions), times = length(example_indices)),
-  TrueEffect = c(t(true_effects[example_indices, ])),
-  ObservedEffect = c(t(observed_effects[example_indices, ]))
+# Parameters
+data_mean <- log(1.5)  # Observed effect (log odds ratio)
+data_sd <- 0.2        # Standard error
+clin_threshold <- log(1.3)  # Clinically significant threshold
+
+# Define priors
+priors <- list(
+  skeptical = list(mean = 0, sd = 0.2, label = "Skeptical Prior"),
+  neutral = list(mean = 0, sd = 100, label = "Neutral Prior"),
+  optimistic = list(mean = log(1.3), sd = 0.3, label = "Optimistic Prior")
 )
 
-# Reshape for plotting
-example_long <- reshape2::melt(example_data, 
-                             id.vars = c("Effect", "Condition"),
-                             variable.name = "EffectType",
-                             value.name = "Value")
+# Create plots for each prior
+plots <- list()
 
-# Create plot
-ggplot(example_long, aes(x = Condition, y = Value, color = EffectType, group = EffectType)) +
-  geom_point(size = 3) +
-  geom_line(size = 1) +
-  facet_wrap(~ Effect, ncol = 3) +
-  scale_color_manual(values = c("TrueEffect" = "blue", "ObservedEffect" = "red"),
-                    labels = c("True Effect", "Observed Effect")) +
-  labs(title = "Multivariate Effect Patterns",
-       subtitle = "mash identifies and leverages these patterns",
-       x = "", 
-       y = "Effect Size",
-       color = "") +
-  theme(legend.position = "bottom")
+for(prior_name in names(priors)) {
+  prior <- priors[[prior_name]]
+  
+  # Calculate posterior
+  posterior <- get_posterior(prior$mean, prior$sd, data_mean, data_sd)
+  
+  # Calculate probabilities
+  prob_significant <- 1 - pnorm(clin_threshold, posterior$mean, posterior$sd)
+  
+  # Create data frame for plotting
+  plot_data <- data.frame(
+    x = x,
+    prior = dnorm(x, prior$mean, prior$sd),
+    likelihood = dnorm(x, data_mean, data_sd),
+    posterior = dnorm(x, posterior$mean, posterior$sd)
+  ) %>%
+    pivot_longer(cols = c(prior, likelihood, posterior),
+                names_to = "distribution",
+                values_to = "density")
+  
+  # Create plot
+  p <- ggplot(plot_data, aes(x = x, y = density, color = distribution)) +
+    geom_line(size = 1.2) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
+    geom_vline(xintercept = clin_threshold, linetype = "dashed", color = "red") +
+    # Add shaded area for clinically significant effect
+    geom_area(data = subset(plot_data, 
+                           distribution == "posterior" & x > clin_threshold),
+              aes(fill = distribution), alpha = 0.2) +
+    guides(fill = "none") +
+    labs(title = paste0(prior$label, "\n",
+                       "P(CSE) = ",
+                       round(prob_significant * 100, 1), "%"),
+         x = "Log Odds Ratio",
+         y = "Density",
+         color = "Distribution") +
+    theme_minimal() +
+    theme(legend.position = if(prior_name == "optimistic") "bottom" else "none", 
+          plot.title = element_text(hjust = 0.5, size = 12),
+          axis.text = element_text(size = 10),
+          axis.title = element_text(size = 12)) +
+    annotate("text", x = -0.8, y = max(plot_data$density),
+             hjust = 0,
+             label = paste0("Prior: N(", round(prior$mean, 2), ", ", 
+                           round(prior$sd, 2), ")\n",
+                           "Likelihood: N(", round(data_mean, 2), ", ",
+                           round(data_sd, 2), ")\n",
+                           "Posterior: N(", round(posterior$mean, 2), ", ",
+                           round(posterior$sd, 2), ")"),
+             size = 3)
+  
+  plots[[prior_name]] <- p
+}
+
+library(ggplot2)
+library(tidyverse)
+library(gridExtra)
+library(cowplot)  
+
+title <- ggdraw() + 
+  draw_label("Bayesian Analysis of Treatment Effect with Different Priors",
+            fontface = 'bold', size = 14)
+
+combined_plot <- plot_grid(
+  plots$skeptical, 
+  plots$neutral,
+  plots$optimistic,
+  ncol = 3,
+  align = 'v',
+  axis = 'lr'
+)
+
+final_plot <- plot_grid(
+  title, combined_plot,
+  ncol = 1,
+  rel_heights = c(0.1, 1)
+)
+
+final_plot
+
 ```
 
-## 4. Bayesian Meta-Analysis: The Mathematical Framework
-
-**Problem**: Combine evidence across heterogeneous studies
+## Bayes combining information
+**Problem**: The meta analysis example, combining evidence across heterogeneous studies
 
 **Model formulation**:\
 - Let $y_i$ be the observed effect in study $i$\
@@ -2293,42 +2467,112 @@ $\theta_i | \mu, \tau^2 \sim N(\mu, \tau^2)$\
 $\mu \sim N(\mu_0, \sigma_0^2)$\
 $\tau^2 \sim \text{InvGamma}(a, b)$
 
-Where:\
+:::notes
 - $\mu$ is the overall mean effect\
 - $\tau^2$ is the between-study heterogeneity\
-- $\mu_0, \sigma_0^2, a, b$ are hyperparameters\
----
+- $\mu_0, \sigma_0^2, a, b$ are mean and 'intra study' variation\
+:::
 
-**Key advantages**:\
-- Naturally accounts for heterogeneity\
-- Uncertainty in all parameters\
-- Shrinkage of extreme estimates toward the mean\
-- Robust to outliers with appropriate priors
+## Putting it together
 
-------------------------------------------------------------------------
+```{r,echo=TRUE}
+library(ggplot2)
+library(tidyverse)
 
-## Bayesian Meta-Analysis: Visualization
+# Create simulated data for visualization
+set.seed(123)
+n_studies <- 6
 
-**Traditional approaches**:\
-- Fixed effects (assumes same effect size)\
-- Random effects (allows variation in effect size)\
-- Often sensitive to outliers
+# Parameters
+mu_true <- 0.3
+tau <- 0.2
+mu0 <- 0
+sigma0 <- 1
 
-**Bayesian advantages**:\
-- Full posterior distribution for all parameters\
-- Can incorporate informative priors\
-- Naturally handles small studies (shrinkage)\
-- Can model outliers explicitly\
-- Direct probability statements about effects
+# Generate study-specific effects
+theta_i <- rnorm(n_studies, mu_true, tau)
+sigma_i <- runif(n_studies, 0.1, 0.3)
+y_i <- rnorm(n_studies, theta_i, sigma_i)
 
-**Example interpretation**:\
-- Posterior probability of benefit = 98%\
-- 95% credible interval for effect size: \[0.1, 0.5\]\
-- 90% probability heterogeneity is moderate to high
+# Create plot data
+plot_data <- data.frame(
+  study = 1:n_studies,
+  y = y_i,
+  theta = theta_i,
+  se = sigma_i
+)
 
-## Visualization
+# Create the hierarchical visualization
+ggplot() +
+  # Draw the overall prior distribution for μ
+  stat_function(fun = dnorm, 
+               args = list(mean = mu0, sd = sigma0),
+               aes(color = "Prior for μ"),
+               xlim = c(-2, 2)) +
+  
+  # Draw the distribution for study effects θᵢ
+  stat_function(fun = dnorm,
+               args = list(mean = mu_true, sd = tau),
+               aes(color = "Distribution of θi"),
+               xlim = c(-2, 2)) +
+  
+  # Add study-specific observations with error bars
+  geom_pointrange(data = plot_data,
+                 aes(x = y, y = study, 
+                     xmin = y - 1.96*se,
+                     xmax = y + 1.96*se,
+                     color = "Observed effects yi"),
+                 size = 1) +
+  
+  # Add true study effects
+  geom_point(data = plot_data,
+             aes(x = theta, y = study,
+                 color = "True effects θi"),
+             size = 3) +
+  
+  # Add vertical line for true mean
+  geom_vline(xintercept = mu_true, 
+             linetype = "dashed", 
+             color = "darkgreen") +
+  
+  # Customize appearance
+  scale_color_manual(name = "Components",
+                    values = c("Prior for μ" = "blue",
+                             "Distribution of θi" = "purple",
+                             "True effects θi" = "darkgreen",
+                             "Observed effects yi" = "red")) +
+  
+  # Add labels and theme
+  labs(title = "Hierarchical Structure of Meta-Analysis Model",
+       subtitle = paste("μ0 =", mu0, ", σ0 =", sigma0, 
+                       ", τ =", tau, "\nTrue μ =", mu_true),
+       x = "Effect Size",
+       y = "Study") +
+  
+  # Add annotations explaining the hierarchy
+  annotate("text", x = -1.8, y = 7.5,
+           label = "yi|θi,sigmai² ~ N(θi,σi²)\n
+           θᵢ|μ,τ² ~ N(μ,τ²)\n
+           μ ~ N(μ1,σ1²)",
+           hjust = 0) +
+  
+  theme_minimal() +
+  theme(legend.position = "bottom",
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
 
-```{r}
+:::notes
+At the study level, we observe $y_i$ with known variance $\sigma_i^2$
+These come from true effects $\theta_i$ that vary around the overall effect $\mu$ with variance $\tau^2$
+We put priors on $\mu$ (using $\mu_0, \sigma_0^2$) and $\tau^2$ (using $a, b$)
+The key is that $\tau^2$ represents how much the true effects vary between studies, while $\sigma_i^2$ represents the uncertainty within each study. $\mu_0$ and $\sigma_0^2$ are just prior parameters for our belief about the overall effect.
+:::
+
+
+## Visualization in frequentist terms
+
+```{r,echo=TRUE}
 #| fig-height: 6
 set.seed(678)
 
@@ -2432,32 +2676,53 @@ p1 + p2 +
     subtitle = "Forest plot and posterior distribution showing probability of clinically meaningful effect"
   )
 ```
+:::notes
+- Fixed effects (assumes same effect size)\
+- Random effects (allows variation in effect size)\
+- Often sensitive to outliers
 
+- Full posterior distribution for all parameters\
+- Can incorporate informative priors\
+- Naturally handles small studies (shrinkage)\
+- Can model outliers explicitly\
+- Direct probability statements about effects
+
+- Posterior probability of benefit = 98%\
+- 95% credible interval for effect size: \[0.1, 0.5\]\
+- 90% probability heterogeneity is moderate to high
+:::
 ------------------------------------------------------------------------
 
 ## Practical Recommendations for Bayesian Genomics
 
-1.  **Start with informative priors when possible**
+1.  **Informative vs flat: know your purpose**
+2.  **Report posterior probabilities, not just p-values**
+3.  **Use conjugate models for computational efficiency**
+4.  **Consider mixture models for complex data**
+5.  **Apply decision theory for optimal designs**
+
+:::notes
+Start with informative priors when possible**
     -   Use previous studies\
     -   Incorporate functional annotations\
     -   Consider evolutionary constraints
-2.  **Report posterior probabilities, not just p-values**
+Report posterior probabilities, not just p-values**
     -   $P(\text{association} | \text{data})$ is more interpretable than
         $P(\text{data} | \text{no association})$\
     -   Provides direct probability statements about hypotheses
-3.  **Use conjugate models for computational efficiency**
+Use conjugate models for computational efficiency**
     -   Beta-Binomial for allele frequencies\
     -   Dirichlet-Multinomial for haplotype frequencies\
     -   Normal-Normal for quantitative traits
-4.  **Consider mixture models for complex data**
+Consider mixture models for complex data**
     -   Population structure\
     -   Heterogeneous effect sizes\
     -   Multiple causal variants
-5.  **Apply decision theory for optimal designs**
+Apply decision theory for optimal designs**
     -   Balance false positives and false negatives\
     -   Consider costs of follow-up studies\
     -   Optimize sample allocation
-
+:::
 ------------------------------------------------------------------------
 
 ## Summary: When to Use Bayesian Methods
@@ -2481,17 +2746,25 @@ p1 + p2 +
 - **Specialized**: `STRUCTURE`, `ADMIXTURE`, `SNPTEST`
 
 **Books**:\
-["Bayesian Data Analysis"](https://sites.stat.columbia.edu/gelman/book/BDA3.pdf) by Gelman et al.\
-["Understanding Uncertainty"](https://www.al-edu.com/wp-content/uploads/2014/05/Lindley-D.V.-Understanding-uncertainty-2006.pdf), by David Lindley\
+["Bayesian Data
+Analysis"](https://sites.stat.columbia.edu/gelman/book/BDA3.pdf) by
+Gelman et al.\
+["Understanding
+Uncertainty"](https://www.al-edu.com/wp-content/uploads/2014/05/Lindley-D.V.-Understanding-uncertainty-2006.pdf),
+by David Lindley\
 "The Art of Statistics" David Spiegelhalter\
 "Bayesian Approaches to Clinical Trials" David Spiegelhalter\
-["Elements of Statistical Learning"](https://hastie.su.domains/ElemStatLearn/) Hastie, Tibshirani et al\
+["Elements of Statistical
+Learning"](https://hastie.su.domains/ElemStatLearn/) Hastie, Tibshirani
+et al\
 
 ## **Online Resources**:
 
 -   [Five Minute Stats](https://stephenslab.github.io/fiveMinuteStats/)\
 -   [Stan User Guide](https://mc-stan.org/users/documentation/)\
--   ME! surbut\@mgh.harvard.edu
+-   ME! surbut@mgh.harvard.edu
+
+All [slides and codes](github.com/surbut/mpgtutorial)
 
 ------------------------------------------------------------------------
 
