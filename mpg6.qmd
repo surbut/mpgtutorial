@@ -600,9 +600,28 @@ In multiple testing, we have two distributions:
     true.
 
 2.  **Alternative Distribution** ($f_1$):
-    $$f_1(z) = \mathcal{N}(0, se^2 + \sigma^2)$$ This is a normal
-    distribution with increased *true effect* variance for tests where
-    $H_1$ is true.
+$$f_1(z) = \int \mathcal{N}(z|\mu, se^2) \mathcal{N}(\mu|0, \sigma^2) d\mu = \mathcal{N}(0, se^2 + \sigma^2)$$
+ This is a normal distribution with increased *true effect* variance for tests where $H_1$ is true.
+
+:::notes
+This is the marginal likelihood after integrating over possible true effect sizes, where:
+$\sigma^2$ represents the variance of true effects
+Larger $\sigma^2$ means we expect larger true effects
+The marginal likelihood will be more spread out (heavier tails)
+Therefore, large observed effects are more likely under this distribution
+:::
+
+## Prior, Likelihood, Post: Drawing Interlude
+
+(Board)
+
+
+:::notes
+$p(\theta) = \sum_k \pi_k N(\mu_0^k, \sigma_0^k)$
+$p(z|\theta) = N(\theta, se^2)$
+$p(\theta|z) = \sum_k \pi_k^* N(\mu_1^k, \sigma_1^k)$
+$\pi_k^* \propto \pi_k \times p(z|\mu_0^k, \sigma_0^k + se^2)$
+:::
 
 ## The Mathematical Framework
 

@@ -1025,8 +1025,38 @@ Even with the most optimistic assumptions, the evidence against the null is mode
 <p>In multiple testing, we have two distributions:</p>
 <ol type="1">
 <li><p><strong>Null Distribution</strong> (<span class="math inline">\(f_0\)</span>): <span class="math display">\[f_0(z) = \mathcal{N}(0, se^2)\]</span> This is the standard normal distribution for tests where <span class="math inline">\(H_0\)</span> is true.</p></li>
-<li><p><strong>Alternative Distribution</strong> (<span class="math inline">\(f_1\)</span>): <span class="math display">\[f_1(z) = \mathcal{N}(0, se^2 + \sigma^2)\]</span> This is a normal distribution with increased <em>true effect</em> variance for tests where <span class="math inline">\(H_1\)</span> is true.</p></li>
+<li><p><strong>Alternative Distribution</strong> (<span class="math inline">\(f_1\)</span>): <span class="math display">\[f_1(z) = \int \mathcal{N}(z|\mu, se^2) \mathcal{N}(\mu|0, \sigma^2) d\mu = \mathcal{N}(0, se^2 + \sigma^2)\]</span> This is a normal distribution with increased <em>true effect</em> variance for tests where <span class="math inline">\(H_1\)</span> is true.</p></li>
 </ol>
+<aside class="notes">
+<p>This is the marginal likelihood after integrating over possible true effect sizes, where: <span class="math inline">\(\sigma^2\)</span> represents the variance of true effects Larger <span class="math inline">\(\sigma^2\)</span> means we expect larger true effects The marginal likelihood will be more spread out (heavier tails) Therefore, large observed effects are more likely under this distribution</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="prior-likelihood-post-drawing-interlude" class="slide level2">
+<h2>Prior, Likelihood, Post: Drawing Interlude</h2>
+<p>(Board)</p>
+<aside class="notes">
+<p><span class="math inline">\(p(\theta) = \sum_k \pi_k N(\mu_0^k, \sigma_0^k)\)</span> <span class="math inline">\(p(z|\theta) = N(\theta, se^2)\)</span> <span class="math inline">\(p(\theta|z) = \sum_k \pi_k^* N(\mu_1^k, \sigma_1^k)\)</span> <span class="math inline">\(\pi_k^* \propto \pi_k \times p(z|\mu_0^k, \sigma_0^k + se^2)\)</span></p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="the-mathematical-framework-1" class="slide level2">
 <h2>The Mathematical Framework</h2>
