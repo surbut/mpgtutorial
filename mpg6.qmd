@@ -308,7 +308,7 @@ p-value of 0.001 only gives \~18% posterior probability of true
 association! (app interlude) [Shiny
 P!](https://surbut.shinyapps.io/shinypval/)
 
-## The Mathematical Connection
+## The Mathematical Connection ... for B(01)
 
 Under certain conditions, p-values can be converted to minimum Bayes
 factors, see [Sellke, Bayarri, and
@@ -325,17 +325,15 @@ less evidence than typically assumed:
 | 0.01    | 0.084                |
 | 0.001   | 0.0083               |
 
-::: notes
+::: callout
 What is the Minimum Bayes Factor?
-
-The Minimum Bayes Factor is calculated as:\
-$\text{MBF} \approx -e \times p \times \log(p)$
-
 This formula (derived by Sellke, Bayarri, and Berger) represents the
 **smallest possible Bayes factor** that could correspond to a given
 p-value, regardless of the specific alternative hypothesis being tested
 (i.e p(D\|H0)/p(D/H1))
+::: 
 
+::: notes
 Why "Minimum"?
 
 It's called "minimum" because:
@@ -423,7 +421,7 @@ is modest
 
 <!-- ::: -->
 
-## Interpreting Bayes Factors
+## Interpreting Bayes Factors .. back to BF 10
 
 Bayes factors have a natural interpretation:
 
@@ -444,7 +442,7 @@ Bayes' theorem connects all the pieces:
 
 $$P(H_1|data) = \frac{P(data|H_1)P(H_1)}{P(data|H_1)P(H_1) + P(data|H_0)P(H_0)}$$
 
-This can be rewritten using the Bayes factor:
+This can be rewritten using the Bayes factor BF10:
 
 $$P(H_1|data) = \frac{BF_{10} \times P(H_1)}{BF_{10} \times P(H_1) + P(H_0)}$$
 
@@ -566,11 +564,9 @@ ggplot(df, aes(x = p_value, fill = significant)) +
 ```
 
 The challenge: Separating true signals (blue) from noise (gray) when
-true effects are rare. The Bayesian solutions ...
+true effects are rare. How do you know $pi0$?vThe Bayesian solutions ...
 
 ## Local False Discovery Rate (LFDR)
-
-The key insight from Matthew Stephens' work:
 
 Instead of controlling the overall FDR, we can calculate the probability
 that each individual test is a false discovery:
@@ -719,7 +715,7 @@ Key contributions:
 1.  **Estimate from data**: Learn $\pi_1$ and effect size distribution
     from the data
 2.  **Adaptive shrinkage**: Stronger shrinkage for uncertain estimates
-3.  **Correlation structure**: Account for LD and other dependencies
+3.  **Correlation structure**: Account for sharing of noise (mashr)
 
 ::: callout
 1.  **ashr**: Adaptive shrinkage for effect sizes
@@ -727,6 +723,15 @@ Key contributions:
 3.  **flashier**: Sparse factor analysis (more on aladynoulli to come)
 :::
 
+:::notes
+In the empirical Bayes approach:
+1. Effects are shrunk adaptively based on both their size and the overall distribution of effects
+2. Small observed effects are shrunk more heavily toward zero because they're more likely to be noise
+3. Large observed effects undergo less shrinkage because they're more likely to be real
+4. The amount of shrinkage is learned from the data itself through: Estimation of π₁ (proportion of non-null effects)
+Estimation of σ (scale of true effects)
+5. The local false discovery rate (LFDR) determines shrinkage amount for each effect
+:::
 ## Empirical Bayes Approach
 
 ```{r,echo=TRUE}
@@ -766,6 +771,8 @@ ggplot(shrinkage_data, aes(x = Observed, y = Shrunk,col=as.factor(is_null))) +
        y = "Shrunk Effect") +
   theme_minimal(base_size = 16)  # Increased base size
 ```
+
+
 
 ## Practical Implementation
 
@@ -924,7 +931,8 @@ $$\mathbf{U}\_k =
 \rho\sigma_1\sigma_2 & \sigma^2_2
 \end{pmatrix}$$
 
-where: - $\sigma^2_1$ and $\sigma^2_2$: trait variances\
+
+- $\sigma^2_1$ and $\sigma^2_2$: trait variances\
 - $\rho$ is the correlation coefficient\
 - $\rho\sigma_1\sigma_2$ represents the covariance.
 
@@ -932,10 +940,10 @@ where: - $\sigma^2_1$ and $\sigma^2_2$: trait variances\
 
 The multivariate normal density is then:
 
-$$\mathbf{x}\|\mathbf{U}\_k) = \frac{1}{2\pi|\mathbf{U}_k|^{1/2}}
-\exp\left(-\frac{1}{2}\mathbf{x}^T\mathbf{U}\_k^{-1}\mathbf{x}\right)$$
+$$p(\mathbf{x}|\mathbf{U}\_k) = \frac{1}{2\pi|\mathbf{U}_k|^{1/2}}
+\exp\left(-\frac{1}{2}\mathbf{x}^T\mathbf{U}_k^{-1}\mathbf{x}\right)$$
 
-Different covariance matrices (\mathbf{U}\_k) lead to different shapes:
+Different covariance matrices ($\mathbf{U}_k$) lead to different shapes:
 
 1.  When ($\rho$ = 0):
     -   Effects are independent
@@ -1191,6 +1199,10 @@ plot_data$Distribution <- factor(plot_data$Distribution,
   theme(legend.position = "bottom")
 ```
 
+:::notes
+even under an 'incoorrect prior', you can't help but come to the truth with adeuqate data
+:::
+
 ## Simple Example:
 
 Why TB was a geneticist: Imagine tracking minor allele frequency:
@@ -1199,7 +1211,7 @@ Why TB was a geneticist: Imagine tracking minor allele frequency:
 
 -   **Observe**: AABB AABB ABBB (5 A's, 7 B's)
 
--   **Updates**: - After 1st group: Beta(4, 10)
+-   **Updates**: After 1st group: Beta(4, 10)
 
 -   After 2nd group: Beta(6, 12)
 
@@ -1813,7 +1825,7 @@ population (link interlude <https://surbut.shinyapps.io/shinyP/> )
 Bayesian mixture models add priors to the parameters:
 $p(\theta, \pi | x_1, \ldots, x_n) \propto p(x_1, \ldots, x_n | \theta, \pi) \times p(\theta, \pi)$
 
-Common prior choices:\
+#### Common prior choices:\
 $\pi \sim \text{Dirichlet}(\alpha_1, \ldots, \alpha_K)$ for mixing
 weights\
 **Component-specific priors for** $\theta_k$ (e.g., Normal-Inverse-Gamma
@@ -2007,7 +2019,8 @@ $\log(P(Data|Pop1)) = \log(f_1^A) + \log(f_1^C) + \log(f_1^A)$
 
 $\log(P(Data|Pop2)) = \log(f_2^A) + \log(f_2^C) + \log(f_2^A)$
 
-Total for Pop1 = $L_{11} + L_{21} + L_{31}$
+Total for Pop1 = $L_{11} + L_{12} + L_{13}$\
+Total for Pop1 = $L_{21} + L_{22} + L_{23}$
 
 ::: notes
 Here, we're updating the ancestry proportions (`q`) for Individual
@@ -2024,15 +2037,28 @@ This process is repeated for each individual in the dataset
 
 ## Step 2: Dirichlet Update
 
-$$q_1 \sim \text{Dirichlet}(\alpha + \sum{Pop1}, \sum{Pop2})$$ where:
+$$q_1 \sim \text{Dirichlet}(\alpha1 + \sum{L1}, \alpha2 +\sum{L2})$$ where:
 
-**-** $\sum{Pop1} = L_{11} + L_{21} + L_{31}$ (added to $\alpha_1$)\
-**-** $\sum{Pop2} = L_{12} + L_{22} + L_{32}$ (added to $\alpha_2$)
+**-** $\sum{L1} = L_{11} + L_{21} + L_{31}$ (added to $\alpha_1$)\
+**-** $\sum{L2} = L_{12} + L_{22} + L_{32}$ (added to $\alpha_2$)
+
 
 ::: callout-note
-The Dirichlet update incorporates likelihood contributions from both
+The Dirichlet update incorporates log likelihood contributions from both
 populations to estimate how much of Individual 1's ancestry comes from
 each population.
+:::
+
+:::notes
+The key difference between this and just adding counts is
+Simple case: We KNOW which population (just one!) each allele belongs to
+STRUCTURE case: We DON'T know which population each allele belongs to, so we:Calculate how likely the sequence is under each population
+Use these likelihoods to update our beliefs about population membership
+Then use these membership probabilities (q) to update allele frequencies (f). Conjugate Dirichlet-Multinomial Special Case:
+Prior: Dirichlet(α₁, α₂, α₃)
+Likelihood: Multinomial(n₁, n₂, n₃)
+Posterior: Dirichlet(α₁ + n₁, α₂ + n₂, α₃ + n₃)
+The beauty of conjugate priors is that this complex calculation: adding counts in the conjugate case IS doing likelihood × prior, it's just a mathematically convenient way to get there!
 :::
 
 ## Updating Allele Frequencies (f) with Fixed Ancestry (q)
