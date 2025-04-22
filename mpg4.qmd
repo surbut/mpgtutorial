@@ -1,0 +1,1782 @@
+---
+title: "A Practical Primer on Bayesian Statistics for Population Genomics"
+author: "Sarah Urbut, MD PhD"
+affiliation: "Natarajan Lab"
+date: "March 29, 2025"
+format: 
+  revealjs:
+    theme: simple
+    transition: slide
+    slide-number: true
+    code-fold: true
+    highlight-style: github
+    footer: "Population Genomics Methods Seminar"
+execute:
+  echo: false
+  warning: false
+---
+
+```{r setup, include=FALSE}
+# Load necessary packages
+library(tidyverse)
+library(ggplot2)
+library(reshape2)
+library(viridis)
+library(gtools)     # For Dirichlet distribution
+library(gridExtra)  # For arranging plots
+
+# Set a clean theme for all plots
+theme_set(theme_minimal(base_size = 12) + 
+          theme(plot.title = element_text(hjust = 0.5),
+                plot.subtitle = element_text(hjust = 0.5)))
+
+# Set seed for reproducibility
+set.seed(42)
+```
+
+## Overview
+
+In this seminar, we'll cover:
+
+1. Introduction to Bayesian thinking and posterior distributions
+2. The p-value fallacy and Bayesian alternatives
+3. Conjugate priors for genetic models (Beta-Binomial, Dirichlet)
+4. Mixture models for population structure 
+5. Clinical trials with flat priors - lessons for genomics
+6. Multivariate normal mixtures (mash)
+
+---
+
+# Introduction to Bayesian Thinking
+
+---
+
+## Why Bayesian for Population Genomics?
+
+Population genomics presents unique challenges:
+
+- **Multiple testing** across thousands/millions of variants
+- **Complex patterns** across populations and traits
+- **Prior knowledge** from evolution and previous studies
+- **Decision-making** under uncertainty
+
+Bayesian approaches offer elegant solutions to these challenges.
+
+---
+
+## Probabilistic Interpretation of Estimates
+
+::::: columns
+::: {.column width="50%"}
+In the Bayesian framework:
+
+- **Parameters are random variables** with distributions, not fixed values
+- **Uncertainty is represented directly** through probability distributions
+- **All evidence is integrated coherently** within a probability framework
+- **Natural quantification of uncertainty** without hypothetical repeated sampling
+- **Interpretation is direct and intuitive** for researchers and clinicians
+:::
+
+::: {.column width="50%"}
+```{r echo=FALSE}
+# Create example data for frequentist vs Bayesian comparison
+x <- seq(0.2, 0.8, length = 1000)
+
+# Bayesian posterior (beta distribution)
+post_y <- dbeta(x, 70, 30)
+
+# Create data frame for plotting
+plot_data <- data.frame(
+  x = x,
+  y = post_y
+)
+
+# Point estimate
+point_est <- 0.7
+ci_lower <- 0.61
+ci_upper <- 0.79
+cred_lower <- qbeta(0.025, 70, 30)
+cred_upper <- qbeta(0.975, 70, 30)
+
+# Get maximum y value for annotation positioning
+max_y_val <- max(plot_data$y)
+
+# Plot
+ggplot(plot_data, aes(x = x, y = y)) +
+  geom_line(size = 1.2, color = "darkblue") +
+  geom_vline(xintercept = point_est, color = "red", linetype = "dashed") +
+  geom_segment(aes(x = ci_lower, xend = ci_upper, y = max_y_val/10, yend = max_y_val/10), 
+               color = "darkred", size = 2) +
+  geom_segment(aes(x = cred_lower, xend = cred_upper, y = max_y_val/5, yend = max_y_val/5), 
+               color = "darkblue", size = 2) +
+  annotate("text", x = point_est + 0.05, y = max_y_val/1.5, 
+           label = "Point Estimate", color = "red") +
+  annotate("text", x = ci_lower - 0.05, y = max_y_val/10, 
+           label = "95% CI", color = "darkred") +
+  annotate("text", x = cred_upper + 0.05, y = max_y_val/5, 
+           label = "95% Credible Interval", color = "darkblue") +
+  labs(title = "Bayesian Posterior Distribution",
+       subtitle = "Directly interpretable probability statements about parameters",
+       x = "Parameter Value", 
+       y = "Posterior Density") +
+  theme_minimal()
+```
+:::
+:::::
+
+---
+
+## Bayesian vs. Frequentist Intervals
+
+| Bayesian Credible Interval | Frequentist Confidence Interval |
+|----------------------------|--------------------------------|
+| "95% probability the parameter is between a and b" | "If we repeated the experiment many times, 95% of intervals constructed would contain the true parameter" |
+| Directly interpretable as probability statement about the parameter | Cannot be interpreted as probability statement about the parameter |
+| Incorporates prior information | No mechanism to incorporate prior information |
+| Can be asymmetric, reflecting asymmetric uncertainty | Typically symmetric by construction |
+| Conditioning on the observed data | Based on hypothetical repeated sampling |
+
+---
+
+## Overview
+
+In this primer, we'll explore key Bayesian concepts critical for modern genomics:
+
+1.  **P-values vs. Posterior Probabilities**: Why Bayesian thinking helps avoid misinterpretations
+2.  **Conjugate Models**: Elegant solutions for population genetic inference
+3.  **Mixture Models**: Powerful tools for complex genomic data
+4.  **Bayesian Clinical & Adaptive Designs**: Learning and adapting as data accumulates
+
+---
+
+## Bayes' Theorem - The Core Idea
+
+$$P(H|D) = \frac{P(D|H) \times P(H)}{P(D)}$$
+
+Where:
+
+- $P(H|D)$ is the **posterior probability** - what we want to know
+- $P(D|H)$ is the **likelihood** - how probable the data is under our hypothesis
+- $P(H)$ is the **prior probability** - what we knew before
+- $P(D)$ is the **evidence** - a normalizing constant
+
+Simply: **Posterior ∝ Likelihood × Prior**
+
+---
+
+## Bayesian Updating: Visual Intuition
+
+```{r bayesian-updating}
+# Create data for three distributions
+x <- seq(0.001, 0.999, length = 1000)
+prior <- data.frame(x = x, y = dbeta(x, 2, 3), Distribution = "Prior: Beta(2,3)")
+likelihood <- data.frame(x = x, y = dbeta(x, 7, 3), Distribution = "Likelihood (Data)")
+posterior <- data.frame(x = x, y = dbeta(x, 9, 6), Distribution = "Posterior: Beta(9,6)")
+
+# Combine data
+all_distributions <- rbind(prior, likelihood, posterior)
+
+# Plot all three distributions
+ggplot(all_distributions, aes(x = x, y = y, color = Distribution)) +
+  geom_line(size = 1.2) +
+  scale_color_manual(values = c("darkgreen", "purple", "red")) +
+  labs(title = "Bayesian Updating of Allele Frequency Estimate",
+       subtitle = "Combining prior knowledge with new data",
+       x = "Allele Frequency", 
+       y = "Density") +
+  theme(legend.position = "bottom")
+```
+
+---
+
+# P-values vs. Posterior Probabilities
+
+---
+
+## The Fallacy of P-values
+
+::: incremental
+-   P-values answer a **counterfactual question**: "If there were no effect, how surprising would these data be?"
+
+-   But researchers want to know: "**What is the probability this association is real?**"
+
+-   This disconnect leads to systematic misinterpretation
+:::
+
+---
+
+## The p-value Fallacy: A Clear Example
+
+::::: columns
+::: {.column width="50%"}
+**Scenario**: Testing a SNP for disease association
+
+**Traditional approach**:
+- Obtain p = 0.001
+- Declare "significant association"
+- Publish result
+
+**The fallacy**:
+- p = 0.001 means "1 in 1000 chance of seeing this data if no association exists"
+- NOT "999 in 1000 chance the association is real"
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 5
+# Parameters
+prior_prob <- 1/1000  # Prior probability of true association
+p_value <- 0.001      # Observed p-value
+
+# Convert p-value to z-score
+z <- qnorm(p_value/2, lower.tail = FALSE)
+
+# Calculate Bayes factor (approximate)
+bf <- exp(z^2/2)
+
+# Calculate posterior probability
+posterior <- (prior_prob * bf) / (prior_prob * bf + (1 - prior_prob))
+
+# Create data for visualization
+df <- data.frame(
+  Stage = factor(c("Prior", "p-value", "Posterior"), 
+                levels = c("Prior", "p-value", "Posterior")),
+  Probability = c(prior_prob, 1-p_value, posterior),
+  Label = c(paste0(round(prior_prob*100, 2), "%"), 
+           paste0(round((1-p_value)*100, 1), "%"), 
+           paste0(round(posterior*100, 1), "%"))
+)
+
+# Create plot
+ggplot(df, aes(x = Stage, y = Probability)) +
+  geom_bar(stat = "identity", fill = c("lightblue", "orange", "darkgreen"), width = 0.6) +
+  geom_text(aes(label = Label), vjust = -0.5, size = 5) +
+  ylim(0, 1) +
+  labs(title = "The p-value Fallacy",
+       subtitle = "p = 0.001 doesn't mean 99.9% chance of true association",
+       x = "", y = "Probability") +
+  theme_minimal(base_size = 14)
+```
+:::
+:::::
+
+**Key insight**: With a realistic prior of 1/1000, a "significant" p-value of 0.001 only gives ~50% posterior probability of true association!
+
+---
+
+## A GWAS Example
+
+::::: columns
+::: {.column width="50%"}
+**Same evidence, different conclusions:**
+
+-   SNP with p = 1 × 10⁻⁵ in GWAS
+
+-   Traditional: "Nearly significant!"
+
+-   Bayesian: "Probably a false positive"
+
+**Why the difference?**
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-width: 6
+#| fig-height: 5
+library(ggplot2)
+library(dplyr)
+
+# Function to calculate posterior probability
+calc_posterior <- function(prior, p_value, n_snps=1e6) {
+  # Convert p-value to z-score
+  z <- qnorm(p_value/2, lower.tail = FALSE)
+  # Approximate Bayes factor
+  bf <- exp(z^2/2)
+  # Calculate posterior
+  posterior <- (prior * bf) / (prior * bf + (1 - prior))
+  return(posterior)
+}
+
+# Create data
+p_values <- 10^seq(-8, -2, 0.5)
+posteriors <- sapply(p_values, function(p) calc_posterior(1/10000, p))
+
+# Create plot
+df <- data.frame(
+  p_value = p_values,
+  posterior = posteriors
+)
+
+ggplot(df, aes(x = -log10(p_value), y = posterior)) +
+  geom_line(size = 1.5, color = "blue") +
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "red") +
+  geom_vline(xintercept = -log10(5e-8), linetype = "dashed", color = "red") +
+  annotate("text", x = 8, y = 0.2, label = "GWAS\nsignificance", color = "red") +
+  annotate("text", x = 4, y = 0.55, label = "50% posterior\nprobability", color = "red") +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "P-value vs. Posterior Probability",
+    subtitle = "Prior probability = 1/10,000",
+    x = "-log10(p-value)",
+    y = "Posterior probability of association"
+  )
+```
+:::
+:::::
+
+---
+
+# Conjugate Priors for Genetic Models
+
+---
+
+## Conjugate Priors: Why They're Beautiful
+
+::::: columns
+::: {.column width="50%"}
+**Definition**: A prior is conjugate when the posterior has the same distribution family
+
+**Why they matter**:
+1. **Analytical solutions** - no MCMC needed
+2. **Interpretable parameters** - prior as "pseudo-observations"
+3. **Sequential updating** - yesterday's posterior is today's prior
+4. **Computational efficiency** - critical for large genomic datasets
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 5
+# Create a function to generate conjugate updating visualization
+plot_conjugate_updating <- function() {
+  # Initial prior
+  alpha0 <- 2
+  beta0 <- 8
+  
+  # Data observations (success/failure)
+  data <- c(1, 1, 0, 1, 1, 0, 1, 1, 1, 0)
+  
+  # Create sequence for plotting
+  x <- seq(0, 1, length.out = 200)
+  
+  # Initialize data frame for plotting
+  plot_data <- data.frame()
+  
+  # Initial prior
+  prior_y <- dbeta(x, alpha0, beta0)
+  plot_data <- rbind(plot_data, data.frame(
+    x = x, y = prior_y, 
+    step = 0, 
+    label = paste0("Prior: Beta(", alpha0, ",", beta0, ")")
+  ))
+  
+  # Update step by step
+  alpha <- alpha0
+  beta <- beta0
+  
+  for (i in 1:length(data)) {
+    # Update parameters
+    if (data[i] == 1) {
+      alpha <- alpha + 1
+    } else {
+      beta <- beta + 1
+    }
+    
+    # Only plot a subset of steps for clarity
+    if (i %in% c(1, 3, 5, 10)) {
+      posterior_y <- dbeta(x, alpha, beta)
+      plot_data <- rbind(plot_data, data.frame(
+        x = x, y = posterior_y, 
+        step = i, 
+        label = paste0("After ", i, " observations: Beta(", alpha, ",", beta, ")")
+      ))
+    }
+  }
+  
+  # Convert step to factor for proper ordering
+  plot_data$step <- factor(plot_data$step, levels = c(0, 1, 3, 5, 10))
+  
+  # Create plot
+  ggplot(plot_data, aes(x = x, y = y, color = step, group = step)) +
+    geom_line(size = 1.2) +
+    scale_color_brewer(palette = "Set1", 
+                      name = "Update Step",
+                      labels = c("Prior", "After 1 obs", "After 3 obs", 
+                                "After 5 obs", "After 10 obs")) +
+    labs(title = "Sequential Updating with Conjugate Prior",
+         subtitle = "Beta-Binomial conjugacy for allele frequency estimation",
+         x = "Allele Frequency", 
+         y = "Density") +
+    theme(legend.position = "bottom")
+}
+
+# Generate the plot
+plot_conjugate_updating()
+```
+:::
+:::::
+
+---
+
+## Beta-Binomial: Perfect for Allele Frequencies
+
+::::: columns
+::: {.column width="50%"}
+**Model**:
+- **Prior**: $\theta \sim \text{Beta}(\alpha, \beta)$
+- **Likelihood**: $X|\theta \sim \text{Binomial}(n, \theta)$
+- **Posterior**: $\theta|X \sim \text{Beta}(\alpha + X, \beta + n - X)$
+
+**Applications**:
+- Allele frequency estimation
+- Case-control association
+- Heterozygosity estimation
+- Sequencing error rates
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 5
+# Create a visualization of Beta-Binomial for allele frequencies
+set.seed(123)
+
+# Parameters
+true_af <- 0.3
+n_samples <- 20
+n_reads_per_sample <- 30
+
+# Generate data
+genotypes <- rbinom(n_samples, 2, true_af)
+read_counts <- rbinom(n_samples, n_reads_per_sample, genotypes/2)
+total_alt <- sum(read_counts)
+total_reads <- n_samples * n_reads_per_sample
+
+# Create data for plotting
+x <- seq(0, 1, length.out = 200)
+
+# Different priors
+priors <- list(
+  "Flat" = c(1, 1),
+  "Informative" = c(10, 20),
+  "Incorrect" = c(20, 5)
+)
+
+# Create data frame for plotting
+plot_data <- data.frame()
+
+for (prior_name in names(priors)) {
+  prior_params <- priors[[prior_name]]
+  alpha_prior <- prior_params[1]
+  beta_prior <- prior_params[2]
+  
+  # Prior
+  prior_y <- dbeta(x, alpha_prior, beta_prior)
+  
+  # Posterior
+  alpha_post <- alpha_prior + total_alt
+  beta_post <- beta_prior + total_reads - total_alt
+  posterior_y <- dbeta(x, alpha_post, beta_post)
+  
+  # Add to data frame
+  plot_data <- rbind(plot_data, 
+                    data.frame(
+                      x = x,
+                      y = prior_y,
+                      Distribution = "Prior",
+                      Prior = prior_name
+                    ),
+                    data.frame(
+                      x = x,
+                      y = posterior_y,
+                      Distribution = "Posterior",
+                      Prior = prior_name
+                    ))
+}
+
+# Add true value line
+plot_data$Distribution <- factor(plot_data$Distribution, 
+                               levels = c("Prior", "Posterior"))
+
+# Create plot
+ggplot(plot_data, aes(x = x, y = y, color = Distribution, linetype = Prior)) +
+  geom_line(size = 1.2) +
+  geom_vline(xintercept = true_af, linetype = "dashed", color = "black") +
+  scale_color_manual(values = c("Prior" = "blue", "Posterior" = "red")) +
+  labs(title = "Beta-Binomial for Allele Frequency Estimation",
+       subtitle = paste0("True AF = ", true_af, ", Observed = ", 
+                       round(total_alt/total_reads, 3)),
+       x = "Allele Frequency", 
+       y = "Density") +
+  theme(legend.position = "bottom")
+```
+:::
+:::::
+
+---
+
+## Dirichlet-Multinomial: For Multiple Alleles
+
+::::: columns
+::: {.column width="50%"}
+**Model**:
+- **Prior**: $\vec{\theta} \sim \text{Dirichlet}(\vec{\alpha})$
+- **Likelihood**: $\vec{X}|\vec{\theta} \sim \text{Multinomial}(n, \vec{\theta})$
+- **Posterior**: $\vec{\theta}|\vec{X} \sim \text{Dirichlet}(\vec{\alpha} + \vec{X})$
+
+**Applications**:
+- Multiple allele frequencies
+- Haplotype frequencies
+- Population admixture proportions
+- Taxonomic abundances
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 5
+# Create a visualization of Dirichlet-Multinomial
+set.seed(234)
+
+# Function to generate random points from a Dirichlet distribution
+rdirichlet_2d <- function(n, alpha) {
+  x <- rgamma(n, alpha[1], 1)
+  y <- rgamma(n, alpha[2], 1)
+  z <- rgamma(n, alpha[3], 1)
+  s <- x + y + z
+  return(data.frame(x = x/s, y = y/s, z = z/s))
+}
+
+# Parameters
+prior_alpha <- c(2, 2, 2)  # Symmetric prior
+true_props <- c(0.6, 0.3, 0.1)  # True proportions
+n_samples <- 50
+
+# Generate data
+counts <- rmultinom(1, n_samples, true_props)
+
+# Calculate posterior
+posterior_alpha <- prior_alpha + counts
+
+# Generate points for visualization
+n_points <- 1000
+prior_points <- rdirichlet_2d(n_points, prior_alpha)
+posterior_points <- rdirichlet_2d(n_points, posterior_alpha)
+
+# Combine data
+prior_points$Distribution <- "Prior"
+posterior_points$Distribution <- "Posterior"
+all_points <- rbind(prior_points, posterior_points)
+
+# Create ternary plot data
+# We'll use a 2D projection since ggtern might not be available
+project_ternary <- function(df) {
+  # Convert to 2D coordinates
+  df$X <- 0.5 * (2 * df$y + df$z) / (df$x + df$y + df$z)
+  df$Y <- (sqrt(3)/2) * df$z / (df$x + df$y + df$z)
+  return(df)
+}
+
+plot_data <- project_ternary(all_points)
+
+# Add true value
+true_point <- data.frame(x = true_props[1], y = true_props[2], z = true_props[3],
+                        Distribution = "True Value")
+true_point <- project_ternary(true_point)
+
+# Create plot
+ggplot(plot_data, aes(x = X, y = Y, color = Distribution)) +
+  geom_point(alpha = 0.3, size = 1) +
+  geom_point(data = true_point, color = "black", size = 5, shape = 8) +
+  scale_color_manual(values = c("Prior" = "blue", "Posterior" = "red", "True Value" = "black")) +
+  labs(title = "Dirichlet-Multinomial for Multiple Alleles",
+       subtitle = paste0("Prior: Dirichlet(", paste(prior_alpha, collapse = ","), 
+                       "), Counts: ", paste(counts, collapse = ",")),
+       x = "", y = "") +
+  theme(legend.position = "bottom",
+        axis.text = element_blank(),
+        axis.ticks = element_blank()) +
+  annotate("text", x = 0, y = 0, label = "A") +
+  annotate("text", x = 1, y = 0, label = "B") +
+  annotate("text", x = 0.5, y = sqrt(3)/2, label = "C")
+```
+:::
+:::::
+
+---
+
+# Mixture Models for Complex Data
+
+---
+
+## What Are Mixture Models?
+
+Mixture models are probabilistic models that represent the presence of subpopulations within an overall population:
+
+- **Used when data come from multiple underlying processes**
+- **Represent heterogeneous populations as mixtures of simpler distributions**
+- **Allow clustering without hard assignments**
+- **Incorporate uncertainty in group membership**
+
+---
+
+## Mixture Model: Mathematical Formulation
+
+A mixture model combines multiple distributions to model complex data:
+
+$$p(x) = \sum_{k=1}^K \pi_k f_k(x|\theta_k)$$
+
+Where:
+
+- $p(x)$ is the overall probability density
+- $K$ is the number of components (subpopulations)
+- $\pi_k$ are the mixing weights ($\sum_{k=1}^K \pi_k = 1$)
+- $f_k(x|\theta_k)$ are the component densities with parameters $\theta_k$
+
+---
+
+## A Closer Look at the Components
+
+::::: columns
+::: {.column width="50%"}
+**Key components**:
+
+1. **Component distributions** $f_k(x|\theta_k)$
+   - Each represents a subpopulation
+   - Can be any distribution family
+   - Common choices: Gaussian, multinomial, beta
+   
+2. **Mixing weights** $\pi_k$
+   - Proportion of data from each component
+   - Must sum to 1: $\sum_{k=1}^K \pi_k = 1$
+   - Reflect prior probabilities of group membership
+   
+3. **Latent variables** $z_i$
+   - Unobserved component membership
+   - $z_i = k$ means data point $i$ came from component $k$
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 6
+# Create a simple mixture model visualization
+set.seed(123)
+
+# Define mixture parameters
+means <- c(-2.5, 1.5)
+sds <- c(0.7, 1.2)
+weights <- c(0.4, 0.6)
+
+# Generate data from mixture
+n_samples <- 1000
+component <- sample(1:2, n_samples, replace = TRUE, prob = weights)
+x <- rnorm(n_samples, mean = means[component], sd = sds[component])
+
+# Create data frame for histogram
+hist_data <- data.frame(x = x, component = factor(component))
+
+# Create data for component densities
+x_seq <- seq(-6, 6, length.out = 500)
+comp1_density <- weights[1] * dnorm(x_seq, mean = means[1], sd = sds[1])
+comp2_density <- weights[2] * dnorm(x_seq, mean = means[2], sd = sds[2])
+mixture_density <- comp1_density + comp2_density
+
+density_data <- data.frame(
+  x = rep(x_seq, 3),
+  y = c(comp1_density, comp2_density, mixture_density),
+  Component = factor(rep(c("Component 1", "Component 2", "Mixture"), each = length(x_seq)))
+)
+
+# Create plot
+ggplot() +
+  geom_histogram(data = hist_data, aes(x = x, y = after_stat(density), fill = component), 
+                bins = 50, alpha = 0.5, position = "identity") +
+  geom_line(data = density_data, aes(x = x, y = y, color = Component), size = 1.2) +
+  scale_fill_manual(values = c("lightblue", "lightgreen"), name = "True Component") +
+  scale_color_manual(values = c("blue", "darkgreen", "red")) +
+  labs(title = "Gaussian Mixture Model",
+       subtitle = "Two underlying subpopulations create a complex distribution",
+       x = "Value", 
+       y = "Density") +
+  theme(legend.position = "bottom")
+```
+:::
+:::::
+
+---
+
+## Likelihood Function for Mixture Models
+
+The likelihood of a mixture model for $n$ independent observations $x_1, \ldots, x_n$ is:
+
+$$L(\theta, \pi | x_1, \ldots, x_n) = \prod_{i=1}^n p(x_i) = \prod_{i=1}^n \sum_{k=1}^K \pi_k f_k(x_i|\theta_k)$$
+
+**Challenge**: The sum inside the product makes this difficult to optimize directly
+
+**Solution**: Introduce latent variables $z_i$ and use the EM algorithm 
+
+---
+
+## The EM Algorithm in Detail
+
+The Expectation-Maximization (EM) algorithm is an iterative method for finding maximum likelihood estimates:
+
+**E-step**: Calculate "responsibilities" - the posterior probability that data point $i$ belongs to component $k$:
+
+$$\gamma_{ik} = P(z_i = k | x_i, \theta) = \frac{\pi_k f_k(x_i|\theta_k)}{\sum_{j=1}^K \pi_j f_j(x_i|\theta_j)}$$
+
+**M-step**: Update parameters using weighted maximum likelihood:
+
+$$\pi_k^{new} = \frac{1}{n}\sum_{i=1}^n \gamma_{ik}$$
+$$\theta_k^{new} = \arg\max_{\theta_k} \sum_{i=1}^n \gamma_{ik} \log f_k(x_i|\theta_k)$$
+
+---
+
+## EM Algorithm: Step-by-Step Example
+
+```{r}
+#| fig-height: 6
+# Simplified EM visualization
+set.seed(789)
+
+# Generate data from a mixture of two Gaussians
+n <- 200
+true_means <- c(-2, 2)
+true_sds <- c(0.8, 0.8)
+true_weights <- c(0.4, 0.6)
+
+z <- sample(1:2, n, replace = TRUE, prob = true_weights)
+x <- rnorm(n, mean = true_means[z], sd = true_sds[z])
+
+# Create data for visualization
+iterations <- c("Initial", "Iteration 1", "Iteration 3", "Final")
+means1 <- c(-1, -1.5, -1.8, -2.0)
+means2 <- c(1, 1.4, 1.8, 2.0)
+sds1 <- c(1.2, 1.0, 0.9, 0.8)
+sds2 <- c(1.2, 1.0, 0.9, 0.8)
+weights1 <- c(0.5, 0.45, 0.42, 0.4)
+weights2 <- c(0.5, 0.55, 0.58, 0.6)
+
+# Create data frame for plotting
+plot_data <- data.frame()
+x_seq <- seq(-5, 5, length.out = 200)
+
+for (i in 1:length(iterations)) {
+  # Component 1
+  comp1 <- data.frame(
+    x = x_seq,
+    y = weights1[i] * dnorm(x_seq, mean = means1[i], sd = sds1[i]),
+    Component = "Component 1",
+    Iteration = iterations[i]
+  )
+  
+  # Component 2
+  comp2 <- data.frame(
+    x = x_seq,
+    y = weights2[i] * dnorm(x_seq, mean = means2[i], sd = sds2[i]),
+    Component = "Component 2",
+    Iteration = iterations[i]
+  )
+  
+  # Mixture
+  mixture <- data.frame(
+    x = x_seq,
+    y = comp1$y + comp2$y,
+    Component = "Mixture",
+    Iteration = iterations[i]
+  )
+  
+  plot_data <- rbind(plot_data, comp1, comp2, mixture)
+}
+
+# Create histogram data
+hist_data <- data.frame(x = x, Iteration = "Data")
+
+# Create plot
+ggplot() +
+  # Add histogram for data
+  geom_histogram(data = hist_data, aes(x = x, y = after_stat(density)), 
+                bins = 30, fill = "gray80", color = "black", alpha = 0.5) +
+  # Add component and mixture densities
+  geom_line(data = plot_data, 
+           aes(x = x, y = y, color = Component, group = interaction(Component, Iteration)),
+           size = 1) +
+  # Facet by iteration
+  facet_wrap(~ Iteration, ncol = 2) +
+  # Customize colors
+  scale_color_manual(values = c("Component 1" = "blue", 
+                              "Component 2" = "green", 
+                              "Mixture" = "red")) +
+  # Add labels
+  labs(title = "EM Algorithm Convergence",
+       subtitle = "Mixture model fit improves with each iteration",
+       x = "Value", 
+       y = "Density") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+:::
+:::::
+
+---
+
+## Worked Example: EM Algorithm Step-by-Step
+
+Let's walk through each step of the EM algorithm for a mixture of two Gaussians:
+
+1. **Initialize parameters**:
+   - Set initial mixing weights: $\pi_1 = \pi_2 = 0.5$
+   - Set initial component means: $\mu_1 = -1, \mu_2 = 1$
+   - Set initial component standard deviations: $\sigma_1 = \sigma_2 = 1$
+
+2. **E-step**: For each data point $x_i$, calculate the responsibility of each component:
+   - $\gamma_{i1} = \frac{\pi_1 N(x_i|\mu_1,\sigma_1^2)}{\pi_1 N(x_i|\mu_1,\sigma_1^2) + \pi_2 N(x_i|\mu_2,\sigma_2^2)}$
+   - $\gamma_{i2} = 1 - \gamma_{i1}$
+
+3. **M-step**: Update the parameters using the responsibilities:
+   - $\pi_1^{new} = \frac{1}{n}\sum_{i=1}^n \gamma_{i1}$ (similarly for $\pi_2^{new}$)
+   - $\mu_1^{new} = \frac{\sum_{i=1}^n \gamma_{i1}x_i}{\sum_{i=1}^n \gamma_{i1}}$ (similarly for $\mu_2^{new}$)
+   - $(\sigma_1^{new})^2 = \frac{\sum_{i=1}^n \gamma_{i1}(x_i-\mu_1^{new})^2}{\sum_{i=1}^n \gamma_{i1}}$ (similarly for $\sigma_2^{new}$)
+
+4. **Repeat** until convergence (parameters stop changing significantly)
+
+---
+
+## Bayesian Mixture Models
+
+Bayesian mixture models add priors to the parameters:
+
+$p(\theta, \pi | x_1, \ldots, x_n) \propto p(x_1, \ldots, x_n | \theta, \pi) \times p(\theta, \pi)$
+
+Common prior choices:
+- $\pi \sim \text{Dirichlet}(\alpha_1, \ldots, \alpha_K)$ for mixing weights
+- Component-specific priors for $\theta_k$ (e.g., Normal-Inverse-Gamma for Gaussian components)
+
+**Advantages**:
+- Handle uncertainty in the number of components (K)
+- Avoid singularities and improve stability
+- Allow for informed priors from previous studies
+- Provide full posterior distribution rather than point estimates
+
+---
+
+## Mixture Model Applications in Genomics
+
+::::: columns
+::: {.column width="50%"}
+**1. Population Structure**
+- Components = ancestral populations
+- Individual genotypes = admixtures of populations
+- Example: STRUCTURE, ADMIXTURE software
+- Used for: demographic history, association studies, conservation
+
+**2. Gene Expression Clustering**
+- Components = cell types/states
+- Expression patterns = signatures of cell types
+- Example: Single-cell RNA-seq clustering
+- Used for: cell type identification, developmental trajectories
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 6
+# Create a visualization of population structure
+set.seed(456)
+
+# Number of individuals and populations
+n_ind <- 60
+n_pop <- 3
+
+# Create admixture proportions
+# First 20 individuals mostly from pop1, etc.
+admixture <- matrix(0, nrow = n_ind, ncol = n_pop)
+for (i in 1:n_ind) {
+  if (i <= 20) {
+    admixture[i,] <- c(0.8, 0.1, 0.1) + rnorm(3, 0, 0.05)
+  } else if (i <= 40) {
+    admixture[i,] <- c(0.1, 0.8, 0.1) + rnorm(3, 0, 0.05)
+  } else {
+    admixture[i,] <- c(0.1, 0.1, 0.8) + rnorm(3, 0, 0.05)
+  }
+  # Ensure proportions are positive and sum to 1
+  admixture[i,] <- pmax(admixture[i,], 0)
+  admixture[i,] <- admixture[i,] / sum(admixture[i,])
+}
+
+# Create data frame for plotting
+admix_df <- data.frame(
+  Individual = rep(1:n_ind, n_pop),
+  Population = factor(rep(paste0("Pop", 1:n_pop), each = n_ind)),
+  Proportion = c(admixture)
+)
+
+# Create barplot
+ggplot(admix_df, aes(x = Individual, y = Proportion, fill = Population)) +
+  geom_col(width = 1) +
+  scale_fill_brewer(palette = "Set1") +
+  labs(title = "Population Structure as a Mixture Model",
+       subtitle = "Each individual is a mixture of ancestral populations",
+       x = "Individual", 
+       y = "Ancestry Proportion") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+```
+:::
+:::::
+
+---
+
+## The STRUCTURE Model in Detail
+
+::::: columns
+::: {.column width="50%"}
+**STRUCTURE**: A Bayesian mixture model for population genetics
+
+**Key components**:
+- Each individual = mixture of $K$ ancestral populations
+- Each population = distinct allele frequencies
+- Goal: Infer ancestry proportions & population frequencies
+
+**Bayesian formulation**:
+- **Prior**: $q_{ik} \sim \text{Dirichlet}(\alpha)$ (ancestry proportions)
+- **Prior**: $f_{kj} \sim \text{Beta}(\lambda)$ (allele frequencies)
+- **Likelihood**: $P(X_{ij} | q_i, f_j)$ (genotype probabilities)
+:::
+
+::: {.column width="50%"}
+```{r}
+# Create a visualization of STRUCTURE-like results
+set.seed(567)
+
+# Parameters
+n_ind <- 100
+n_pop <- 3
+n_markers <- 20
+
+# Create true population allele frequencies
+pop_freqs <- matrix(rbeta(n_pop * n_markers, 0.5, 0.5), nrow = n_pop)
+
+# Create ancestry proportions (3 distinct groups with some admixture)
+q <- matrix(0, nrow = n_ind, ncol = n_pop)
+q[1:40, 1] <- rbeta(40, 10, 1)
+q[41:70, 2] <- rbeta(30, 10, 1)
+q[71:100, 3] <- rbeta(30, 10, 1)
+
+# Normalize rows to sum to 1
+for (i in 1:n_ind) {
+  # Add small values to ensure all populations represented
+  q[i,] <- q[i,] + 0.05
+  q[i,] <- q[i,] / sum(q[i,])
+}
+
+# Create data for heatmap of ancestry proportions
+q_df <- data.frame(
+  Individual = rep(1:n_ind, n_pop),
+  Population = factor(rep(paste0("Pop", 1:n_pop), each = n_ind)),
+  Proportion = c(q)
+)
+
+# Create data for allele frequency heatmap
+freq_df <- data.frame(
+  Population = factor(rep(paste0("Pop", 1:n_pop), each = n_markers)),
+  Marker = factor(rep(paste0("M", 1:n_markers), times = n_pop)),
+  Frequency = c(pop_freqs)
+)
+
+# Create plots
+p1 <- ggplot(q_df, aes(x = Individual, y = Population, fill = Proportion)) +
+  geom_tile() +
+  scale_fill_viridis() +
+  labs(title = "Ancestry Proportions",
+       subtitle = "Each individual's genetic ancestry",
+       x = "Individual", 
+       y = "Ancestral Population") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+
+p2 <- ggplot(freq_df, aes(x = Marker, y = Population, fill = Frequency)) +
+  geom_tile() +
+  scale_fill_viridis() +
+  labs(title = "Population Allele Frequencies",
+       subtitle = "Each population's genetic profile",
+       x = "Genetic Marker", 
+       y = "Ancestral Population")
+
+# Arrange plots
+gridExtra::grid.arrange(p1, p2, ncol = 1)
+```
+:::
+:::::
+
+---
+
+## Application: Effect Size Mixtures in GWAS
+
+::::: columns
+::: {.column width="50%"}
+**Problem**: Most variants have no effect, but some do
+
+**Solutions**:
+- **Spike-and-slab prior**: Mixture of point mass at zero and continuous distribution
+- **Scale mixture**: Mixture of normal distributions with different variances
+- **Bayesian variable selection**: Latent indicator for whether variant is causal
+
+**Benefits**:
+- Controls false discovery rate
+- Improves power to detect true associations
+- Provides interpretable posterior probabilities
+- Naturally handles multiple testing
+:::
+
+::: {.column width="50%"}
+```{r}
+# Create visualization of effect size mixtures
+set.seed(789)
+
+# Parameters
+n_variants <- 500
+pi0 <- 0.95  # Proportion of null effects
+
+# Generate true effects
+is_null <- rbinom(n_variants, 1, pi0)
+true_effects <- rep(0, n_variants)
+true_effects[is_null == 0] <- rnorm(sum(is_null == 0), 0, 0.5)
+
+# Add noise to create observed effects
+observed_effects <- true_effects + rnorm(n_variants, 0, 0.2)
+
+# Create data frame for plotting
+effect_df <- data.frame(
+  Variant = 1:n_variants,
+  TrueEffect = true_effects,
+  ObservedEffect = observed_effects,
+  IsNull = factor(is_null)
+)
+
+# Plot
+ggplot(effect_df, aes(x = ObservedEffect, fill = IsNull)) +
+  geom_histogram(bins = 40, alpha = 0.7, position = "identity") +
+  scale_fill_manual(values = c("red", "gray70"), 
+                   labels = c("Causal", "Null"),
+                   name = "Variant Type") +
+  labs(title = "Mixture of Effect Sizes in GWAS",
+       subtitle = "Most variants have no effect (null)",
+       x = "Observed Effect Size", 
+       y = "Count") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+:::
+:::::
+
+---
+
+## Advanced Topic: Selecting the Number of Components (K)
+
+How do we determine the optimal number of components in a mixture model?
+
+**Frequentist approaches**:
+- **Information criteria**: AIC, BIC, ICL
+- **Likelihood ratio tests**: With bootstrapping for p-values
+- **Cross-validation**: Train on subset, evaluate on holdout
+
+**Bayesian approaches**:
+- **Bayes factors**: Compare models with different K
+- **Reversible jump MCMC**: Sample across different K values
+- **Dirichlet process mixtures**: Infinite mixture model (nonparametric)
+- **Overfitted mixture models**: Start with large K, let some components empty
+
+---
+
+## Common Challenges with Mixture Models
+
+1. **Identifiability issues**: Component labels can be permuted (label switching)
+
+2. **Local optima**: EM algorithm may converge to suboptimal solutions
+
+3. **Initialization sensitivity**: Results depend on starting values
+
+4. **Singularities**: Component variance can collapse to zero
+
+5. **Determining number of components**: No single best method
+
+**Solutions**:
+- Run algorithm multiple times with different initializations
+- Regularization via priors (Bayesian approach)
+- Deterministic annealing or other modified EM variants
+- Model averaging across different K values
+- Cross-validation for model selection
+
+---
+
+# Bayesian Clinical Trials and Adaptive Designs
+
+---
+
+## Sequential Analysis and Sample Size Optimization
+
+```{r adaptive-design}
+# Simulate a genetic association study with sequential sampling
+set.seed(456)
+
+# Parameters
+n_loci <- 1000
+true_effect_size <- 0.3
+max_samples <- 500
+interim_points <- seq(100, max_samples, by = 100)
+
+# Set 5% of loci to have true effects
+n_causal <- floor(n_loci * 0.05)
+causal_loci <- sample(1:n_loci, n_causal)
+
+# Simplified simulation
+interim_summary <- data.frame(
+  SampleSize = interim_points,
+  Discoveries_50 = c(30, 42, 48, 53, 55),
+  Discoveries_80 = c(15, 24, 32, 38, 42),
+  Discoveries_95 = c(8, 15, 22, 28, 32),
+  TruePositives_95 = c(7, 12, 18, 23, 26),
+  FalsePositives_95 = c(1, 3, 4, 5, 6)
+)
+
+interim_summary$FDR_95 <- interim_summary$FalsePositives_95 / 
+                          interim_summary$Discoveries_95
+interim_summary$Power_95 <- interim_summary$TruePositives_95 / n_causal
+
+# Create long format data for plotting
+interim_long <- pivot_longer(
+  interim_summary, 
+  cols = c(Discoveries_50, Discoveries_80, Discoveries_95),
+  names_to = "Threshold",
+  values_to = "Discoveries"
+)
+interim_long$Threshold <- factor(
+  interim_long$Threshold,
+  levels = c("Discoveries_50", "Discoveries_80", "Discoveries_95"),
+  labels = c("PP > 0.5", "PP > 0.8", "PP > 0.95")
+)
+
+# Plot discovery trajectories
+ggplot(interim_long, aes(x = SampleSize, y = Discoveries, color = Threshold, group = Threshold)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 3) +
+  scale_color_discrete() +
+  labs(title = "Number of Discoveries vs. Sample Size",
+       subtitle = "Results at different posterior probability thresholds",
+       x = "Sample Size", y = "Number of Discoveries") +
+  theme(legend.position = "bottom")
+```
+
+---
+
+
+## Multivariate Normal Mixtures: The mash Approach
+
+::::: columns
+::: {.column width="50%"}
+**Key idea**: Share information across related conditions
+
+**Model**:
+- $\hat{\beta}_j \sim N(\beta_j, S_j)$ (observed effects)
+- $\beta_j \sim \sum_{k=1}^K \pi_k N(0, U_k)$ (true effects)
+
+**Covariance matrices $U_k$ capture patterns**:
+- Shared effects across all conditions
+- Condition-specific effects
+- Structured correlation patterns
+- Data-driven patterns
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 6
+# Create a visualization of multivariate effects
+set.seed(345)
+
+# Parameters
+n_effects <- 200
+n_conditions <- 4
+
+# Create different effect patterns
+patterns <- list(
+  "Shared" = rep(1, n_conditions),
+  "Condition1" = c(1, 0, 0, 0),
+  "Condition2" = c(0, 1, 0, 0),
+  "Conditions1&2" = c(1, 1, 0, 0),
+  "Conditions3&4" = c(0, 0, 1, 1)
+)
+
+# Assign effects to patterns
+n_per_pattern <- n_effects / length(patterns)
+true_effects <- matrix(0, nrow = n_effects, ncol = n_conditions)
+colnames(true_effects) <- paste0("Condition", 1:n_conditions)
+
+current_idx <- 1
+for (p in 1:length(patterns)) {
+  pattern_name <- names(patterns)[p]
+  pattern <- patterns[[p]]
+  
+  for (i in 1:n_per_pattern) {
+    effect_size <- rnorm(1, 0, 0.5)
+    true_effects[current_idx, ] <- pattern * effect_size
+    current_idx <- current_idx + 1
+  }
+}
+
+# Add noise to create observed effects
+observed_effects <- true_effects + matrix(rnorm(n_effects * n_conditions, 0, 0.2),
+                                        nrow = n_effects)
+
+# Select a few examples for visualization
+example_indices <- c(5, 45, 85, 125, 165)  # One from each pattern
+example_data <- data.frame(
+  Effect = rep(paste0("Effect", example_indices), each = n_conditions),
+  Condition = rep(paste0("Condition", 1:n_conditions), times = length(example_indices)),
+  TrueEffect = c(t(true_effects[example_indices, ])),
+  ObservedEffect = c(t(observed_effects[example_indices, ]))
+)
+
+# Reshape for plotting
+example_long <- reshape2::melt(example_data, 
+                             id.vars = c("Effect", "Condition"),
+                             variable.name = "EffectType",
+                             value.name = "Value")
+
+# Create plot
+ggplot(example_long, aes(x = Condition, y = Value, color = EffectType, group = EffectType)) +
+  geom_point(size = 3) +
+  geom_line(size = 1) +
+  facet_wrap(~ Effect, ncol = 3) +
+  scale_color_manual(values = c("TrueEffect" = "blue", "ObservedEffect" = "red"),
+                    labels = c("True Effect", "Observed Effect")) +
+  labs(title = "Multivariate Effect Patterns",
+       subtitle = "mash identifies and leverages these patterns",
+       x = "", 
+       y = "Effect Size",
+       color = "") +
+  theme(legend.position = "bottom")
+```
+:::
+:::::
+
+## Case Study: Bayesian Meta-Analysis
+
+::::: columns
+::: {.column width="50%"}
+**Problem**: Combine evidence across heterogeneous studies
+
+**Traditional approach**:
+- Fixed effects (assumes same effect size)
+- Random effects (allows variation in effect size)
+- Often sensitive to outliers
+
+**Bayesian approach**:
+- Hierarchical model for effect heterogeneity
+- Robust methods to handle outliers
+- Incorporates prior knowledge
+- Quantifies uncertainty in heterogeneity
+
+**The math behind it**:
+$$y_i | \theta_i, \sigma_i^2 \sim N(\theta_i, \sigma_i^2)$$
+$$\theta_i | \mu, \tau^2 \sim N(\mu, \tau^2)$$
+$$\mu \sim N(\mu_0, \sigma_0^2)$$
+$$\tau^2 \sim \text{InvGamma}(a, b)$$
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 6
+# Create a visualization of Bayesian meta-analysis
+set.seed(678)
+
+# Parameters
+n_studies <- 8
+true_effect <- 0.3
+heterogeneity <- 0.1
+
+# Generate study-specific effects
+study_effects <- rnorm(n_studies, true_effect, heterogeneity)
+
+# Make one study an outlier
+study_effects[n_studies] <- -0.2
+
+# Generate observed effects and standard errors
+sample_sizes <- round(runif(n_studies, 100, 500))
+standard_errors <- 1 / sqrt(sample_sizes)
+observed_effects <- rnorm(n_studies, study_effects, standard_errors)
+
+# Create data frame for forest plot
+meta_df <- data.frame(
+  Study = paste0("Study ", 1:n_studies),
+  Effect = observed_effects,
+  SE = standard_errors,
+  LowerCI = observed_effects - 1.96 * standard_errors,
+  UpperCI = observed_effects + 1.96 * standard_errors
+)
+
+# Add meta-analysis results
+# 1. Fixed effects
+fixed_weights <- 1 / standard_errors^2
+fixed_effect <- sum(fixed_weights * observed_effects) / sum(fixed_weights)
+fixed_se <- sqrt(1 / sum(fixed_weights))
+
+# 2. Random effects (simplified)
+tau2 <- max(0, (sum(fixed_weights * (observed_effects - fixed_effect)^2) - (n_studies - 1)) / 
+             (sum(fixed_weights) - sum(fixed_weights^2) / sum(fixed_weights)))
+random_weights <- 1 / (standard_errors^2 + tau2)
+random_effect <- sum(random_weights * observed_effects) / sum(random_weights)
+random_se <- sqrt(1 / sum(random_weights))
+
+# 3. Bayesian robust (simplified - downweights outliers)
+robust_weights <- 1 / (standard_errors^2 + tau2 + 0.1 * (observed_effects - random_effect)^2)
+robust_effect <- sum(robust_weights * observed_effects) / sum(robust_weights)
+robust_se <- sqrt(1 / sum(robust_weights))
+
+# Add to data frame
+meta_results <- data.frame(
+  Study = c("Fixed Effects", "Random Effects", "Bayesian Robust"),
+  Effect = c(fixed_effect, random_effect, robust_effect),
+  SE = c(fixed_se, random_se, robust_se),
+  LowerCI = c(fixed_effect - 1.96 * fixed_se, 
+             random_effect - 1.96 * random_se,
+             robust_effect - 1.96 * robust_se),
+  UpperCI = c(fixed_effect + 1.96 * fixed_se, 
+             random_effect + 1.96 * random_se,
+             robust_effect + 1.96 * robust_se)
+)
+
+# Combine data
+plot_df <- rbind(
+  meta_df,
+  meta_results
+)
+
+# Add a grouping variable
+plot_df$Group <- ifelse(plot_df$Study %in% meta_results$Study, "Meta-Analysis", "Individual Studies")
+plot_df$Group <- factor(plot_df$Group, levels = c("Individual Studies", "Meta-Analysis"))
+
+# Order studies
+plot_df$Study <- factor(plot_df$Study, 
+                      levels = c(paste0("Study ", 1:n_studies), 
+                                "Fixed Effects", "Random Effects", "Bayesian Robust"))
+
+# Create forest plot
+ggplot(plot_df, aes(x = Effect, y = Study, color = Group)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray") +
+  geom_vline(xintercept = true_effect, linetype = "dotted", color = "darkgreen") +
+  geom_point(aes(size = 1/SE)) +
+  geom_errorbarh(aes(xmin = LowerCI, xmax = UpperCI), height = 0.2) +
+  scale_color_manual(values = c("Individual Studies" = "blue", "Meta-Analysis" = "red")) +
+  scale_size_continuous(guide = "none") +
+  labs(title = "Bayesian Meta-Analysis",
+       subtitle = "Green dotted line shows true effect; note how Bayesian robust method handles outlier",
+       x = "Effect Size", 
+       y = "") +
+  theme(legend.position = "bottom")
+```
+:::
+:::::
+
+---
+
+## Case Study: Bayesian Fine-Mapping with SuSiE
+
+::::: columns
+::: {.column width="50%"}
+**Problem**: Identify causal variants in a GWAS locus
+
+**Traditional approach**:
+- Select all SNPs with p < threshold
+- Often includes many correlated SNPs
+
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 6
+# Create a visualization of Bayesian fine-mapping
+set.seed(456)
+
+# Parameters
+n_snps <- 50
+causal_idx <- 25
+
+# Create correlation structure (LD)
+pos <- 1:n_snps
+ld_matrix <- exp(-abs(outer(pos, pos, "-")) / 10)
+
+# Generate true effects (only one causal variant)
+true_effects <- rep(0, n_snps)
+true_effects[causal_idx] <- 0.5
+
+# Generate observed effects based on LD
+observed_effects <- ld_matrix %*% true_effects + rnorm(n_snps, 0, 0.1)
+
+# Calculate p-values
+p_values <- 2 * pnorm(-abs(observed_effects))
+
+# Calculate Bayes factors (simplified)
+bayes_factors <- exp(observed_effects^2 / 2)
+
+# Calculate posterior probabilities (assuming 1/n_snps prior)
+prior <- 1/n_snps
+posterior_probs <- (prior * bayes_factors) / sum(prior * bayes_factors)
+
+# Create data frame for plotting
+fine_map_df <- data.frame(
+  SNP = 1:n_snps,
+  Position = pos,
+  ObservedEffect = observed_effects,
+  PValue = p_values,
+  PosteriorProb = posterior_probs,
+  Causal = (1:n_snps == causal_idx)
+)
+
+# Calculate 95% credible set
+sorted_idx <- order(posterior_probs, decreasing = TRUE)
+cumulative_prob <- cumsum(posterior_probs[sorted_idx])
+credible_set <- sorted_idx[cumulative_prob <= 0.95]
+fine_map_df$InCredibleSet <- (1:n_snps %in% credible_set)
+
+# Create plot
+ggplot(fine_map_df, aes(x = Position)) +
+  geom_point(aes(y = -log10(PValue), color = "P-value"), size = 3, alpha = 0.7) +
+  geom_point(aes(y = PosteriorProb * 10, color = "Posterior"), size = 3, alpha = 0.7) +
+  geom_vline(xintercept = pos[causal_idx], linetype = "dashed", color = "red") +
+  geom_rect(data = subset(fine_map_df, InCredibleSet),
+            aes(xmin = Position - 0.4, xmax = Position + 0.4, 
+                ymin = 0, ymax = -0.2),
+            fill = "darkgreen", alpha = 0.3) +
+  scale_color_manual(values = c("P-value" = "blue", "Posterior" = "darkgreen"),
+                    name = "Measure") +
+  scale_y_continuous(
+    name = "-log10(p-value)",
+    sec.axis = sec_axis(~./10, name = "Posterior Probability")
+  ) +
+  annotate("text", x = n_snps * 0.8, y = 1, 
+           label = "95% Credible Set", color = "darkgreen") +
+  labs(title = "Bayesian Fine-Mapping vs. P-values",
+       subtitle = "Green bars indicate 95% credible set; red line is true causal variant",
+       x = "Genomic Position") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+:::
+:::::
+
+## The SuSiE Model for Fine-Mapping
+
+---
+
+## What is SuSiE?
+
+- **S**um of **Si**ngle **E**ffects model
+- Bayesian sparse regression for genetic fine-mapping
+- Developed by Wang et al. (2020)
+- Efficiently handles correlated variants (LD)
+- Identifies multiple causal signals simultaneously
+
+---
+
+## Problem SuSiE Solves
+
+**Traditional GWAS challenge:**
+- Many correlated SNPs (in LD) show association signals
+- Which ones are actually causal?
+- How many independent signals exist?
+
+**SuSiE solution:**
+- Model phenotype as sum of sparse effects
+- Each effect has exactly one causal variant
+- Produces probabilistic measures of causality
+
+---
+
+## The SuSiE Mathematical Model
+
+$$\mathbf{y} = \sum_{l=1}^L \mathbf{X} \boldsymbol{\beta}_l + \boldsymbol{\epsilon}$$
+
+Where:
+- $\mathbf{y}$ = phenotype vector
+- $\mathbf{X}$ = genotype matrix
+- $L$ = number of causal signals
+- Each $\boldsymbol{\beta}_l$ has exactly one non-zero element
+- $\boldsymbol{\epsilon} \sim N(\mathbf{0}, \sigma^2\mathbf{I})$ = error term
+
+---
+
+## Key Parameters Explained
+
+- **L**: Number of causal effects
+  * Small integer (typically 1-10)
+  * Can be fixed or determined adaptively
+  * Each effect has one causal variant
+
+- **j**: Index for SNPs
+  * j = 1 to p (total number of SNPs)
+  * Could be hundreds/thousands in a region
+
+---
+
+## Posterior Probabilities in SuSiE
+
+For each effect $l$ and SNP $j$:
+
+$$\alpha_{lj} = P(\text{SNP } j \text{ is causal for effect } l \mid \mathbf{y}, \mathbf{X})$$
+
+**Posterior Inclusion Probability** for SNP $j$:
+
+$$\text{PIP}_j = P(\text{SNP } j \text{ is causal} \mid \mathbf{y}, \mathbf{X}) = 1 - \prod_{l=1}^L (1 - \alpha_{lj})$$
+
+This captures the probability that SNP $j$ is causal for at least one effect.
+
+---
+
+## 95% Credible Sets
+
+For each effect $l$:
+
+1. Order SNPs by their posterior probability $\alpha_{lj}$
+2. Include SNPs until cumulative probability ≥ 95%
+3. This set has 95% probability of containing the causal variant
+
+**Example:**
+- Effect l=1: {SNP25, SNP26, SNP24} with probabilities {0.80, 0.12, 0.05} → 97% coverage
+- Effect l=2: {SNP40, SNP41} with probabilities {0.91, 0.04} → 95% coverage 
+
+---
+
+## SuSiE vs. Traditional Methods
+
+| Feature | SuSiE | Standard GWAS |
+|---------|-------|---------------|
+| Multiple causal variants | ✓ | × |
+| Accounts for LD | ✓ | × |
+| Direct causality measures | ✓ | × |
+| Handles correlation | ✓ | Limited |
+| Interpretation | Probability of causality | Statistical association |
+| Output | Credible sets | Significant SNPs |
+
+---
+
+## Back to Our Example
+
+[Return to your original fine-mapping example visualization]
+
+
+**The math behind SuSiE**:
+
+- Models phenotype as sum of L single-SNP effects
+- Each effect has exactly one causal variant
+- Reports posterior probabilities of causality
+
+$$\mathbf{y} = \sum_{l=1}^L \mathbf{X} \boldsymbol{\beta}_l + \boldsymbol{\epsilon}$$
+
+Where:
+- L = number of causal signals (typically small)
+- Each $\boldsymbol{\beta}_l$ has exactly one non-zero element
+- 95% credible sets contain the causal variant with 95% probability
+--- 
+
+## Bayesian Networks for Causal Inference
+
+::::: columns
+::: {.column width="50%"}
+**Problem**: Infer causal relationships in genomic data
+
+**Bayesian networks**:
+- Directed acyclic graphs (DAGs)
+- Nodes = variables (genes, traits)
+- Edges = conditional dependencies
+- Represent causal relationships
+
+**The math behind it**:
+- Joint probability factorizes as:
+$$P(X_1, X_2, \ldots, X_n) = \prod_{i=1}^n P(X_i | \text{Pa}(X_i))$$
+
+- Posterior probability of network G given data D:
+$$P(G|D) \propto P(D|G)P(G)$$
+
+- Network score considers fit to data and complexity:
+$$\text{Score}(G|D) = \log P(D|G) - \text{penalty}(\text{complexity})$$
+
+**Different from SuSiE**: Bayesian networks model complex dependency structures with directed graphs, while SuSiE is a sparse linear model for fine-mapping.
+:::
+
+::: {.column width="50%"}
+```{r}
+#| fig-height: 6
+# Create a simplified visualization of a Bayesian network
+# This doesn't require igraph
+
+# Create a function to draw nodes and edges
+plot_network <- function() {
+  # Create a data frame for nodes
+  nodes <- data.frame(
+    id = c("SNP1", "SNP2", "Gene1", "Gene2", "Gene3", "Gene4", "Trait", "Outcome"),
+    x = c(1, 1, 2, 2, 3, 3, 4, 5),
+    y = c(1, 3, 2, 4, 1, 3, 2, 2),
+    type = c(rep("SNP", 2), rep("Gene", 4), "Trait", "Outcome"),
+    size = c(rep(3, 2), rep(4, 4), 5, 6)
+  )
+
+  # Create a data frame for edges
+  edges <- data.frame(
+    from = c("SNP1", "SNP2", "Gene1", "Gene1", "Gene2", "Gene3", "Gene4", "Trait"),
+    to = c("Gene1", "Gene2", "Gene3", "Gene4", "Gene3", "Trait", "Trait", "Outcome"),
+    prob = c(0.85, 0.92, 0.78, 0.65, 0.71, 0.88, 0.76, 0.94)
+  )
+
+  # Set up the plot
+  plot(NULL, xlim = c(0.5, 5.5), ylim = c(0.5, 4.5), 
+       xlab = "", ylab = "", xaxt = "n", yaxt = "n",
+       main = "Bayesian Network for Genomic Causality")
+  
+  # Add node colors based on type
+  node_colors <- c("SNP" = "lightblue", "Gene" = "lightgreen", 
+                  "Trait" = "orange", "Outcome" = "pink")
+  
+  # Draw nodes
+  for (i in 1:nrow(nodes)) {
+    points(nodes$x[i], nodes$y[i], pch = 19, 
+           col = node_colors[nodes$type[i]], 
+           cex = nodes$size[i])
+    text(nodes$x[i], nodes$y[i], labels = nodes$id[i], cex = 0.9)
+  }
+  
+  # Draw edges with arrows
+  for (i in 1:nrow(edges)) {
+    from_idx <- which(nodes$id == edges$from[i])
+    to_idx <- which(nodes$id == edges$to[i])
+    
+    # Draw arrow
+    arrows(nodes$x[from_idx], nodes$y[from_idx],
+          nodes$x[to_idx], nodes$y[to_idx],
+          length = 0.1, angle = 30, 
+          lwd = 1 + 2 * edges$prob[i])
+    
+    # Add probability label
+    text_x <- (nodes$x[from_idx] + nodes$x[to_idx]) / 2
+    text_y <- (nodes$y[from_idx] + nodes$y[to_idx]) / 2
+    text(text_x, text_y, labels = edges$prob[i], cex = 0.8, col = "darkblue")
+  }
+  
+  # Add a legend
+  legend("bottomleft", 
+         legend = names(node_colors),
+         pch = 19, 
+         col = node_colors,
+         title = "Node Types",
+         cex = 0.8)
+}
+
+# Generate the plot
+plot_network()
+```
+:::
+:::::
+
+---
+
+## SuSiE vs. Bayesian Networks: Key Differences
+
+::::: columns
+::: {.column width="50%"}
+**SuSiE (Sum of Single Effects)**:
+- Sparse regression model for fine-mapping
+- Identifies causal variants from correlated SNPs
+- Models outcome as sum of L single-variant effects
+- Linear model structure (not a network)
+- Each effect has exactly one causal variant
+- Designed specifically for genetic fine-mapping
+- Computationally efficient for genomic data
+
+**When to use SuSiE**:
+- GWAS/QTL fine-mapping
+- Identifying causal variants from LD blocks
+- When expecting few causal variants among many candidates
+:::
+
+::: {.column width="50%"}
+**Bayesian Networks**:
+- Graph-based probabilistic models
+- Nodes represent variables (genes, variants, traits)
+- Edges represent conditional dependencies
+- Can represent complex causal relationships
+- Joint probability factorizes according to graph
+- Used for inferring regulatory relationships
+- Structure learning is computationally intensive
+
+**When to use Bayesian Networks**:
+- Gene regulatory network inference
+- Causal pathway analysis
+- Multi-omics data integration
+- When modeling complex interactions between variables
+:::
+:::::
+---
+
+## Practical Recommendations for Bayesian Genomics
+
+1. **Start with informative priors when possible**
+   - Use previous studies
+   - Incorporate functional annotations
+   - Consider evolutionary constraints
+
+2. **Report posterior probabilities, not just p-values**
+   - P(association | data) is more interpretable than P(data | no association)
+   - Provides direct probability statements about hypotheses
+
+3. **Use conjugate models for computational efficiency**
+   - Beta-Binomial for allele frequencies
+   - Dirichlet-Multinomial for haplotype frequencies
+   - Normal-Normal for quantitative traits
+
+4. **Consider mixture models for complex data**
+   - Population structure
+   - Heterogeneous effect sizes
+   - Multiple causal variants
+
+5. **Apply decision theory for optimal designs**
+   - Balance false positives and false negatives
+   - Consider costs of follow-up studies
+   - Optimize sample allocation
+
+---
+
+## Summary: When to Use Bayesian Methods
+
+| Problem | Bayesian Approach | Advantage |
+|---------|-------------------|-----------|
+| Multiple testing | Posterior probabilities | Direct interpretation, no arbitrary thresholds |
+| Sparse effects | Mixture priors | Better power, natural sparsity |
+| Heterogeneous effects | Hierarchical models | Borrows strength across contexts |
+| Sequential data collection | Adaptive designs | Efficiency, early stopping |
+| Prior knowledge integration | Informative priors | Improved accuracy, reduced sample size |
+| Complex dependencies | Bayesian networks | Causal inference, missing data handling |
+
+---
+
+## Resources for Bayesian Genomics
+
+**Software**:
+- **R packages**: `rstan`, `brms`, `mashr`, `BGLR`, `INLA`
+- **Python**: `PyMC3`, `Stan`, `Edward`
+- **Specialized**: `STRUCTURE`, `ADMIXTURE`, `SNPTEST`
+
+**Books**:
+- "Bayesian Data Analysis" by Gelman et al.
+- "Statistical Rethinking" by McElreath
+- "Bayesian Methods for Data Analysis" by Carlin & Louis
+
+**Online Resources**:
+- [StatisticalGenetics.info](https://stephenslab.github.io/fiveMinuteStats/)
+- [Stan User Guide](https://mc-stan.org/users/documentation/)
+- [Bayesian Methods for Hackers](https://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/)
+
+---
+
+## Questions?
+
+Thank you!! 
+
+- Pradeep Natarajan, MD MMSc
+- Sasha Gusev, PhD
+- Giovanni Parmigiani, PhD
