@@ -1,7 +1,7 @@
 ---
 title: "Aladynoulli: Borrowing Information to Predict Disease"
 subtitle: "A Statistical Journey in Medicine"
-author: "Sarah Urbut, MD PhD"
+author: "Sarah Urbut, MD PhD and Giovanni Parmigiani, PhD"
 format: 
   revealjs:
     theme: simple
