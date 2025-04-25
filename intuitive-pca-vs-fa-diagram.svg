@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 800 550">
+  <!-- Generator: Adobe Illustrator 29.4.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 152)  -->
+  <defs>
+    <style>
+      .st0, .st1, .st2, .st3 {
+        fill: none;
+        stroke-dasharray: 5 2;
+      }
+
+      .st0, .st4 {
+        stroke: #4d908e;
+      }
+
+      .st5, .st6, .st7, .st8, .st9, .st10, .st11, .st12, .st13, .st14, .st15, .st16 {
+        isolation: isolate;
+      }
+
+      .st5, .st6, .st7, .st8, .st9, .st10, .st12, .st13, .st14, .st16 {
+        font-family: Arial-BoldMT, Arial;
+        font-weight: 700;
+      }
+
+      .st5, .st6, .st9, .st17, .st18 {
+        fill: #e63946;
+      }
+
+      .st5, .st12, .st13 {
+        font-size: 18px;
+      }
+
+      .st19, .st7, .st20 {
+        fill: #fcbf49;
+      }
+
+      .st19, .st21, .st18, .st22 {
+        stroke: #333;
+      }
+
+      .st6, .st7, .st8, .st11 {
+        font-size: 14px;
+      }
+
+      .st23 {
+        fill-opacity: .2;
+      }
+
+      .st23, .st24, .st3, .st25 {
+        stroke: #4361ee;
+      }
+
+      .st23, .st10, .st25, .st12 {
+        fill: #4361ee;
+      }
+
+      .st23, .st25 {
+        stroke-width: 1.5px;
+      }
+
+      .st1, .st26, .st17 {
+        stroke: #e63946;
+      }
+
+      .st26 {
+        fill: #fff0f5;
+      }
+
+      .st26, .st20, .st24, .st21, .st17, .st4 {
+        stroke-width: 2px;
+      }
+
+      .st20, .st2 {
+        stroke: #fcbf49;
+      }
+
+      .st20, .st17, .st4 {
+        fill-opacity: .4;
+      }
+
+      .st24 {
+        fill: #e6f3ff;
+      }
+
+      .st21 {
+        fill: #f8f9fa;
+      }
+
+      .st8, .st4, .st22 {
+        fill: #4d908e;
+      }
+
+      .st9, .st10, .st15, .st16 {
+        font-size: 16px;
+      }
+
+      .st11, .st13, .st14, .st15, .st16 {
+        fill: #333;
+      }
+
+      .st11, .st15 {
+        font-family: ArialMT, Arial;
+      }
+
+      .st25 {
+        fill-opacity: .3;
+      }
+
+      .st14 {
+        font-size: 24px;
+      }
+    </style>
+  </defs>
+  <text class="st14" transform="translate(120.61 40)"><tspan x="0" y="0">PCA vs Factor Analysis: An Intuitive Comparison</tspan></text>
+  <rect class="st21" x="50" y="70" width="700" height="150" rx="10" ry="10"/>
+  <text class="st13" transform="translate(236.63 95)"><tspan x="0" y="0">Patient Symptoms (What We Observe)</tspan></text>
+  <circle class="st18" cx="130" cy="130" r="7"/>
+  <text class="st11" transform="translate(112.11 155)"><tspan x="0" y="0">Fever</tspan></text>
+  <circle class="st18" cx="210" cy="130" r="7"/>
+  <text class="st11" transform="translate(189.37 155)"><tspan x="0" y="0">Cough</tspan></text>
+  <circle class="st18" cx="290" cy="130" r="7"/>
+  <text class="st11" transform="translate(266.65 155)"><tspan x="0" y="0">Fatigue</tspan></text>
+  <circle class="st22" cx="370" cy="130" r="7"/>
+  <text class="st11" transform="translate(335.76 155)"><tspan x="0" y="0">Chest Pain</tspan></text>
+  <circle class="st22" cx="450" cy="130" r="7"/>
+  <text class="st11" transform="translate(388.13 155)"><tspan x="0" y="0">Shortness of Breath</tspan></text>
+  <circle class="st22" cx="530" cy="130" r="7"/>
+  <text class="st11" transform="translate(479.02 155)"><tspan x="0" y="0">Rapid Heartbeat</tspan></text>
+  <circle class="st19" cx="610" cy="130" r="7"/>
+  <text class="st11" transform="translate(579.26 155)"><tspan x="0" y="0">Joint Pain</tspan></text>
+  <circle class="st19" cx="670" cy="130" r="7"/>
+  <text class="st11" transform="translate(653.66 155)"><tspan x="0" y="0">Rash</tspan></text>
+  <rect class="st24" x="50" y="240" width="340" height="260" rx="10" ry="10"/>
+  <text class="st12" transform="translate(90.31 270)"><tspan x="0" y="0">Principal Component Analysis</tspan></text>
+  <text class="st15" transform="translate(118.88 300)"><tspan x="0" y="0">&quot;Let me find the directions of</tspan></text>
+  <text class="st15" transform="translate(102.91 325)"><tspan x="0" y="0">maximum variation in symptoms&quot;</tspan></text>
+  <rect class="st25" x="80" y="345" width="280" height="40" rx="5" ry="5"/>
+  <text class="st11" transform="translate(88.09 370)"><tspan x="0" y="0">Component 1: Fever, Cough, Chest Pain...</tspan></text>
+  <rect class="st23" x="80" y="395" width="280" height="40" rx="5" ry="5"/>
+  <text class="st11" transform="translate(90.04 420)"><tspan x="0" y="0">Component 2: Joint Pain, Rash, Fatigue...</tspan></text>
+  <line class="st3" x1="130" y1="170" x2="180" y2="345"/>
+  <line class="st3" x1="210" y1="170" x2="200" y2="345"/>
+  <line class="st3" x1="290" y1="170" x2="250" y2="395"/>
+  <line class="st3" x1="610" y1="170" x2="220" y2="395"/>
+  <text class="st10" transform="translate(107.09 460)"><tspan x="0" y="0">Result: Efficient compression</tspan></text>
+  <text class="st11" transform="translate(95.5 480)"><tspan x="0" y="0">Components explain maximum variance</tspan></text>
+  <rect class="st26" x="410" y="240" width="340" height="260" rx="10" ry="10"/>
+  <text class="st5" transform="translate(513.31 270)"><tspan x="0" y="0">Factor Analysis</tspan></text>
+  <text class="st15" transform="translate(470.42 300)"><tspan x="0" y="0">&quot;Let me find the hidden causes</tspan></text>
+  <text class="st15" transform="translate(475.78 325)"><tspan x="0" y="0">that explain these symptoms&quot;</tspan></text>
+  <circle class="st17" cx="580" cy="370" r="25"/>
+  <text class="st6" transform="translate(541.81 370)"><tspan x="0" y="0">Respiratory</tspan></text>
+  <text class="st6" transform="translate(551.79 387.73)"><tspan x="0" y="0">Infection</tspan></text>
+  <line class="st1" x1="130" y1="170" x2="557" y2="360"/>
+  <line class="st1" x1="210" y1="170" x2="557" y2="370"/>
+  <line class="st1" x1="290" y1="170" x2="562" y2="380"/>
+  <circle class="st4" cx="480" cy="370" r="25"/>
+  <text class="st8" transform="translate(462.1 375)"><tspan x="0" y="0">Heart</tspan></text>
+  <text class="st8" transform="translate(447.34 395)"><tspan x="0" y="0">Condition</tspan></text>
+  <line class="st0" x1="370" y1="170" x2="467" y2="360"/>
+  <line class="st0" x1="450" y1="170" x2="480" y2="360"/>
+  <line class="st0" x1="530" y1="170" x2="490" y2="360"/>
+  <circle class="st20" cx="680" cy="370" r="25"/>
+  <text class="st7" transform="translate(661.73 375)"><tspan x="0" y="0">Auto-</tspan></text>
+  <text class="st7" transform="translate(653.16 395)"><tspan x="0" y="0">immune</tspan></text>
+  <line class="st2" x1="610" y1="170" x2="670" y2="360"/>
+  <line class="st2" x1="670" y1="170" x2="680" y2="360"/>
+  <text class="st9" transform="translate(455.99 460)"><tspan x="0" y="0">Result: Meaningful latent factors</tspan></text>
+  <text class="st11" transform="translate(467.16 480)"><tspan x="0" y="0">Uncovers hidden disease signatures</tspan></text>
+  <text class="st16" transform="translate(75.33 525)"><tspan x="0" y="0">For disease signatures, Factor Analysis helps uncover the true underlying conditions</tspan></text>
+  <text class="st11" transform="translate(257.6 545)"><tspan x="0" y="0">that explain patterns of symptoms we observe</tspan></text>
+</svg>

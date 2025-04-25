@@ -7,90 +7,87 @@ format:
     theme: simple
     transition: slide
     slide-number: true
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
 ## My Journey: Bridging Multiple Worlds
 
-:::: {.columns}
-
+::::: columns
 ::: {.column width="60%"}
-- Cardiologist, scientist, geneticist, and statistician ... confused
-- PhD focused on **mixture models**: like me?
-- Medicine and science enhance our understanding of disease
-- Combining statistical expertise with clinical experience
-- Came to Boston ... Met the best mentors of all time!
+-   Cardiologist, scientist, geneticist, and statistician ... confused
+-   PhD focused on **mixture models**: like me?
+-   Medicine and science enhance our understanding of disease
+-   Combining statistical expertise with clinical experience
+-   Came to Boston ... Met the best mentors of all time!
 :::
 
 ::: {.column width="40%"}
 ![](aladynoulli-diverse-diagnoses.svg)
 :::
-
-::::
+:::::
 
 ## The Statistical Paradox in Medicine
 
-:::: {.columns}
-
+::::: columns
 ::: {.column width="60%"}
-- One of my first consults as a cardiology fellow revealed a **paradox**:
-- A 38-year-old with clear signs of a heart attack
-- Yet just a day earlier, they wouldn't have qualified for prevention
-- Why? Our reliance on **short-term and narrowly defined risk**
-- A fundamental flaw: **current models fail to capture how disease evolves dynamically atop a genetic background**
+-   One of my first consults as a cardiology fellow revealed a
+    **paradox**:
+-   A 38-year-old with clear signs of a heart attack
+-   Yet just a day earlier, they wouldn't have qualified for prevention
+-   Why? Our reliance on **short-term and narrowly defined risk**
+-   A fundamental flaw: **current models fail to capture how disease
+    evolves dynamically atop a genetic background**
 :::
 
 ::: {.column width="40%"}
 ![A pager - the doctor's ball and chain](pager.svg)
-
 :::
-
-::::
+:::::
 
 ## The Challenge
 
-:::: {.columns}
-
+:::: columns
 ::: {.column width="100%"}
 People develop multiple diseases over their lifetime, but:
 
-- Diseases don't occur in isolation
-- Comorbidities follow patterns, but these vary by individual
-- Genetics influences these patterns (but isn't destiny)
-- Standard approaches miss the dynamic nature of these relationships
+-   Diseases don't occur in isolation
+-   Comorbidities follow patterns, but these vary by individual
+-   Genetics influences these patterns (but isn't destiny)
+-   Standard approaches miss the dynamic nature of these relationships
 
-To both predict and understand, we need to consider past, present, and future.
+To both predict and understand, we need to consider past, present, and
+future.
 
-**How do we model the complete trajectory of an individual's health, incorporating both genetics and evolving clinical status?**
+**How do we model the complete trajectory of an individual's health,
+incorporating both genetics and evolving clinical status?**
 :::
-
 ::::
 
 ## What Are "Latent Variables"?
 
-:::: {.columns}
-
+::::: columns
 ::: {.column width="60%"}
-- Things we can't directly observe
-- Must be inferred from what we can measure
-- Examples in everyday life:
-  - Intelligence (measured by tests)
-  - Happiness (measured by behaviors)
-  - Disease patterns (measured by symptoms and test results)
-- Powerful statistical concept for finding hidden structure
+-   Things we can't directly observe
+-   Must be inferred from what we can measure
+-   Examples in everyday life:
+    -   Intelligence (measured by tests)
+    -   Happiness (measured by behaviors)
+    -   Disease patterns (measured by symptoms and test results)
+-   Powerful statistical concept for finding hidden structure
 :::
 
 ::: {.column width="40%"}
 ![](latent-variable-diagram.svg)
 :::
-
-::::
+:::::
 
 ## A Simple Medical Example
 
-:::: {.columns}
-
+:::: columns
 ::: {.column width="100%"}
-```
+```         
 Observable:               Hidden:                  Observable:
                           _________
 Fever                    |         |
@@ -100,230 +97,240 @@ Cough               |    |_________|    |
 Pain  --------------                    -------> Imaging Findings
 ```
 
-The disease is a **latent variable** we infer from observable symptoms and test results
+The disease is a **latent variable** we infer from observable symptoms
+and test results
+:::
+::::
+
+## Understanding Latent Variables
+
+![](images/pc-comparison-diagram.svg){width="600"}
+
+::: notes
+  
+When two (or more) biomarkers are highly correlated, they contain partially redundant information. Find the direction that maximizes
+variation, which often means combining information from both
+markers, resolving more differences than either alone.
+This is why these statistical techniques are so powerful for medical
+applications. Rather than looking at dozens of individual biomarkers
+in isolation, you can create composite scores that capture more of the underlying biological signal (like cardiac
+damage) Reduce noise by combining multiple measurements and create
+better separation between patients with different disease severity
+this concept extends beautifully to time-varying data, binary
+outcomes, and the complex patterns of comorbidities with Aladynoulli
+model!
 :::
 
-::::
+## Correlated biomarkers 
+
+Troponin and CK-MB
+
+![](latent-variable-simple.svg)
+
+
 
 ## Disease "Signatures"
 
-:::: {.columns}
-
+::::: columns
 ::: {.column width="60%"}
 We introduce and define **signatures** as:
 
-- **Latent patterns of disease co-occurrence that vary in time**
-- Learned from data in an unsupervised way
-- Example signatures:
-  - Cardiovascular (hypercholesterolemia → CAD → heart failure)
-  - Metabolic (diabetes, obesity, fatty liver)
-  - Neoplastic (various cancers, anemia)
-- Discovered through statistical methods, not predefined categories
+-   **Latent patterns of disease co-occurrence that vary in time**
+-   Learned from data in an unsupervised way
+-   Example signatures:
+    -   Cardiovascular (hypercholesterolemia → CAD → heart failure)
+    -   Metabolic (diabetes, obesity, fatty liver)
+    -   Neoplastic (various cancers, anemia)
+-   Discovered through statistical methods, not predefined categories
 :::
 
 ::: {.column width="40%"}
 ![](disease-signatures-diagram.svg)
 :::
-
-::::
+:::::
 
 ## How Signatures Change Over Time
 
-:::: {.columns}
-
+:::: columns
 ::: {.column width="100%"}
-![Diseases don't all happen at once - they follow patterns over time](cvdsig.svg)
+![Diseases don't all happen at once - they follow patterns over
+time](cvdsig.svg)
 :::
-
 ::::
 
 ## Patient Trajectories Vary
 
-:::: {.columns}
-
+::::: columns
 ::: {.column width="60%"}
-**Patients don't sit still** - their signature profiles change over time:
+**Patients don't sit still** - their signature profiles change over
+time:
 
-**Example patient journey:**
-- Rheumatologic diagnoses at age 30
-- Premature coronary artery disease at age 40
-- Increased neoplastic risk by age 50
+**Example patient journey:** - Rheumatologic diagnoses at age 30 -
+Premature coronary artery disease at age 40 - Increased neoplastic risk
+by age 50
 
-This story is distinct from other patients, **revealing heterogeneity underlying a shared phenotype**
+This story is distinct from other patients, **revealing heterogeneity
+underlying a shared phenotype**
 :::
 
 ::: {.column width="40%"}
 ![](patient-trajectory-diagram.svg)
 :::
-
-::::
+:::::
 
 ## Borrowing Information
 
-:::: {.columns}
-
+::::: columns
 ::: {.column width="60%"}
 **Key Statistical Insight:**
 
-We can "borrow information" from similar patients to make better predictions
+We can "borrow information" from similar patients to make better
+predictions
 
-- If we see Patient A with pattern X develop disease Y
-- And Patient B shows early signs of pattern X
-- We can better predict B's risk of disease Y
+-   If we see Patient A with pattern X develop disease Y
+-   And Patient B shows early signs of pattern X
+-   We can better predict B's risk of disease Y
 :::
 
 ::: {.column width="40%"}
 ![Connecting the dots across patients](histories.svg)
 :::
-
-::::
+:::::
 
 ## The Bayesian Approach
 
-:::: {.columns}
-
+:::: columns
 ::: {.column width="100%"}
 Mathematical way to update our beliefs as new information arrives:
 
 $$\text{Updated Belief} \propto \text{Prior Knowledge} \times \text{New Data}$$
 
-In practical terms:
-- Start with what we know about disease patterns in general
-- Update based on this specific patient's data
-- Continually refine as more information comes in
+In practical terms: - Start with what we know about disease patterns in
+general - Update based on this specific patient's data - Continually
+refine as more information comes in
 :::
-
 ::::
 
 ## A Simple Bayesian Example
 
 Predicting heart attack risk:
 
-1. **Prior**: 5% of people with high blood pressure have heart attacks
-2. **New Data**: Our patient has chest pain
-3. **Updated Belief**: Risk is now 15% given both factors
+1.  **Prior**: 5% of people with high blood pressure have heart attacks
+2.  **New Data**: Our patient has chest pain
+3.  **Updated Belief**: Risk is now 15% given both factors
 
-This is "borrowing information" from population studies to help with individual prediction.
+This is "borrowing information" from population studies to help with
+individual prediction.
 
 ## The Mathematical Model (Simplified)
 
-:::: {.columns}
-
-::: {.column width="60%"}
 Turning patient stories into math helps us formalize the problem:
 
-- **ϕ (phi)** - Time-varying disease signatures
-  - How different diseases evolve over time within a signature
-  - Centered around population incidence
+-   **ϕ (phi)** - Time-varying disease signatures
+    -   How different diseases evolve over time within a signature
+    -   Centered around population incidence
+-   **λ (lambda)** - Individual's time-varying signature loading
+    -   Anchored on germline genetic predisposition
+    -   Shows which signatures are important for a specific person
+-   Both evolve smoothly over time (using Gaussian processes)
+-   Helps us "borrow information" across years
 
-- **λ (lambda)** - Individual's time-varying signature loading
-  - Anchored on germline genetic predisposition
-  - Shows which signatures are important for a specific person
+## The Mathematical Model (Simplified)
 
-- Both evolve smoothly over time (using Gaussian processes)
-  - Helps us "borrow information" across years
-:::
-
-::: {.column width="40%"}
 ![](bayesian-model-diagram.svg)
-:::
-
-::::
 
 ## The Bayesian Magic
 
-:::: {.columns}
-
+::::: columns
 ::: {.column width="60%"}
 Our approach works because:
 
-1. We start with prior beliefs (based on population patterns)
-2. **Each new diagnosis refines our model parameters in real time**
-3. We integrate prior knowledge with patient-specific data
-4. The past informs the present, and the present becomes the past to inform the future
+1.  We start with prior beliefs (based on population patterns)
+2.  **Each new diagnosis refines our model parameters in real time**
+3.  We integrate prior knowledge with patient-specific data
+4.  The past informs the present, and the present becomes the past to
+    inform the future
 
 Four key innovations:
 
-1. **Bridges discovery and prediction** 
-2. **Disease signatures evolve over time and across diseases**
-3. **Anchoring in genomics** produces biologically meaningful parameters
-4. **Bayesian updating adapts estimates in real time**
+1.  **Bridges discovery and prediction**
+2.  **Disease signatures evolve over time and across diseases**
+3.  **Anchoring in genomics** produces biologically meaningful
+    parameters
+4.  **Bayesian updating adapts estimates in real time**
 :::
 
 ::: {.column width="40%"}
 ![](bayesian-updating-diagram.svg)
 :::
-
-::::
+:::::
 
 ## Why This Matters
 
-:::: {.columns}
-
+::::: columns
 ::: {.column width="60%"}
-- Earlier detection of disease
-- More personalized prevention strategies
-- Better understanding of disease mechanisms
-- Identifying new subtypes of diseases
-- Improving clinical trials by targeting the right patients
+-   Earlier detection of disease
+-   More personalized prevention strategies
+-   Better understanding of disease mechanisms
+-   Identifying new subtypes of diseases
+-   Improving clinical trials by targeting the right patients
 :::
 
 ::: {.column width="40%"}
 ![Better prevention and prediction](fig5.svg)
 :::
-
-::::
+:::::
 
 ## Case Study: Early Heart Disease
 
-:::: {.columns}
-
+:::: columns
 ::: {.column width="100%"}
-![A patient's signature profile can predict risk years before disease appears](figure3_patient_example_2.svg)
+![A patient's signature profile can predict risk years before disease
+appears](figure3_patient_example_2.svg)
 :::
-
 ::::
 
 ## Why This Work Matters
 
-:::: {.columns}
-
+:::: columns
 ::: {.column width="100%"}
 This work is the essence of translational medicine:
 
-- Bridges basic, methodologic, and clinical science
-- Requires both math and biology appreciation
-- Transcends single-discipline medicine
-- Transforms how we predict, prevent, and understand disease progression
+-   Bridges basic, methodologic, and clinical science
+-   Requires both math and biology appreciation
+-   Transcends single-discipline medicine
+-   Transforms how we predict, prevent, and understand disease
+    progression
 
-What statistics has taught me:
-- Complex systems can be modeled but require careful assumptions
-- Uncertainty should be embraced, not ignored  
-- Borrowing information is powerful but must be done carefully
-- The best models combine mathematical elegance with real-world knowledge
-- Clinical intuition + statistical rigor = better medicine
+What statistics has taught me: - Complex systems can be modeled but
+require careful assumptions - Uncertainty should be embraced, not
+ignored\
+- Borrowing information is powerful but must be done carefully - The
+best models combine mathematical elegance with real-world knowledge -
+Clinical intuition + statistical rigor = better medicine
 :::
-
 ::::
 
 ## Resources & Questions
 
-:::: {.columns}
-
+::::: columns
 ::: {.column width="60%"}
-- Paper: [medrxiv.org/content/10.1101/2024.09.29.24314557V1](https://www.medrxiv.org/content/10.1101/2024.09.29.24314557V1)
-- Code: [github.com/surbut/Aladynoulli2](https://github.com/surbut/Aladynoulli2)
-- Interactive app: [Surbut.shinyapps.io/berndiffapp](https://Surbut.shinyapps.io/berndiffapp)
+-   Paper:
+    [medrxiv.org/content/10.1101/2024.09.29.24314557V1](https://www.medrxiv.org/content/10.1101/2024.09.29.24314557V1)
+-   Code:
+    [github.com/surbut/Aladynoulli2](https://github.com/surbut/Aladynoulli2)
+-   Interactive app:
+    [Surbut.shinyapps.io/berndiffapp](https://Surbut.shinyapps.io/berndiffapp)
 :::
 
 ::: {.column width="40%"}
 ![QR code to resources](https://i.imgur.com/dummy-qr.jpg)
 :::
-
-::::
+:::::
 
 ## Thank You!
 
-Statistics can help us understand health in ways that transform medicine.
+Statistics can help us understand health in ways that transform
+medicine.
 
 (And yes, it's worth learning for your Stat 102 class!)

@@ -421,6 +421,28 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 <p>The disease is a <strong>latent variable</strong> we infer from observable symptoms and test results</p>
 </div></div>
 </section>
+<section id="understanding-latent-variables" class="slide level2">
+<h2>Understanding Latent Variables</h2>
+
+<img data-src="images/pc-comparison-diagram.svg" width="600" class="r-stretch"><aside class="notes">
+<p>When two (or more) biomarkers are highly correlated, they contain partially redundant information. Find the direction that maximizes variation, which often means combining information from both markers, resolving more differences than either alone. This is why these statistical techniques are so powerful for medical applications. Rather than looking at dozens of individual biomarkers in isolation, you can create composite scores that capture more of the underlying biological signal (like cardiac damage) Reduce noise by combining multiple measurements and create better separation between patients with different disease severity this concept extends beautifully to time-varying data, binary outcomes, and the complex patterns of comorbidities with Aladynoulli model!</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="correlated-biomarkers" class="slide level2">
+<h2>Correlated biomarkers</h2>
+<p>Troponin and CK-MB</p>
+
+<img data-src="latent-variable-simple.svg" class="r-stretch"></section>
 <section id="disease-signatures" class="slide level2">
 <h2>Disease “Signatures”</h2>
 <div class="columns">
@@ -505,8 +527,6 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 </section>
 <section id="the-mathematical-model-simplified" class="slide level2">
 <h2>The Mathematical Model (Simplified)</h2>
-<div class="columns">
-<div class="column" style="width:60%;">
 <p>Turning patient stories into math helps us formalize the problem:</p>
 <ul>
 <li><strong>ϕ (phi)</strong> - Time-varying disease signatures
@@ -519,15 +539,14 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 <li>Anchored on germline genetic predisposition</li>
 <li>Shows which signatures are important for a specific person</li>
 </ul></li>
-<li>Both evolve smoothly over time (using Gaussian processes)
-<ul>
+<li>Both evolve smoothly over time (using Gaussian processes)</li>
 <li>Helps us “borrow information” across years</li>
-</ul></li>
 </ul>
-</div><div class="column" style="width:40%;">
-<p><img data-src="bayesian-model-diagram.svg"></p>
-</div></div>
 </section>
+<section id="the-mathematical-model-simplified-1" class="slide level2">
+<h2>The Mathematical Model (Simplified)</h2>
+
+<img data-src="bayesian-model-diagram.svg" class="r-stretch"></section>
 <section id="the-bayesian-magic" class="slide level2">
 <h2>The Bayesian Magic</h2>
 <div class="columns">
