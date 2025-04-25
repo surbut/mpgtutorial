@@ -1,0 +1,296 @@
+<svg viewBox="0 0 900 700" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="900" height="700" fill="#f8f9fa" rx="8" ry="8"/>
+  
+  <!-- Title -->
+  <text x="450" y="30" font-family="Arial" font-size="22" text-anchor="middle" font-weight="bold">ALADYNOULLI: Comprehensive Model Schematic</text>
+  
+  <!-- Patient Timeline Section -->
+  <text x="450" y="60" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">Patient Timeline of Disease</text>
+  
+  <!-- Timeline border -->
+  <rect x="50" y="70" width="800" height="100" fill="none" stroke="#333" stroke-width="1" rx="5" ry="5" stroke-dasharray="5,5"/>
+  
+  <!-- Timeline -->
+  <line x1="100" y1="120" x2="800" y2="120" stroke="#333" stroke-width="3"/>
+  
+  <!-- Timeline ticks and ages -->
+  <line x1="100" y1="115" x2="100" y2="125" stroke="#333" stroke-width="2"/>
+  <text x="100" y="140" font-family="Arial" font-size="12" text-anchor="middle">Age 30</text>
+  
+  <line x1="240" y1="115" x2="240" y2="125" stroke="#333" stroke-width="2"/>
+  <text x="240" y="140" font-family="Arial" font-size="12" text-anchor="middle">Age 40</text>
+  
+  <line x1="380" y1="115" x2="380" y2="125" stroke="#333" stroke-width="2"/>
+  <text x="380" y="140" font-family="Arial" font-size="12" text-anchor="middle">Age 50</text>
+  
+  <line x1="520" y1="115" x2="520" y2="125" stroke="#333" stroke-width="2"/>
+  <text x="520" y="140" font-family="Arial" font-size="12" text-anchor="middle">Age 60</text>
+  
+  <line x1="660" y1="115" x2="660" y2="125" stroke="#333" stroke-width="2"/>
+  <text x="660" y="140" font-family="Arial" font-size="12" text-anchor="middle">Age 70</text>
+  
+  <line x1="800" y1="115" x2="800" y2="125" stroke="#333" stroke-width="2"/>
+  <text x="800" y="140" font-family="Arial" font-size="12" text-anchor="middle">Age 80</text>
+  
+  <!-- Diagnosis Events -->
+  <circle cx="150" cy="120" r="8" fill="#3498DB"/>
+  <text x="150" y="100" font-family="Arial" font-size="12" text-anchor="middle">Asthma</text>
+  
+  <circle cx="220" cy="120" r="8" fill="#E74C3C"/>
+  <text x="220" y="100" font-family="Arial" font-size="12" text-anchor="middle">Hypertension</text>
+  
+  <circle cx="320" cy="120" r="8" fill="#9B59B6"/>
+  <text x="320" y="100" font-family="Arial" font-size="12" text-anchor="middle">Rheumatoid Arthritis</text>
+  
+  <circle cx="420" cy="120" r="8" fill="#E74C3C"/>
+  <text x="420" y="100" font-family="Arial" font-size="12" text-anchor="middle">Type 2 Diabetes</text>
+  
+  <circle cx="490" cy="120" r="8" fill="#2ECC71"/>
+  <text x="490" y="100" font-family="Arial" font-size="12" text-anchor="middle">Breast Cancer</text>
+  
+  <circle cx="550" cy="120" r="8" fill="#E74C3C"/>
+  <text x="550" y="100" font-family="Arial" font-size="12" text-anchor="middle">Coronary Artery Disease</text>
+  
+  <circle cx="680" cy="120" r="8" fill="#E74C3C"/>
+  <text x="680" y="100" font-family="Arial" font-size="12" text-anchor="middle">Heart Failure</text>
+  
+  <circle cx="750" cy="120" r="8" fill="#3498DB"/>
+  <text x="750" y="100" font-family="Arial" font-size="12" text-anchor="middle">COPD</text>
+  
+  <!-- Current time point marker -->
+  <line x1="550" y1="90" x2="550" y2="150" stroke="#3498DB" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="550" y="165" font-family="Arial" font-size="14" text-anchor="middle" fill="#3498DB" font-weight="bold">Current Time</text>
+  
+  <!-- Section A: Disease-Signature Relationships -->
+  <text x="160" y="190" font-family="Arial" font-size="16" font-weight="bold">A. Disease-Signature Relationships (ϕ)</text>
+  
+  <!-- Section A border -->
+  <rect x="50" y="200" width="270" height="230" fill="none" stroke="#333" stroke-width="1" rx="5" ry="5" stroke-dasharray="5,5"/>
+  
+  <!-- Time axis -->
+  <line x1="80" y1="400" x2="280" y2="400" stroke="#333" stroke-width="2"/>
+  <text x="180" y="420" font-family="Arial" font-size="12" text-anchor="middle">Time (Age)</text>
+  
+  <!-- Probability axis -->
+  <line x1="80" y1="400" x2="80" y2="230" stroke="#333" stroke-width="2"/>
+  <text x="60" y="315" font-family="Arial" font-size="12" transform="rotate(-90,60,315)" text-anchor="middle">Disease Probability (ϕ)</text>
+  
+  <!-- Cardiovascular Signature -->
+  <path d="M 80 380 Q 180 360, 280 280" fill="none" stroke="#E74C3C" stroke-width="3"/>
+  <text x="290" y="280" font-family="Arial" font-size="10" fill="#E74C3C">Coronary Disease</text>
+  
+  <path d="M 80 370 Q 180 340, 280 310" fill="none" stroke="#E74C3C" stroke-width="2" stroke-dasharray="4,2"/>
+  <text x="290" y="310" font-family="Arial" font-size="10" fill="#E74C3C">Heart Failure</text>
+  
+  <path d="M 80 390 Q 180 370, 280 350" fill="none" stroke="#E74C3C" stroke-width="2" stroke-dasharray="2,2"/>
+  <text x="290" y="350" font-family="Arial" font-size="10" fill="#E74C3C">Hypertension</text>
+  
+  <!-- Signature label -->
+  <rect x="140" y="230" width="115" height="25" fill="#E74C3C" opacity="0.8" rx="5" ry="5"/>
+  <text x="198" y="247" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Cardiovascular</text>
+  
+  <!-- Equation callout -->
+  <rect x="90" y="330" width="200" height="40" fill="white" stroke="#333" stroke-width="1" rx="5" ry="5" opacity="0.9"/>
+  <text x="190" y="355" font-family="Arial" font-size="12" text-anchor="middle">ϕₖₐ ~ GP(μₐ + ψₖₐ, Kϕ)</text>
+  
+  <!-- Connection to timeline -->
+  <path d="M 220 200 L 220 170" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  <path d="M 420 200 L 420 170" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  <path d="M 550 200 L 550 170" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  <path d="M 680 200 L 680 170" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  
+  <!-- Section B: Individual-Signature Loadings -->
+  <text x="480" y="190" font-family="Arial" font-size="16" font-weight="bold">B. Individual-Signature Loadings (λ)</text>
+  
+  <!-- Section B border -->
+  <rect x="370" y="200" width="270" height="230" fill="none" stroke="#333" stroke-width="1" rx="5" ry="5" stroke-dasharray="5,5"/>
+  
+  <!-- Time axis -->
+  <line x1="400" y1="400" x2="600" y2="400" stroke="#333" stroke-width="2"/>
+  <text x="500" y="420" font-family="Arial" font-size="12" text-anchor="middle">Time (Age)</text>
+  
+  <!-- Loading axis -->
+  <line x1="400" y1="400" x2="400" y2="230" stroke="#333" stroke-width="2"/>
+  <text x="380" y="315" font-family="Arial" font-size="12" transform="rotate(-90,380,315)" text-anchor="middle">Signature Loading (λ)</text>
+  
+  <!-- Patient diagnostic events - correspond to timeline -->
+  <circle cx="420" cy="400" r="4" fill="#E74C3C"/>
+  <circle cx="446" cy="400" r="4" fill="#9B59B6"/>
+  <circle cx="470" cy="400" r="4" fill="#E74C3C"/>
+  <circle cx="494" cy="400" r="4" fill="#2ECC71"/>
+  <circle cx="518" cy="400" r="4" fill="#E74C3C"/>
+  <circle cx="565" cy="400" r="4" fill="#E74C3C"/>
+  
+  <!-- Diagnosis arrows -->
+  <line x1="420" y1="400" x2="420" y2="380" stroke="#333" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="446" y1="400" x2="446" y2="350" stroke="#333" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="470" y1="400" x2="470" y2="370" stroke="#333" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="494" y1="400" x2="494" y2="330" stroke="#333" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="518" y1="400" x2="518" y2="320" stroke="#333" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="565" y1="400" x2="565" y2="300" stroke="#333" stroke-width="1" stroke-dasharray="3,3"/>
+  
+  <!-- Individual's signature loadings -->
+  <!-- Cardiovascular -->
+  <path d="M 400 380 Q 420 375, 450 370 Q 470 368, 490 365 Q 510 350, 520 320 Q 540 310, 565 300 Q 580 295, 600 290" fill="none" stroke="#E74C3C" stroke-width="3"/>
+  <text x="610" y="290" font-family="Arial" font-size="10" fill="#E74C3C">Cardiovascular</text>
+  
+  <!-- Oncology -->
+  <path d="M 400 390 Q 420 390, 450 388 Q 470 387, 490 330 Q 510 325, 520 323 Q 540 322, 565 320 Q 580 318, 600 315" fill="none" stroke="#2ECC71" stroke-width="3"/>
+  <text x="610" y="315" font-family="Arial" font-size="10" fill="#2ECC71">Oncology</text>
+  
+  <!-- Rheumatology -->
+  <path d="M 400 385 Q 420 385, 445 350 Q 465 345, 485 343 Q 505 342, 520 340 Q 540 338, 565 335 Q 580 334, 600 332" fill="none" stroke="#9B59B6" stroke-width="3"/>
+  <text x="610" y="332" font-family="Arial" font-size="10" fill="#9B59B6">Rheumatology</text>
+  
+  <!-- Pulmonary -->
+  <path d="M 400 388 Q 420 387, 445 385 Q 465 383, 485 382 Q 505 380, 520 378 Q 540 375, 565 372 Q 580 370, 600 360" fill="none" stroke="#3498DB" stroke-width="3"/>
+  <text x="610" y="360" font-family="Arial" font-size="10" fill="#3498DB">Pulmonary</text>
+  
+  <!-- Patient label -->
+  <rect x="460" y="230" width="90" height="25" fill="#333" opacity="0.8" rx="5" ry="5"/>
+  <text x="505" y="247" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Patient 123</text>
+  
+  <!-- Equation callout -->
+  <rect x="410" y="330" width="200" height="40" fill="white" stroke="#333" stroke-width="1" rx="5" ry="5" opacity="0.9"/>
+  <text x="510" y="355" font-family="Arial" font-size="12" text-anchor="middle">λᵢₖ ~ GP(rₖ + Γₖᵀgᵢ, Kλ)</text>
+  
+  <!-- Connection to timeline -->
+  <path d="M 420 200 L 420 170" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  <path d="M 490 200 L 490 170" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  <path d="M 550 200 L 550 170" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  
+  <!-- Section C: Combined Risk Prediction -->
+  <text x="800" y="190" font-family="Arial" font-size="16" font-weight="bold">C. Combined Disease Risk (π)</text>
+  
+  <!-- Section C border -->
+  <rect x="690" y="200" width="270" height="230" fill="none" stroke="#333" stroke-width="1" rx="5" ry="5" stroke-dasharray="5,5"/>
+  
+  <!-- Time axis -->
+  <line x1="720" y1="400" x2="920" y2="400" stroke="#333" stroke-width="2"/>
+  <text x="820" y="420" font-family="Arial" font-size="12" text-anchor="middle">Time (Age)</text>
+  
+  <!-- Probability axis -->
+  <line x1="720" y1="400" x2="720" y2="230" stroke="#333" stroke-width="2"/>
+  <text x="700" y="315" font-family="Arial" font-size="12" transform="rotate(-90,700,315)" text-anchor="middle">Disease Probability (π)</text>
+  
+  <!-- Current time marker -->
+  <line x1="850" y1="400" x2="850" y2="230" stroke="#3498DB" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="850" y="225" font-family="Arial" font-size="12" fill="#3498DB" text-anchor="middle">Current Time</text>
+  
+  <!-- Risk prediction curves -->
+  <!-- Heart Failure -->
+  <path d="M 720 395 L 760 390 L 800 375 L 830 355 L 850 330 L 870 310 L 890 290 L 920 270" fill="none" stroke="#E74C3C" stroke-width="3"/>
+  
+  <!-- Rheumatoid Arthritis Progression -->
+  <path d="M 720 370 L 760 368 L 800 365 L 830 363 L 850 360 L 870 355 L 890 350 L 920 345" fill="none" stroke="#9B59B6" stroke-width="3"/>
+  
+  <!-- Breast Cancer Recurrence -->
+  <path d="M 720 380 L 760 375 L 800 360 L 830 350 L 850 345 L 870 342 L 890 340 L 920 335" fill="none" stroke="#2ECC71" stroke-width="3"/>
+  
+  <!-- Risk prediction shading (past) - Heart Failure -->
+  <path d="M 720 395 L 760 390 L 800 375 L 830 355 L 850 330 L 850 400 L 720 400 Z" fill="#E74C3C" opacity="0.1"/>
+  
+  <!-- Risk prediction shading (future) - Heart Failure -->
+  <path d="M 850 330 L 870 310 L 890 290 L 920 270 L 920 400 L 850 400 Z" fill="#E74C3C" opacity="0.05" stroke="#E74C3C" stroke-width="1" stroke-dasharray="3,3"/>
+  
+  <!-- Threshold line -->
+  <line x1="720" y1="300" x2="920" y2="300" stroke="#333" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="710" y="300" font-family="Arial" font-size="10" text-anchor="end">Threshold</text>
+  
+  <!-- Risk labels -->
+  <text x="930" y="270" font-family="Arial" font-size="10" fill="#E74C3C">Heart Failure</text>
+  <text x="930" y="335" font-family="Arial" font-size="10" fill="#2ECC71">Breast Cancer Recurrence</text>
+  <text x="930" y="345" font-family="Arial" font-size="10" fill="#9B59B6">RA Progression</text>
+  
+  <!-- Equation callout -->
+  <rect x="730" y="330" width="200" height="40" fill="white" stroke="#333" stroke-width="1" rx="5" ry="5" opacity="0.9"/>
+  <text x="830" y="355" font-family="Arial" font-size="12" text-anchor="middle">πᵢₐₜ = κ·Σₖ θᵢₖₜ·sigmoid(ϕₖₐₜ)</text>
+  
+  <!-- Connection to timeline -->
+  <path d="M 680 230 L 680 170" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  <path d="M 550 230 L 550 170" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  <path d="M 490 230 L 490 170" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  <path d="M 320 230 L 320 170" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  
+  <!-- Section D: Model Diagram -->
+  <text x="450" y="450" font-family="Arial" font-size="16" font-weight="bold">D. ALADYNOULLI Model Integration</text>
+  
+  <!-- Section D border -->
+  <rect x="50" y="460" width="800" height="230" fill="none" stroke="#333" stroke-width="1" rx="5" ry="5" stroke-dasharray="5,5"/>
+  
+  <!-- Diagram Title -->
+  <text x="450" y="480" font-family="Arial" font-size="14" text-anchor="middle">How the Components Work Together</text>
+  
+  <!-- Core model diagram -->
+  <rect x="180" y="500" width="200" height="150" fill="#E8F8F5" stroke="#333" stroke-width="1" rx="5" ry="5"/>
+  <text x="280" y="520" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">Disease Signatures</text>
+  <text x="280" y="540" font-family="Arial" font-size="12" text-anchor="middle">ϕₖₐₜ ~ GP(μₐ + ψₖₐ, Kϕ)</text>
+  
+  <path d="M 180 560 L 380 560" fill="none" stroke="#333" stroke-width="1"/>
+  
+  <rect x="190" y="570" width="40" height="30" fill="#E74C3C" opacity="0.8" rx="5" ry="5"/>
+  <text x="210" y="590" font-family="Arial" font-size="12" fill="white" text-anchor="middle">CV</text>
+  
+  <rect x="240" y="570" width="40" height="30" fill="#2ECC71" opacity="0.8" rx="5" ry="5"/>
+  <text x="260" y="590" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Onc</text>
+  
+  <rect x="290" y="570" width="40" height="30" fill="#9B59B6" opacity="0.8" rx="5" ry="5"/>
+  <text x="310" y="590" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Rheum</text>
+  
+  <rect x="340" y="570" width="40" height="30" fill="#3498DB" opacity="0.8" rx="5" ry="5"/>
+  <text x="360" y="590" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Pulm</text>
+  
+  <text x="280" y="620" font-family="Arial" font-size="12" text-anchor="middle" font-style="italic">Defines signature-disease</text>
+  <text x="280" y="635" font-family="Arial" font-size="12" text-anchor="middle" font-style="italic">relationships over time</text>
+  
+  <rect x="520" y="500" width="200" height="150" fill="#E8F8F5" stroke="#333" stroke-width="1" rx="5" ry="5"/>
+  <text x="620" y="520" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">Individual Loadings</text>
+  <text x="620" y="540" font-family="Arial" font-size="12" text-anchor="middle">λᵢₖₜ ~ GP(rₖ + Γₖᵀgᵢ, Kλ)</text>
+  <text x="620" y="560" font-family="Arial" font-size="12" text-anchor="middle">θᵢₖₜ = softmax(λᵢₖₜ)</text>
+  
+  <path d="M 520 580 L 720 580" fill="none" stroke="#333" stroke-width="1"/>
+  
+  <rect x="530" y="590" width="80" height="20" fill="#E74C3C" opacity="0.4" rx="5" ry="5"/>
+  <rect x="530" y="590" width="40" height="20" fill="#E74C3C" opacity="0.8" rx="5" ry="5"/>
+  <text x="550" y="605" font-family="Arial" font-size="10" fill="white" text-anchor="middle">CV</text>
+  
+  <rect x="530" y="615" width="80" height="20" fill="#2ECC71" opacity="0.4" rx="5" ry="5"/>
+  <rect x="530" y="615" width="30" height="20" fill="#2ECC71" opacity="0.8" rx="5" ry="5"/>
+  <text x="550" y="630" font-family="Arial" font-size="10" fill="white" text-anchor="middle">Onc</text>
+  
+  <text x="625" y="605" font-family="Arial" font-size="12" text-anchor="middle" font-style="italic">Indicates patient's</text>
+  <text x="625" y="620" font-family="Arial" font-size="12" text-anchor="middle" font-style="italic">association with</text>
+  <text x="625" y="635" font-family="Arial" font-size="12" text-anchor="middle" font-style="italic">each signature</text>
+  
+  <!-- Flow arrows -->
+  <path d="M 280 650 L 280 670 L 450 670 L 620 670 L 620 650" fill="none" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Risk prediction component -->
+  <rect x="350" y="590" width="200" height="50" fill="#D4EFDF" stroke="#333" stroke-width="1" rx="5" ry="5"/>
+  <text x="450" y="605" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">Risk Prediction</text>
+  <text x="450" y="625" font-family="Arial" font-size="12" text-anchor="middle">πᵢₐₜ = κ·Σₖ θᵢₖₜ·sigmoid(ϕₖₐₜ)</text>
+  
+  <!-- Input arrows -->
+  <path d="M 380 575 L 450 590" fill="none" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <path d="M 520 575 L 450 590" fill="none" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Output arrow -->
+  <path d="M 450 640 L 450 670" fill="none" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Outcome -->  
+  <rect x="400" y="680" width="100" height="30" fill="#E74C3C" opacity="0.8" rx="15" ry="15"/>
+  <text x="450" y="700" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Disease Risk</text>
+  
+  <!-- Interconnecting lines -->
+  <path d="M 320 460 L 160 430" stroke="#333" stroke-width="1" stroke-dasharray="2,2"/>
+  <path d="M 500 460 L 480 430" stroke="#333" stroke-width="1" stroke-dasharray="2,2"/>
+  <path d="M 650 460 L 800 430" stroke="#333" stroke-width="1" stroke-dasharray="2,2"/>
+  
+  <!-- Definitions -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+  </defs>
+</svg>

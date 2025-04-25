@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="450" viewBox="0 0 600 450">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="3" dy="3" stdDeviation="2" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Title -->
+  <text x="300" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#333">Disease Signatures: Patterns Over Time</text>
+  
+  <!-- Age axis -->
+  <line x1="100" y1="380" x2="500" y2="380" stroke="#333" stroke-width="2"/>
+  <text x="300" y="410" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Age (years)</text>
+  
+  <!-- Age markers -->
+  <line x1="100" y1="380" x2="100" y2="385" stroke="#333" stroke-width="2"/>
+  <text x="100" y="400" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">30</text>
+  
+  <line x1="200" y1="380" x2="200" y2="385" stroke="#333" stroke-width="2"/>
+  <text x="200" y="400" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">40</text>
+  
+  <line x1="300" y1="380" x2="300" y2="385" stroke="#333" stroke-width="2"/>
+  <text x="300" y="400" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">50</text>
+  
+  <line x1="400" y1="380" x2="400" y2="385" stroke="#333" stroke-width="2"/>
+  <text x="400" y="400" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">60</text>
+  
+  <line x1="500" y1="380" x2="500" y2="385" stroke="#333" stroke-width="2"/>
+  <text x="500" y="400" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333">70</text>
+  
+  <!-- Cardiovascular Signature -->
+  <text x="300" y="70" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#E63946">Cardiovascular Signature</text>
+  
+  <!-- Cardiovascular disease progression curves -->
+  <path d="M100,350 Q150,340 200,320 Q250,290 300,230 Q350,180 400,140 Q450,130 500,140" fill="none" stroke="#E63946" stroke-width="3"/>
+  <text x="520" y="140" font-family="Arial, sans-serif" font-size="12" text-anchor="start" fill="#E63946">Heart Failure</text>
+  
+  <path d="M100,360 Q150,350 200,325 Q250,290 300,215 Q350,160 400,120 Q450,100 500,110" fill="none" stroke="#E63946" stroke-width="3" stroke-dasharray="5,5"/>
+  <text x="520" y="110" font-family="Arial, sans-serif" font-size="12" text-anchor="start" fill="#E63946">MI</text>
+  
+  <path d="M100,340 Q150,330 200,300 Q250,260 300,180 Q350,130 400,110 Q450,105 500,120" fill="none" stroke="#E63946" stroke-width="3" stroke-dasharray="10,3"/>
+  <text x="520" y="120" font-family="Arial, sans-serif" font-size="12" text-anchor="start" fill="#E63946">CAD</text>
+  
+  <path d="M100,320 Q150,300 200,260 Q250,200 300,150 Q350,120 400,115 Q450,120 500,150" fill="none" stroke="#E63946" stroke-width="2" stroke-opacity="0.6"/>
+  <text x="520" y="150" font-family="Arial, sans-serif" font-size="12" text-anchor="start" fill="#E63946">Hypertension</text>
+  
+  <!-- Metabolic Signature -->
+  <text x="300" y="180" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#4D908E">Metabolic Signature</text>
+  
+  <!-- Metabolic disease progression curves -->
+  <path d="M100,340 Q150,320 200,290 Q250,250 300,210 Q350,190 400,180 Q450,170 500,160" fill="none" stroke="#4D908E" stroke-width="3"/>
+  <text x="520" y="160" font-family="Arial, sans-serif" font-size="12" text-anchor="start" fill="#4D908E">Type 2 Diabetes</text>
+  
+  <path d="M100,350 Q150,340 200,320 Q250,280 300,240 Q350,230 400,220 Q450,210 500,200" fill="none" stroke="#4D908E" stroke-width="3" stroke-dasharray="5,5"/>
+  <text x="520" y="200" font-family="Arial, sans-serif" font-size="12" text-anchor="start" fill="#4D908E">Obesity</text>
+  
+  <path d="M100,360 Q150,350 200,340 Q250,320 300,290 Q350,260 400,240 Q450,230 500,220" fill="none" stroke="#4D908E" stroke-width="3" stroke-dasharray="10,3"/>
+  <text x="520" y="220" font-family="Arial, sans-serif" font-size="12" text-anchor="start" fill="#4D908E">Fatty Liver</text>
+  
+  <!-- Neoplastic Signature -->
+  <text x="300" y="290" font-family="Arial, sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#9D4EDD">Neoplastic Signature</text>
+  
+  <!-- Neoplastic disease progression curves -->
+  <path d="M100,370 Q200,370 250,360 Q300,340 350,300 Q400,240 450,200 Q475,190 500,200" fill="none" stroke="#9D4EDD" stroke-width="3"/>
+  <text x="520" y="200" font-family="Arial, sans-serif" font-size="12" text-anchor="start" fill="#9D4EDD">Various Cancers</text>
+  
+  <path d="M100,365 Q200,365 250,360 Q300,350 350,320 Q400,290 450,270 Q475,260 500,250" fill="none" stroke="#9D4EDD" stroke-width="3" stroke-dasharray="5,5"/>
+  <text x="520" y="250" font-family="Arial, sans-serif" font-size="12" text-anchor="start" fill="#9D4EDD">Anemia</text>
+  
+  <path d="M100,368 Q200,368 250,365 Q300,355 350,330 Q400,280 450,245 Q475,235 500,230" fill="none" stroke="#9D4EDD" stroke-width="3" stroke-dasharray="10,3"/>
+  <text x="520" y="230" font-family="Arial, sans-serif" font-size="12" text-anchor="start" fill="#9D4EDD">Metastases</text>
+  
+  <!-- Legend -->
+  <text x="160" y="435" font-family="Arial, sans-serif" font-size="14" text-anchor="start" fill="#333">Each line represents disease probability within a signature over time</text>
+</svg>
