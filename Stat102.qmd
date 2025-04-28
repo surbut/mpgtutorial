@@ -162,6 +162,8 @@ Summary: More spread → better ability to separate patients by severity.
 
 Summary: More spread → better ability to separate patients by severity.
 
+## Understanding Latent Variables
+
 ```{r}
 # Step 1: Simulate Data
 set.seed(123)
@@ -201,13 +203,7 @@ ggplot(summary_stats, aes(x = Variable, y = Range, fill = Variable)) +
 ::: notes
 Words you say: First direction stretches patients apart the most.
 PC1 captures more information than using just Troponin or CK-MB alone.
-:::
 
-## Understanding Latent Variables
-
-![](images/pc-comparison-diagram.svg){width="600"}
-
-::: notes
 When two (or more) biomarkers are highly correlated, they contain
 partially redundant information. Find the direction that maximizes
 variation, which often means combining information from both markers,

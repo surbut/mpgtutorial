@@ -430,25 +430,12 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 <p>You’ll see PC1 has a bigger spread — it separates patients more strongly.</p>
 <p>Summary: More spread → better ability to separate patients by severity.</p>
 <p>Summary: More spread → better ability to separate patients by severity.</p>
-
-<img data-src="Stat102_files/figure-revealjs/unnamed-chunk-1-1.png" width="960" class="r-stretch"><aside class="notes">
-<p>Words you say: First direction stretches patients apart the most. PC1 captures more information than using just Troponin or CK-MB alone.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
 </section>
 <section id="understanding-latent-variables" class="slide level2">
 <h2>Understanding Latent Variables</h2>
 
-<img data-src="images/pc-comparison-diagram.svg" width="600" class="r-stretch"><aside class="notes">
+<img data-src="Stat102_files/figure-revealjs/unnamed-chunk-1-1.png" width="960" class="r-stretch"><aside class="notes">
+<p>Words you say: First direction stretches patients apart the most. PC1 captures more information than using just Troponin or CK-MB alone.</p>
 <p>When two (or more) biomarkers are highly correlated, they contain partially redundant information. Find the direction that maximizes variation, which often means combining information from both markers, resolving more differences than either alone. This is why these statistical techniques are so powerful for medical applications. Rather than looking at dozens of individual biomarkers in isolation, you can create composite scores that capture more of the underlying biological signal (like cardiac damage) Reduce noise by combining multiple measurements and create better separation between patients with different disease severity this concept extends beautifully to time-varying data, binary outcomes, and the complex patterns of comorbidities with Aladynoulli model!</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
