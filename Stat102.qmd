@@ -102,32 +102,131 @@ and test results
 :::
 ::::
 
+## Latent variables
+
+```{r}
+#| label: pca-plot
+#| fig-cap: "Finding directions of maximum variation with PCA"
+
+# Step 1: Simulate Data
+set.seed(123)
+n <- 10
+troponin <- rnorm(n, mean = 5, sd = 1)
+ckmb <- troponin * 1.2 + rnorm(n, mean = 0, sd = 0.5)
+data <- data.frame(Troponin = troponin, CKMB = ckmb)
+
+# Step 2: Run PCA
+pca_result <- prcomp(data, scale. = TRUE)
+
+# Step 3: Plot
+library(ggplot2)
+
+# Get mean of the data for arrows
+center <- colMeans(scale(data))
+
+# PC directions
+pc1 <- pca_result$rotation[,1]
+pc2 <- pca_result$rotation[,2]
+
+# Scale for plotting arrows
+arrow_length <- 3
+
+# Plot
+ggplot(data, aes(x = Troponin, y = CKMB)) +
+  geom_point(size = 3) +
+  geom_segment(aes(x = mean(Troponin), y = mean(CKMB),
+                   xend = mean(Troponin) + arrow_length * pc1[1],
+                   yend = mean(CKMB) + arrow_length * pc1[2]),
+               arrow = arrow(length = unit(0.3, "cm")),
+               color = "blue", size = 1.2) +
+  geom_segment(aes(x = mean(Troponin), y = mean(CKMB),
+                   xend = mean(Troponin) + arrow_length * pc2[1],
+                   yend = mean(CKMB) + arrow_length * pc2[2]),
+               arrow = arrow(length = unit(0.3, "cm")),
+               color = "red", size = 1.2) +
+  theme_minimal() +
+  labs(title = "PCA: Finding the Directions of Maximum Difference",
+       x = "Troponin",
+       y = "CK-MB") +
+  annotate("text", x = mean(troponin) + 2.5 * pc1[1], y = mean(ckmb) + 2.5 * pc1[2],
+           label = "PC1", color = "blue", size = 5, hjust = 0) +
+  annotate("text", x = mean(troponin) + 2.5 * pc2[1], y = mean(ckmb) + 2.5 * pc2[2],
+           label = "PC2", color = "red", size = 5, hjust = 0)
+```
+
+## PC1
+
+You’ll see PC1 has a bigger spread — it separates patients more strongly.
+
+Summary: More spread → better ability to separate patients by severity.
+
+Summary: More spread → better ability to separate patients by severity.
+
+```{r}
+# Step 1: Simulate Data
+set.seed(123)
+n <- 10
+troponin <- rnorm(n, mean = 5, sd = 1)
+ckmb <- troponin * 1.2 + rnorm(n, mean = 0, sd = 0.5)
+data <- data.frame(Troponin = troponin, CKMB = ckmb)
+
+# Step 2: Run PCA
+pca_result <- prcomp(data, scale. = TRUE)
+
+# Step 3: Calculate the ranges
+range_troponin <- diff(range(data$Troponin))
+range_ckmb <- diff(range(data$CKMB))
+range_pc1 <- diff(range(pca_result$x[,1]))
+
+# Step 4: Put into a clean table
+summary_stats <- data.frame(
+  Variable = c("Troponin", "CKMB", "PC1 Score"),
+  Range = c(range_troponin, range_ckmb, range_pc1)
+)
+
+
+# Step 6: Plot it
+library(ggplot2)
+
+ggplot(summary_stats, aes(x = Variable, y = Range, fill = Variable)) +
+  geom_col(width = 0.5) +
+  labs(title = "Spread of Patient Values by Variable",
+       y = "Range (Max - Min)",
+       x = "") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+```
+
+::: notes
+Words you say: First direction stretches patients apart the most.
+PC1 captures more information than using just Troponin or CK-MB alone.
+:::
+
 ## Understanding Latent Variables
 
 ![](images/pc-comparison-diagram.svg){width="600"}
 
 ::: notes
-  
-When two (or more) biomarkers are highly correlated, they contain partially redundant information. Find the direction that maximizes
-variation, which often means combining information from both
-markers, resolving more differences than either alone.
-This is why these statistical techniques are so powerful for medical
-applications. Rather than looking at dozens of individual biomarkers
-in isolation, you can create composite scores that capture more of the underlying biological signal (like cardiac
-damage) Reduce noise by combining multiple measurements and create
-better separation between patients with different disease severity
-this concept extends beautifully to time-varying data, binary
-outcomes, and the complex patterns of comorbidities with Aladynoulli
-model!
+When two (or more) biomarkers are highly correlated, they contain
+partially redundant information. Find the direction that maximizes
+variation, which often means combining information from both markers,
+resolving more differences than either alone. This is why these
+statistical techniques are so powerful for medical applications. Rather
+than looking at dozens of individual biomarkers in isolation, you can
+create composite scores that capture more of the underlying biological
+signal (like cardiac damage) Reduce noise by combining multiple
+measurements and create better separation between patients with
+different disease severity this concept extends beautifully to
+time-varying data, binary outcomes, and the complex patterns of
+comorbidities with Aladynoulli model!
 :::
 
-## Correlated biomarkers 
+## Correlated biomarkers
 
 Troponin and CK-MB
 
 ![](latent-variable-simple.svg)
-
-
 
 ## Disease "Signatures"
 
