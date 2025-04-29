@@ -75,7 +75,6 @@ incorporating both genetics and evolving clinical status?**
     -   Intelligence (measured by tests)
     -   Happiness (measured by behaviors)
     -   Disease patterns (measured by symptoms and test results)
--   Powerful statistical concept for finding hidden structure
 :::
 
 ::: {.column width="40%"}
@@ -102,180 +101,11 @@ and test results
 :::
 ::::
 
-## Latent variables
-
-```{r,eval=FALSE}
-#| label: pca-plot
-#| fig-cap: "Finding directions of maximum variation with PCA"
-
-# Step 1: Simulate Data
-set.seed(123)
-n <- 10
-troponin <- rnorm(n, mean = 5, sd = 1)
-ckmb <- troponin * 1.2 + rnorm(n, mean = 0, sd = 0.5)
-data <- data.frame(Troponin = troponin, CKMB = ckmb)
-
-# Step 2: Run PCA
-pca_result <- prcomp(data, scale. = TRUE)
-
-# Step 3: Plot
-library(ggplot2)
-
-# Get mean of the data for arrows
-center <- colMeans(scale(data))
-
-# PC directions
-pc1 <- pca_result$rotation[,1]
-pc2 <- pca_result$rotation[,2]
-
-# Scale for plotting arrows
-arrow_length <- 3
-
-# Plot
-ggplot(data, aes(x = Troponin, y = CKMB)) +
-  geom_point(size = 3) +
-  geom_segment(aes(x = mean(Troponin), y = mean(CKMB),
-                   xend = mean(Troponin) + arrow_length * pc1[1],
-                   yend = mean(CKMB) + arrow_length * pc1[2]),
-               arrow = arrow(length = unit(0.3, "cm")),
-               color = "blue", size = 1.2) +
-  geom_segment(aes(x = mean(Troponin), y = mean(CKMB),
-                   xend = mean(Troponin) + arrow_length * pc2[1],
-                   yend = mean(CKMB) + arrow_length * pc2[2]),
-               arrow = arrow(length = unit(0.3, "cm")),
-               color = "red", size = 1.2) +
-  theme_minimal() +
-  labs(title = "PCA: Finding the Directions of Maximum Difference",
-       x = "Troponin",
-       y = "CK-MB") +
-  annotate("text", x = mean(troponin) + 2.5 * pc1[1], y = mean(ckmb) + 2.5 * pc1[2],
-           label = "PC1", color = "blue", size = 5, hjust = 0) +
-  annotate("text", x = mean(troponin) + 2.5 * pc2[1], y = mean(ckmb) + 2.5 * pc2[2],
-           label = "PC2", color = "red", size = 5, hjust = 0)
-
-ggplot(pca_result, aes(x = PC1, y = PC2)) +
-  geom_point(size = 3) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "gray") +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "gray") +
-  coord_fixed() +  # Keep aspect ratio 1:1 so angles are preserved
-  theme_minimal() +
-  labs(title = "Data in Principal Component Space",
-       x = "Principal Component 1 (PC1)",
-       y = "Principal Component 2 (PC2)")
-```
-
-## Comparing
-
-```{r}
-
-# Load libraries
-library(ggplot2)
-library(patchwork)  # for side-by-side plots
-library(grid)       # for arrow heads
-library(ggfortify)
-# Step 1: Simulate data
-set.seed(123)
-n <- 10
-troponin <- rnorm(n, mean = 5, sd = 1)
-ckmb <- troponin * 1.2 + rnorm(n, mean = 0, sd = 0.5)
-data <- data.frame(Troponin = troponin, CKMB = ckmb)
-
-# Step 2: Run PCA
-pca_result <- prcomp(data, scale. = TRUE)
-pc_data <- as.data.frame(pca_result$x)  # Rotated data: PC1 and PC2
-
-# Step 3: PC directions
-pc1 <- pca_result$rotation[,1]
-pc2 <- pca_result$rotation[,2]
-
-# Center for the arrows
-center_x <- mean(data$Troponin)
-center_y <- mean(data$CKMB)
-arrow_length <- 3  # scaling for arrows
-
-# Step 4: Plot 1 - Original variables with PCA directions
-p1 <- ggplot(data, aes(x = Troponin, y = CKMB)) +
-    geom_point(size = 3) +
-    geom_segment(aes(x = center_x, y = center_y,
-                     xend = center_x + arrow_length * pc1[1],
-                     yend = center_y + arrow_length * pc1[2]),
-                 arrow = arrow(length = unit(0.3, "cm")),
-                 color = "blue", size = 1.2) +
-    geom_segment(aes(x = center_x, y = center_y,
-                     xend = center_x + arrow_length * pc2[1],
-                     yend = center_y + arrow_length * pc2[2]),
-                 arrow = arrow(length = unit(0.3, "cm")),
-                 color = "red", size = 1.2) +
-    theme_minimal() +
-    labs(title = "Original Variables (Troponin, CKMB)",
-         x = "Troponin",
-         y = "CK-MB")
-
-# Step 5: Plot 2 - Data projected onto PCs
-p2 <- ggplot(pc_data, aes(x = PC1, y = PC2)) +
-    geom_point(size = 3) +
-    stat_ellipse(type = "norm", linetype = "dotted", color = "blue", level = 0.95) +
-    geom_hline(yintercept = 0, linetype = "dashed", color = "gray") +
-    geom_vline(xintercept = 0, linetype = "dashed", color = "gray") +
-    coord_fixed() +
-    theme_minimal() +
-    labs(title = "Rotated to Principal Components",
-         x = "Principal Component 1 (PC1)",
-         y = "Principal Component 2 (PC2)")
-
-# Step 6: Arrange side-by-side
-p1 + p2 + plot_layout(ncol = 2)
-```
-## PC1
-
-You’ll see PC1 has a bigger spread — it separates patients more strongly.
-
-Summary: More spread → better ability to separate patients by severity.
-
-Summary: More spread → better ability to separate patients by severity.
-
 ## Understanding Latent Variables
 
-```{r}
-# Step 1: Simulate Data
-set.seed(123)
-n <- 10
-troponin <- rnorm(n, mean = 5, sd = 1)
-ckmb <- troponin * 1.2 + rnorm(n, mean = 0, sd = 0.5)
-data <- data.frame(Troponin = troponin, CKMB = ckmb)
-
-# Step 2: Run PCA
-pca_result <- prcomp(data, scale. = TRUE)
-
-# Step 3: Calculate the ranges
-range_troponin <- diff(range(data$Troponin))
-range_ckmb <- diff(range(data$CKMB))
-range_pc1 <- diff(range(pca_result$x[,1]))
-
-# Step 4: Put into a clean table
-summary_stats <- data.frame(
-  Variable = c("Troponin", "CKMB", "PC1 Score"),
-  Range = c(range_troponin, range_ckmb, range_pc1)
-)
-
-
-# Step 6: Plot it
-library(ggplot2)
-
-ggplot(summary_stats, aes(x = Variable, y = Range, fill = Variable)) +
-  geom_col(width = 0.5) +
-  labs(title = "Spread of Patient Values by Variable",
-       y = "Range (Max - Min)",
-       x = "") +
-  theme_minimal() +
-  theme(legend.position = "none")
-
-```
+![](images/pc-comparison-diagram.svg){width="600"}
 
 ::: notes
-Words you say: First direction stretches patients apart the most.
-PC1 captures more information than using just Troponin or CK-MB alone.
-
 When two (or more) biomarkers are highly correlated, they contain
 partially redundant information. Find the direction that maximizes
 variation, which often means combining information from both markers,
@@ -298,8 +128,6 @@ Troponin and CK-MB
 
 ## Disease "Signatures"
 
-::::: columns
-::: {.column width="60%"}
 We introduce and define **signatures** as:
 
 -   **Latent patterns of disease co-occurrence that vary in time**
@@ -309,12 +137,10 @@ We introduce and define **signatures** as:
     -   Metabolic (diabetes, obesity, fatty liver)
     -   Neoplastic (various cancers, anemia)
 -   Discovered through statistical methods, not predefined categories
-:::
 
-::: {.column width="40%"}
+## Disease "Signatures"
+
 ![](disease-signatures-diagram.svg)
-:::
-:::::
 
 ## How Signatures Change Over Time
 
@@ -372,9 +198,13 @@ Mathematical way to update our beliefs as new information arrives:
 
 $$\text{Updated Belief} \propto \text{Prior Knowledge} \times \text{New Data}$$
 
-In practical terms: - Start with what we know about disease patterns in
-general - Update based on this specific patient's data - Continually
-refine as more information comes in
+In practical terms:
+
+**Start with what we know about disease patterns in general**
+
+**Update based on this specific patient's data**
+
+**Continually refine as more information comes in**
 :::
 ::::
 
@@ -399,9 +229,11 @@ Turning patient stories into math helps us formalize the problem:
 -   **λ (lambda)** - Individual's time-varying signature loading
     -   Anchored on germline genetic predisposition
     -   Shows which signatures are important for a specific person
+    
+:::notes
 -   Both evolve smoothly over time (using Gaussian processes)
 -   Helps us "borrow information" across years
-
+:::
 ## The Mathematical Model (Simplified)
 
 ![](bayesian-model-diagram.svg)
@@ -417,33 +249,33 @@ Our approach works because:
 3.  We integrate prior knowledge with patient-specific data
 4.  The past informs the present, and the present becomes the past to
     inform the future
+:::
+::: {.column width="40%"}
 
-Four key innovations:
+![](bayesian-updating-diagram.svg)
+:::
+:::::
+
+## Four key innovations:
 
 1.  **Bridges discovery and prediction**
 2.  **Disease signatures evolve over time and across diseases**
 3.  **Anchoring in genomics** produces biologically meaningful
     parameters
 4.  **Bayesian updating adapts estimates in real time**
-:::
 
-::: {.column width="40%"}
-![](bayesian-updating-diagram.svg)
-:::
-:::::
 
 ## Why This Matters
 
 ::::: columns
-::: {.column width="60%"}
+::: {.column width="40%"}
 -   Earlier detection of disease
 -   More personalized prevention strategies
 -   Better understanding of disease mechanisms
 -   Identifying new subtypes of diseases
 -   Improving clinical trials by targeting the right patients
 :::
-
-::: {.column width="40%"}
+::: {.column width="60%"}
 ![Better prevention and prediction](fig5.svg)
 :::
 :::::
@@ -469,18 +301,18 @@ This work is the essence of translational medicine:
 -   Transforms how we predict, prevent, and understand disease
     progression
 
-What statistics has taught me: - Complex systems can be modeled but
-require careful assumptions - Uncertainty should be embraced, not
-ignored\
-- Borrowing information is powerful but must be done carefully - The
-best models combine mathematical elegance with real-world knowledge -
-Clinical intuition + statistical rigor = better medicine
+What statistics has taught me: 
+- Complex systems can be modeled but require careful assumptions 
+- Uncertainty should be embraced, not ignored 
+- Borrowing information is powerful but must be done carefully 
+- The best models combine mathematical elegance with real-world knowledge 
+- Clinical intuition + statistical rigor = better medicine
 :::
 ::::
 
 ## Resources & Questions
 
-::::: columns
+:::: columns
 ::: {.column width="60%"}
 -   Paper:
     [medrxiv.org/content/10.1101/2024.09.29.24314557V1](https://www.medrxiv.org/content/10.1101/2024.09.29.24314557V1)
@@ -490,14 +322,10 @@ Clinical intuition + statistical rigor = better medicine
     [Surbut.shinyapps.io/berndiffapp](https://Surbut.shinyapps.io/berndiffapp)
 :::
 
-::: {.column width="40%"}
-![QR code to resources](https://i.imgur.com/dummy-qr.jpg)
-:::
-:::::
-
 ## Thank You!
 
 Statistics can help us understand health in ways that transform
 medicine.
 
 (And yes, it's worth learning for your Stat 102 class!)
+::::

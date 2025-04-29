@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="Stat102_files/libs/clipboard/clipboard.min.js"></script>
-<script src="Stat102_files/libs/quarto-html/tabby.min.js"></script>
-<script src="Stat102_files/libs/quarto-html/popper.min.js"></script>
-<script src="Stat102_files/libs/quarto-html/tippy.umd.min.js"></script>
-<link href="Stat102_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Stat102_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="Stat102_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
-<link href="Stat102_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<script src="stat_files/libs/clipboard/clipboard.min.js"></script>
+<script src="stat_files/libs/quarto-html/tabby.min.js"></script>
+<script src="stat_files/libs/quarto-html/popper.min.js"></script>
+<script src="stat_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="stat_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="stat_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="stat_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="stat_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.57">
 
   <meta name="author" content="Sarah Urbut, MD PhD and Giovanni Parmigiani, PhD">
@@ -15,8 +15,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="Stat102_files/libs/revealjs/dist/reset.css">
-  <link rel="stylesheet" href="Stat102_files/libs/revealjs/dist/reveal.css">
+  <link rel="stylesheet" href="stat_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="stat_files/libs/revealjs/dist/reveal.css">
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -30,11 +30,11 @@
       vertical-align: middle;
     }
   </style>
-  <link rel="stylesheet" href="Stat102_files/libs/revealjs/dist/theme/quarto.css">
-  <link href="Stat102_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
-  <link href="Stat102_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
-  <link href="Stat102_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
-  <link href="Stat102_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <link rel="stylesheet" href="stat_files/libs/revealjs/dist/theme/quarto.css">
+  <link href="stat_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="stat_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="stat_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="stat_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
 
   .callout {
@@ -401,7 +401,6 @@ Sarah Urbut, MD PhD and Giovanni Parmigiani, PhD
 <li>Happiness (measured by behaviors)</li>
 <li>Disease patterns (measured by symptoms and test results)</li>
 </ul></li>
-<li>Powerful statistical concept for finding hidden structure</li>
 </ul>
 </div><div class="column" style="width:40%;">
 <p><img data-src="latent-variable-diagram.svg"></p>
@@ -421,24 +420,10 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 <p>The disease is a <strong>latent variable</strong> we infer from observable symptoms and test results</p>
 </div></div>
 </section>
-<section id="latent-variables" class="slide level2">
-<h2>Latent variables</h2>
-</section>
-<section id="comparing" class="slide level2">
-<h2>Comparing</h2>
-
-<img data-src="Stat102_files/figure-revealjs/unnamed-chunk-1-1.png" width="960" class="r-stretch"></section>
-<section id="pc1" class="slide level2">
-<h2>PC1</h2>
-<p>You’ll see PC1 has a bigger spread — it separates patients more strongly.</p>
-<p>Summary: More spread → better ability to separate patients by severity.</p>
-<p>Summary: More spread → better ability to separate patients by severity.</p>
-</section>
 <section id="understanding-latent-variables" class="slide level2">
 <h2>Understanding Latent Variables</h2>
 
-<img data-src="Stat102_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"><aside class="notes">
-<p>Words you say: First direction stretches patients apart the most. PC1 captures more information than using just Troponin or CK-MB alone.</p>
+<img data-src="images/pc-comparison-diagram.svg" width="600" class="r-stretch"><aside class="notes">
 <p>When two (or more) biomarkers are highly correlated, they contain partially redundant information. Find the direction that maximizes variation, which often means combining information from both markers, resolving more differences than either alone. This is why these statistical techniques are so powerful for medical applications. Rather than looking at dozens of individual biomarkers in isolation, you can create composite scores that capture more of the underlying biological signal (like cardiac damage) Reduce noise by combining multiple measurements and create better separation between patients with different disease severity this concept extends beautifully to time-varying data, binary outcomes, and the complex patterns of comorbidities with Aladynoulli model!</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -459,8 +444,6 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 <img data-src="latent-variable-simple.svg" class="r-stretch"></section>
 <section id="disease-signatures" class="slide level2">
 <h2>Disease “Signatures”</h2>
-<div class="columns">
-<div class="column" style="width:60%;">
 <p>We introduce and define <strong>signatures</strong> as:</p>
 <ul>
 <li><strong>Latent patterns of disease co-occurrence that vary in time</strong></li>
@@ -473,10 +456,11 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 </ul></li>
 <li>Discovered through statistical methods, not predefined categories</li>
 </ul>
-</div><div class="column" style="width:40%;">
-<p><img data-src="disease-signatures-diagram.svg"></p>
-</div></div>
 </section>
+<section id="disease-signatures-1" class="slide level2">
+<h2>Disease “Signatures”</h2>
+
+<img data-src="disease-signatures-diagram.svg" class="r-stretch"></section>
 <section id="how-signatures-change-over-time" class="slide level2">
 <h2>How Signatures Change Over Time</h2>
 <div class="columns">
@@ -526,7 +510,10 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 <div class="column" style="width:100%;">
 <p>Mathematical way to update our beliefs as new information arrives:</p>
 <p><span class="math display">\[\text{Updated Belief} \propto \text{Prior Knowledge} \times \text{New Data}\]</span></p>
-<p>In practical terms: - Start with what we know about disease patterns in general - Update based on this specific patient’s data - Continually refine as more information comes in</p>
+<p>In practical terms:</p>
+<p><strong>Start with what we know about disease patterns in general</strong></p>
+<p><strong>Update based on this specific patient’s data</strong></p>
+<p><strong>Continually refine as more information comes in</strong></p>
 </div></div>
 </section>
 <section id="a-simple-bayesian-example" class="slide level2">
@@ -553,9 +540,23 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 <li>Anchored on germline genetic predisposition</li>
 <li>Shows which signatures are important for a specific person</li>
 </ul></li>
+</ul>
+<aside class="notes">
+<ul>
 <li>Both evolve smoothly over time (using Gaussian processes)</li>
 <li>Helps us “borrow information” across years</li>
 </ul>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="the-mathematical-model-simplified-1" class="slide level2">
 <h2>The Mathematical Model (Simplified)</h2>
@@ -572,21 +573,23 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 <li>We integrate prior knowledge with patient-specific data</li>
 <li>The past informs the present, and the present becomes the past to inform the future</li>
 </ol>
-<p>Four key innovations:</p>
+</div><div class="column" style="width:40%;">
+<p><img data-src="bayesian-updating-diagram.svg"></p>
+</div></div>
+</section>
+<section id="four-key-innovations" class="slide level2">
+<h2>Four key innovations:</h2>
 <ol type="1">
 <li><strong>Bridges discovery and prediction</strong></li>
 <li><strong>Disease signatures evolve over time and across diseases</strong></li>
 <li><strong>Anchoring in genomics</strong> produces biologically meaningful parameters</li>
 <li><strong>Bayesian updating adapts estimates in real time</strong></li>
 </ol>
-</div><div class="column" style="width:40%;">
-<p><img data-src="bayesian-updating-diagram.svg"></p>
-</div></div>
 </section>
 <section id="why-this-matters" class="slide level2">
 <h2>Why This Matters</h2>
 <div class="columns">
-<div class="column" style="width:60%;">
+<div class="column" style="width:40%;">
 <ul>
 <li>Earlier detection of disease</li>
 <li>More personalized prevention strategies</li>
@@ -594,7 +597,7 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 <li>Identifying new subtypes of diseases</li>
 <li>Improving clinical trials by targeting the right patients</li>
 </ul>
-</div><div class="column" style="width:40%;">
+</div><div class="column" style="width:60%;">
 <div class="quarto-figure quarto-figure-center">
 <figure>
 <p><img data-src="fig5.svg"></p>
@@ -626,8 +629,7 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 <li>Transcends single-discipline medicine</li>
 <li>Transforms how we predict, prevent, and understand disease progression</li>
 </ul>
-<p>What statistics has taught me: - Complex systems can be modeled but require careful assumptions - Uncertainty should be embraced, not ignored<br>
-- Borrowing information is powerful but must be done carefully - The best models combine mathematical elegance with real-world knowledge - Clinical intuition + statistical rigor = better medicine</p>
+<p>What statistics has taught me: - Complex systems can be modeled but require careful assumptions - Uncertainty should be embraced, not ignored - Borrowing information is powerful but must be done carefully - The best models combine mathematical elegance with real-world knowledge - Clinical intuition + statistical rigor = better medicine</p>
 </div></div>
 </section>
 <section id="resources-questions" class="slide level2">
@@ -639,19 +641,12 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 <li>Code: <a href="https://github.com/surbut/Aladynoulli2">github.com/surbut/Aladynoulli2</a></li>
 <li>Interactive app: <a href="https://Surbut.shinyapps.io/berndiffapp">Surbut.shinyapps.io/berndiffapp</a></li>
 </ul>
-</div><div class="column" style="width:40%;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="https://i.imgur.com/dummy-qr.jpg"></p>
-<figcaption>QR code to resources</figcaption>
-</figure>
-</div>
-</div></div>
-</section>
-<section id="thank-you" class="slide level2">
+</div><section id="thank-you" class="slide level2">
 <h2>Thank You!</h2>
 <p>Statistics can help us understand health in ways that transform medicine.</p>
 <p>(And yes, it’s worth learning for your Stat 102 class!)</p>
+</section>
+</div>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
@@ -662,19 +657,19 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
   </div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
-  <script src="Stat102_files/libs/revealjs/dist/reveal.js"></script>
+  <script src="stat_files/libs/revealjs/dist/reveal.js"></script>
   <!-- reveal.js plugins -->
-  <script src="Stat102_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
-  <script src="Stat102_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
-  <script src="Stat102_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
-  <script src="Stat102_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
-  <script src="Stat102_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="stat_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="stat_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="stat_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="stat_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="stat_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
-  <script src="Stat102_files/libs/revealjs/plugin/notes/notes.js"></script>
-  <script src="Stat102_files/libs/revealjs/plugin/search/search.js"></script>
-  <script src="Stat102_files/libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="Stat102_files/libs/revealjs/plugin/math/math.js"></script>
+  <script src="stat_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="stat_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="stat_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="stat_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
@@ -868,44 +863,6 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
         ]
       });
     </script>
-    
-    <script>
-      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
-      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
-      // slide changes (different for each slide format).
-      (function () {
-        // dispatch for htmlwidgets
-        function fireSlideEnter() {
-          const event = window.document.createEvent("Event");
-          event.initEvent("slideenter", true, true);
-          window.document.dispatchEvent(event);
-        }
-
-        function fireSlideChanged(previousSlide, currentSlide) {
-          fireSlideEnter();
-
-          // dispatch for shiny
-          if (window.jQuery) {
-            if (previousSlide) {
-              window.jQuery(previousSlide).trigger("hidden");
-            }
-            if (currentSlide) {
-              window.jQuery(currentSlide).trigger("shown");
-            }
-          }
-        }
-
-        // hookup for slidy
-        if (window.w3c_slidy) {
-          window.w3c_slidy.add_observer(function (slide_num) {
-            // slide_num starts at position 1
-            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
-          });
-        }
-
-      })();
-    </script>
-
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {
