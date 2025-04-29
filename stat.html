@@ -434,9 +434,9 @@ Sarah Urbut, MD PhD and Giovanni Parmigiani, PhD
 <li>Must be inferred from what we can measure</li>
 <li>Examples in everyday life:
 <ul>
-<li>Intelligence (measured by tests)</li>
+<li>Underlying population structure</li>
 <li>Happiness (measured by behaviors)</li>
-<li>Disease patterns (measured by symptoms and test results)</li>
+<li>Underlying patterns (measured by symptoms and test results)</li>
 </ul></li>
 </ul>
 </div><div class="column" style="width:40%;">
@@ -469,6 +469,53 @@ Cough               |    |_________|    |
 Pain  --------------                    -------&gt; Imaging Findings</code></pre>
 <p>The disease is a <strong>latent variable</strong> we infer from observable symptoms and test results</p>
 </div></div>
+</section>
+<section id="example-from-population-genetics" class="slide level2">
+<h2>Example from Population Genetics</h2>
+<ul>
+<li>You observe genotypes across 1000s of SNPs (high-dimensional, noisy, correlated)</li>
+<li>You don’t observe the true “latent” coordinates</li>
+<li>PCA finds directions of maximum variation</li>
+<li>Because alleles change gradually over geography (e.g., North-South, East-West in Europe), the leading PCs reflect these geographic gradients</li>
+</ul>
+<div class="callout callout-none no-icon callout-style-simple">
+<div class="callout-body">
+<div class="callout-content">
+<p>PCA is recovering an unobserved, lower-dimensional latent structure: the ancestry and geography that shaped the genotypes.</p>
+</div>
+</div>
+</div>
+<aside class="notes">
+<p>The latent variable structure that PCA is uncovering is the underlying population structure — specifically, the geographic ancestry of the individuals. In our simulation, that’s their location on the fake “map” (their x_coord and y_coord), and in real genetics, it corresponds to shared ancestry patterns shaped by migration, drift, admixture, etc.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="real-data-genotype-heatmap" class="slide level2 smaller">
+<h2>Real Data: Genotype Heatmap</h2>
+
+<img data-src="stat_files/figure-revealjs/genotype_heatmap-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"></section>
+<section id="making-sense-of-it-all-pca-analysis" class="slide level2">
+<h2>Making Sense of It All: PCA Analysis</h2>
+
+<img data-src="stat_files/figure-revealjs/pca_plot-1.png" class="quarto-figure quarto-figure-center r-stretch" width="960"></section>
+<section id="key-insights" class="slide level2">
+<h2>Key Insights</h2>
+<ul>
+<li>PCA effectively clusters individuals by their genetic ancestry</li>
+<li>The first two principal components often correspond to major geographic patterns</li>
+<li>This dimensionality reduction technique reveals population structure that wasn’t directly observed</li>
+<li>Each dot in the PCA plot represents an individual, clustered by their genetic similarity</li>
+<li>Different colors represent different population groups</li>
+</ul>
 </section>
 <section id="understanding-latent-variables" class="slide level2">
 <h2>Understanding Latent Variables</h2>
@@ -962,6 +1009,44 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {

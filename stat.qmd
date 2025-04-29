@@ -94,9 +94,9 @@ germline genomics,
 -   Things we can't directly observe
 -   Must be inferred from what we can measure
 -   Examples in everyday life:
-    -   Intelligence (measured by tests)
+    -   Underlying population structure
     -   Happiness (measured by behaviors)
-    -   Disease patterns (measured by symptoms and test results)
+    -   Underlying patterns (measured by symptoms and test results)
 :::
 
 ::: {.column width="40%"}
@@ -129,6 +129,106 @@ The disease is a **latent variable** we infer from observable symptoms
 and test results
 :::
 ::::
+
+
+
+
+## Example from Population Genetics
+
+- You observe genotypes across 1000s of SNPs (high-dimensional, noisy, correlated)
+- You don't observe the true "latent" coordinates 
+- PCA finds directions of maximum variation
+- Because alleles change gradually over geography (e.g., North-South, East-West in Europe), the leading PCs reflect these geographic gradients
+
+::: {.callout}
+PCA is recovering an unobserved, lower-dimensional latent structure: the ancestry and geography that shaped the genotypes.
+:::
+
+::: {.notes}
+The latent variable structure that PCA is uncovering is the underlying population structure — specifically, the geographic ancestry of the individuals. In our simulation, that's their location on the fake "map" (their x_coord and y_coord), and in real genetics, it corresponds to shared ancestry patterns shaped by migration, drift, admixture, etc.
+:::
+
+## Real Data: Genotype Heatmap {.smaller}
+
+```{r setup, include=FALSE}
+# This chunk sets global options
+knitr::opts_chunk$set(
+  echo = FALSE,       # Don't show code
+  message = FALSE,    # Don't show messages
+  warning = FALSE,    # Don't show warnings
+  fig.align = "center"
+)
+```
+
+```{r load_data, include=FALSE}
+# Load packages
+library(SNPRelate)
+library(pheatmap)
+library(ggplot2)
+
+# 1. Load example GDS file
+gds.fn <- snpgdsExampleFileName()
+genofile <- snpgdsOpen(gds.fn)
+
+# 2. Get sample information
+sample.id <- read.gdsn(index.gdsn(genofile, "sample.id"))
+pop_code <- read.gdsn(index.gdsn(genofile, "sample.annot/pop.group"))
+
+# 3. SNP pruning (light pruning for independent SNPs)
+set.seed(100)
+snpset <- snpgdsLDpruning(genofile, sample.id = sample.id, ld.threshold = 0.2)
+snpset.id <- unlist(snpset)
+
+# 4. Get genotype matrix for heatmap
+geno <- snpgdsGetGeno(genofile, sample.id = sample.id, snp.id = snpset.id)
+```
+
+```{r genotype_heatmap}
+# 5. Make heatmap - this will display
+pheatmap(geno,
+         cluster_rows = TRUE, cluster_cols = TRUE,
+         show_rownames = FALSE, show_colnames = FALSE,
+         main = "Genotype Heatmap (Multiple Populations)")
+```
+
+## Making Sense of It All: PCA Analysis
+
+```{r pca_analysis, include=FALSE}
+# 6. PCA analysis
+pca <- snpgdsPCA(genofile, sample.id = sample.id, snp.id = snpset.id, num.thread = 2)
+
+# 7. Prepare PCA plot data
+pca_df <- data.frame(
+  sample.id = pca$sample.id,
+  PC1 = pca$eigenvect[,1],
+  PC2 = pca$eigenvect[,2],
+  Population = factor(pop_code[match(pca$sample.id, sample.id)])
+)
+```
+
+```{r pca_plot}
+# 8. Plot PCA with ancestry names as color - this will display
+ggplot(pca_df, aes(x = PC1, y = PC2, color = Population)) +
+  geom_point(size = 2, alpha = 0.8) +
+  theme_minimal() +
+  labs(title = "PCA of 1000 Genomes: Colored by Population",
+       x = "PC1", y = "PC2", color = "Population") +
+  scale_color_brewer(palette = "Set1")
+```
+
+```{r cleanup, include=FALSE}
+# 9. Close GDS file
+snpgdsClose(genofile)
+```
+
+## Key Insights
+
+- PCA effectively clusters individuals by their genetic ancestry
+- The first two principal components often correspond to major geographic patterns
+- This dimensionality reduction technique reveals population structure that wasn't directly observed
+- Each dot in the PCA plot represents an individual, clustered by their genetic similarity
+- Different colors represent different population groups
+
 
 ## Understanding Latent Variables
 
