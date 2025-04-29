@@ -352,6 +352,19 @@ Sarah Urbut, MD PhD and Giovanni Parmigiani, PhD
 </div><div class="column" style="width:40%;">
 <p><img data-src="aladynoulli-diverse-diagnoses.svg"></p>
 </div></div>
+<aside class="notes">
+<p>Like many applicants today, I’m fortunate to bridge multiple worlds—cardiologist, scientist, geneticist, and statistician. My PhD in statistics focused on mixture models, elegant frameworks for combining different distributions to describe natural phenomena—much like how medicine and science enhance our understanding of disease. One of my first consults as a cardiology fellow revealed a paradox that struck me as a statistician: A 38-year-old with clear signs and symptoms of an MI, wouldn’t have qualified for primary prevention just a day earlier due to our reliance on short-term and narrowly defined risk. This highlighted a fundamental flaw: current models fail to capture how disease evolves dynamically atop a genetic background. To both predict and understand, we need to consider past, present, and future. Patients interact with multiple specialties in their lifetime, revealing patterns across diseases and time. Driven by clinical urgency yet informed by statistical intuition, I set out to build a model from the groud up.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="the-statistical-paradox-in-medicine" class="slide level2">
 <h2>The Statistical Paradox in Medicine</h2>
@@ -384,9 +397,33 @@ Sarah Urbut, MD PhD and Giovanni Parmigiani, PhD
 <li>Genetics influences these patterns (but isn’t destiny)</li>
 <li>Standard approaches miss the dynamic nature of these relationships</li>
 </ul>
-<p>To both predict and understand, we need to consider past, present, and future.</p>
-<p><strong>How do we model the complete trajectory of an individual’s health, incorporating both genetics and evolving clinical status?</strong></p>
+<aside class="notes">
+<p>to both predict and understnad: how do we consider past present future</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </div></div>
+<aside class="notes">
+<p>Our problem exists in three dimensions: time, disease, and individual. Our data consists of updated EHR diagnoses across over 350 diseases and germline genomics,</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="what-are-latent-variables" class="slide level2">
 <h2>What Are “Latent Variables”?</h2>
@@ -405,6 +442,19 @@ Sarah Urbut, MD PhD and Giovanni Parmigiani, PhD
 </div><div class="column" style="width:40%;">
 <p><img data-src="latent-variable-diagram.svg"></p>
 </div></div>
+<aside class="notes">
+<p>We introduce and define signatures as latent patterns of disease co-occurrence that vary in time at a population level. These signatures are learned from the data in an unsupervised way, providing targets for both discovery and prediction.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="a-simple-medical-example" class="slide level2">
 <h2>A Simple Medical Example</h2>
@@ -456,6 +506,19 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 </ul></li>
 <li>Discovered through statistical methods, not predefined categories</li>
 </ul>
+<aside class="notes">
+<p>Within each signature, diseases appear with characteristic incidence and timing. For example, our method learns an ischemic cardiovascular signature, in which hypercholesterolemia → CAD → CHF. Through the magic that is matrix decomposition, signatures reveal natural patterns but require no prespecified guidance.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="disease-signatures-1" class="slide level2">
 <h2>Disease “Signatures”</h2>
@@ -483,6 +546,19 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 </div><div class="column" style="width:40%;">
 <p><img data-src="patient-trajectory-diagram.svg"></p>
 </div></div>
+<aside class="notes">
+<p>But patients don’t sit still – the relative loading or importance of a signature to a patient depends on when the question is asked. Example: Our patient may have rheumatologic diagnoses at 30, develop premature CAD at 40, and by 50, increased neoplastic risk. This story is distinct from another patient revealing heterogeneity underlying a shared phenotype. turning this patient story into math can help us formalize the discussion into a solvable problem with a few key parameters</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="borrowing-information" class="slide level2">
 <h2>Borrowing Information</h2>
@@ -542,10 +618,7 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 </ul></li>
 </ul>
 <aside class="notes">
-<ul>
-<li>Both evolve smoothly over time (using Gaussian processes)</li>
-<li>Helps us “borrow information” across years</li>
-</ul>
+<p>ϕ (phi) represents the time varying signatures, where each signature demonstrates how different diseases evolve over time, centered around population incidence (mu) and a term relating the importance of the signature to the disease (psid) λ represents an individual’s time varying loading, anchored on their germline genetic predisposition Both evolve smoothly over time as captured in their covariance matrix, which helps us borrow information across years.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -576,6 +649,19 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 </div><div class="column" style="width:40%;">
 <p><img data-src="bayesian-updating-diagram.svg"></p>
 </div></div>
+<aside class="notes">
+<p>Before encountering data, these serve as our prior beliefs And herein lies the Bayesian magic —each new diagnosis refines these key parameters in real time, integrating prior knowledge with patient-specific data (point to bayes rule) we then combine these parameters across signatures, generating disease probabilities, to also help predict the future. This is a key innovation that separates the Aladynoulli approach, and stems from its Bernoulli parameterization Returning to our pt, this feature could mean the difference between prevention and emergency intervention”</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="four-key-innovations" class="slide level2">
 <h2>Four key innovations:</h2>
@@ -585,6 +671,19 @@ Pain  --------------                    -------&gt; Imaging Findings</code></pre
 <li><strong>Anchoring in genomics</strong> produces biologically meaningful parameters</li>
 <li><strong>Bayesian updating adapts estimates in real time</strong></li>
 </ol>
+<aside class="notes">
+<p>The novelty in our approach parallels our patient’s walk in 4 key ways: *First, our model bridges discovery and prediction, by discovering latent disease signatures that also combine to form individualized predictions. Second, our disease signatures evolve over time and across disease, expanding the dimension of shared biology. Third, anchoring individual loadings in genomics ensures that our model produces biologically informed parameters rather than ML artifacts, which enables targeted precision treatment strategies. And finally, Bayesian updating adapts estimates in real time, jointly refining our understanding of the population and the individual. Our 38-year-old patient’s past informs the present, and the present becomes the past to inform the future.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="why-this-matters" class="slide level2">
 <h2>Why This Matters</h2>

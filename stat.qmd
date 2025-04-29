@@ -28,6 +28,24 @@ editor:
 :::
 :::::
 
+::: notes
+Like many applicants today, I’m fortunate to bridge multiple
+worlds—cardiologist, scientist, geneticist, and statistician. My PhD in
+statistics focused on mixture models, elegant frameworks for combining
+different distributions to describe natural phenomena—much like how
+medicine and science enhance our understanding of disease. One of my
+first consults as a cardiology fellow revealed a paradox that struck me
+as a statistician: A 38-year-old with clear signs and symptoms of an MI,
+wouldn’t have qualified for primary prevention just a day earlier due to
+our reliance on short-term and narrowly defined risk. This highlighted a
+fundamental flaw: current models fail to capture how disease evolves
+dynamically atop a genetic background. To both predict and understand,
+we need to consider past, present, and future. Patients interact with
+multiple specialties in their lifetime, revealing patterns across
+diseases and time. Driven by clinical urgency yet informed by
+statistical intuition, I set out to build a model from the groud up.
+:::
+
 ## The Statistical Paradox in Medicine
 
 ::::: columns
@@ -48,8 +66,8 @@ editor:
 
 ## The Challenge
 
-:::: columns
-::: {.column width="100%"}
+::::: columns
+:::: {.column width="100%"}
 People develop multiple diseases over their lifetime, but:
 
 -   Diseases don't occur in isolation
@@ -57,13 +75,17 @@ People develop multiple diseases over their lifetime, but:
 -   Genetics influences these patterns (but isn't destiny)
 -   Standard approaches miss the dynamic nature of these relationships
 
-To both predict and understand, we need to consider past, present, and
-future.
-
-**How do we model the complete trajectory of an individual's health,
-incorporating both genetics and evolving clinical status?**
+::: notes
+to both predict and understnad: how do we consider past present future
 :::
 ::::
+:::::
+
+::: notes
+Our problem exists in three dimensions: time, disease, and individual.
+Our data consists of updated EHR diagnoses across over 350 diseases and
+germline genomics,
+:::
 
 ## What Are "Latent Variables"?
 
@@ -81,6 +103,13 @@ incorporating both genetics and evolving clinical status?**
 ![](latent-variable-diagram.svg)
 :::
 :::::
+
+::: notes
+We introduce and define signatures as latent patterns of disease
+co-occurrence that vary in time at a population level. These signatures
+are learned from the data in an unsupervised way, providing targets for
+both discovery and prediction.
+:::
 
 ## A Simple Medical Example
 
@@ -138,6 +167,14 @@ We introduce and define **signatures** as:
     -   Neoplastic (various cancers, anemia)
 -   Discovered through statistical methods, not predefined categories
 
+::: notes
+Within each signature, diseases appear with characteristic incidence and
+timing. For example, our method learns an ischemic cardiovascular
+signature, in which hypercholesterolemia → CAD → CHF. Through the magic
+that is matrix decomposition, signatures reveal natural patterns but
+require no prespecified guidance.
+:::
+
 ## Disease "Signatures"
 
 ![](disease-signatures-diagram.svg)
@@ -170,6 +207,16 @@ underlying a shared phenotype**
 ![](patient-trajectory-diagram.svg)
 :::
 :::::
+
+::: notes
+But patients don’t sit still – the relative loading or importance of a
+signature to a patient depends on when the question is asked. Example:
+Our patient may have rheumatologic diagnoses at 30, develop premature
+CAD at 40, and by 50, increased neoplastic risk. This story is distinct
+from another patient revealing heterogeneity underlying a shared
+phenotype. turning this patient story into math can help us formalize
+the discussion into a solvable problem with a few key parameters
+:::
 
 ## Borrowing Information
 
@@ -229,11 +276,17 @@ Turning patient stories into math helps us formalize the problem:
 -   **λ (lambda)** - Individual's time-varying signature loading
     -   Anchored on germline genetic predisposition
     -   Shows which signatures are important for a specific person
-    
-:::notes
--   Both evolve smoothly over time (using Gaussian processes)
--   Helps us "borrow information" across years
+
+::: notes
+ϕ (phi) represents the time varying signatures, where each signature
+demonstrates how different diseases evolve over time, centered around
+population incidence (mu) and a term relating the importance of the
+signature to the disease (psid) λ represents an individual’s time
+varying loading, anchored on their germline genetic predisposition Both
+evolve smoothly over time as captured in their covariance matrix, which
+helps us borrow information across years.
 :::
+
 ## The Mathematical Model (Simplified)
 
 ![](bayesian-model-diagram.svg)
@@ -250,11 +303,23 @@ Our approach works because:
 4.  The past informs the present, and the present becomes the past to
     inform the future
 :::
-::: {.column width="40%"}
 
+::: {.column width="40%"}
 ![](bayesian-updating-diagram.svg)
 :::
 :::::
+
+::: notes
+Before encountering data, these serve as our prior beliefs And herein
+lies the Bayesian magic —each new diagnosis refines these key parameters
+in real time, integrating prior knowledge with patient-specific data
+(point to bayes rule) we then combine these parameters across
+signatures, generating disease probabilities, to also help predict the
+future. This is a key innovation that separates the Aladynoulli
+approach, and stems from its Bernoulli parameterization Returning to our
+pt, this feature could mean the difference between prevention and
+emergency intervention"
+:::
 
 ## Four key innovations:
 
@@ -264,6 +329,19 @@ Our approach works because:
     parameters
 4.  **Bayesian updating adapts estimates in real time**
 
+::: notes
+The novelty in our approach parallels our patient’s walk in 4 key ways:
+\*First, our model bridges discovery and prediction, by discovering
+latent disease signatures that also combine to form individualized
+predictions. Second, our disease signatures evolve over time and across
+disease, expanding the dimension of shared biology. Third, anchoring
+individual loadings in genomics ensures that our model produces
+biologically informed parameters rather than ML artifacts, which enables
+targeted precision treatment strategies. And finally, Bayesian updating
+adapts estimates in real time, jointly refining our understanding of the
+population and the individual. Our 38-year-old patient’s past informs
+the present, and the present becomes the past to inform the future.
+:::
 
 ## Why This Matters
 
@@ -275,6 +353,7 @@ Our approach works because:
 -   Identifying new subtypes of diseases
 -   Improving clinical trials by targeting the right patients
 :::
+
 ::: {.column width="60%"}
 ![Better prevention and prediction](fig5.svg)
 :::
@@ -301,12 +380,11 @@ This work is the essence of translational medicine:
 -   Transforms how we predict, prevent, and understand disease
     progression
 
-What statistics has taught me: 
-- Complex systems can be modeled but require careful assumptions 
-- Uncertainty should be embraced, not ignored 
-- Borrowing information is powerful but must be done carefully 
-- The best models combine mathematical elegance with real-world knowledge 
-- Clinical intuition + statistical rigor = better medicine
+What statistics has taught me: - Complex systems can be modeled but
+require careful assumptions - Uncertainty should be embraced, not
+ignored - Borrowing information is powerful but must be done carefully -
+The best models combine mathematical elegance with real-world
+knowledge - Clinical intuition + statistical rigor = better medicine
 :::
 ::::
 
